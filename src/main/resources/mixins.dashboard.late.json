@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8.3-GTNH",
+  "package": "com.gtnewhorizon.dashboard.mixins.late",
+  "refmap": "mixins.dashboard.refmap.json",
+  "target": "@env(DEFAULT)",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
+  "compatibilityLevel": "JAVA_8"
+}

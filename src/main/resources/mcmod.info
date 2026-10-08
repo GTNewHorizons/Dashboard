@@ -3,18 +3,18 @@
 	"modList": [{
 		"modid": "${modId}",
 		"name": "${modName}",
-		"description": "An example mod for Minecraft 1.7.10 with Forge focused on a stable setup.",
+		"description": "Configure HUD elements from Minecraft and other mods in an in-game editor.",
 		"version": "${modVersion}",
 		"mcversion": "${minecraftVersion}",
-		"url": "https://github.com/SinTh0r4s/MyMod",
+		"url": "https://github.com/GTNewHorizons/Dashboard",
 		"updateUrl": "",
-		"authorList": ["SinTho0r4s"],
+		"authorList": ["Ranzu"],
 		"credits": "",
 		"logoFile": "",
 		"screenshots": [],
 		"parent": "",
-		"requiredMods": [],
-		"dependencies": [],
+		"requiredMods": ["gtnhlib"],
+		"dependencies": ["gtnhlib"],
 		"dependants": [],
 		"useDependencyInformation": false
 	}]
