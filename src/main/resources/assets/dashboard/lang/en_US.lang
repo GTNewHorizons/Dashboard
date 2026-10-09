@@ -30,3 +30,4 @@ dashboard.element.minecraft.health=Health
 dashboard.element.minecraft.armor=Armor
 dashboard.element.minecraft.food=Food
 dashboard.element.minecraft.air=Air
+dashboard.element.minecraft.mount_health=Mount Health

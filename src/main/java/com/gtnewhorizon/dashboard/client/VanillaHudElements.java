@@ -51,6 +51,7 @@ public final class VanillaHudElements {
         addStacked(ElementType.ARMOR, "armor", false);
         addStacked(ElementType.FOOD, "food", true);
         addStacked(ElementType.AIR, "air", true);
+        addStacked(ElementType.HEALTHMOUNT, "mount_health", true);
     }
 
     private static void add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
