@@ -10,6 +10,7 @@ public final class ColorUtils {
     public static final ColorResource
     // spotless:off
         text              = color.rgb("text",               "0xFFFFFF"),
+        textPosition      = color.rgb("textPosition",       "0xFFFF55"),
 
         showingFill       = color.argb("showingFill",       "0x2000FF00"),
         showingBorder     = color.argb("showingBorder",     "0xA000FF00"),
@@ -23,6 +24,8 @@ public final class ColorUtils {
         helpIcon          = color.argb("helpIcon",          "0x30FFFFFF"),
         helpIconHovered   = color.argb("helpIconHovered",   "0x60FFFFFF"),
         grid              = color.argb("grid",              "0x20FFFFFF"),
-        gridCenter        = color.argb("gridCenter",        "0x50FFFFFF");
+        gridCenter        = color.argb("gridCenter",        "0x50FFFFFF")
+
+        ;
     // spotless:on
 }

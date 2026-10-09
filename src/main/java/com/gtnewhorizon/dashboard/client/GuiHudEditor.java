@@ -34,12 +34,14 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_RESET_ALL = 1;
     private static final int BUTTON_GRID = 2;
     private static final int BUTTON_LABELS = 3;
-    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_LABELS };
+    private static final int BUTTON_POSITIONS = 4;
+    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_LABELS, BUTTON_POSITIONS };
     private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
     private static final int SNAP_DISTANCE = 4;
     private static final int CENTER_MARK_LENGTH = 3;
+    private static final float POSITION_TEXT_SCALE = 0.75f;
     private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
         "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset" };
     private static final int HELP_ICON_SIZE = 12;
@@ -108,6 +110,7 @@ public class GuiHudEditor extends GuiScreen {
         return switch (buttonId) {
             case BUTTON_GRID -> "grid";
             case BUTTON_LABELS -> "labels";
+            case BUTTON_POSITIONS -> "positions";
             default -> throw new IllegalArgumentException("Not a toggle button: " + buttonId);
         };
     }
@@ -116,6 +119,7 @@ public class GuiHudEditor extends GuiScreen {
         return switch (buttonId) {
             case BUTTON_GRID -> DashboardConfig.showGrid;
             case BUTTON_LABELS -> DashboardConfig.showLabels;
+            case BUTTON_POSITIONS -> DashboardConfig.showPositions;
             default -> false;
         };
     }
@@ -124,6 +128,7 @@ public class GuiHudEditor extends GuiScreen {
         switch (buttonId) {
             case BUTTON_GRID -> DashboardConfig.showGrid = !DashboardConfig.showGrid;
             case BUTTON_LABELS -> DashboardConfig.showLabels = !DashboardConfig.showLabels;
+            case BUTTON_POSITIONS -> DashboardConfig.showPositions = !DashboardConfig.showPositions;
             default -> {}
         }
         ConfigurationManager.save(DashboardConfig.class);
@@ -355,6 +360,28 @@ public class GuiHudEditor extends GuiScreen {
         if (DashboardConfig.showLabels) {
             drawElementName(element.getDisplayName(), bounds);
         }
+        if (DashboardConfig.showPositions) {
+            drawPosition(bounds);
+        }
+    }
+
+    /** The element's middle, measured from the middle of the screen. */
+    private void drawPosition(HudBounds bounds) {
+        int fromCenterX = bounds.x + bounds.width / 2 - width / 2;
+        int fromCenterY = height / 2 - (bounds.y + bounds.height / 2);
+        String text = fromCenterX + ", " + fromCenterY;
+        float textWidth = fontRendererObj.getStringWidth(text) * POSITION_TEXT_SCALE;
+        float textHeight = fontRendererObj.FONT_HEIGHT * POSITION_TEXT_SCALE;
+        float x = bounds.getRight() - textWidth;
+        float y = bounds.y - textHeight - 1;
+        if (y < 0) {
+            y = bounds.y + 1;
+        }
+        GL11.glPushMatrix();
+        GL11.glTranslatef(x, y, 0);
+        GL11.glScalef(POSITION_TEXT_SCALE, POSITION_TEXT_SCALE, 1);
+        fontRendererObj.drawStringWithShadow(text, 0, 0, ColorUtils.textPosition.getColor());
+        GL11.glPopMatrix();
     }
 
     private static void drawCenterMark(HudBounds bounds, int color) {
@@ -542,7 +569,7 @@ public class GuiHudEditor extends GuiScreen {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
             case BUTTON_RESET_ALL -> HudLayout.resetAll();
-            case BUTTON_GRID, BUTTON_LABELS -> toggle(button.id);
+            case BUTTON_GRID, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}
         }
     }

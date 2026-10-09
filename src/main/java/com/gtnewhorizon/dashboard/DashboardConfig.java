@@ -15,4 +15,9 @@ public class DashboardConfig {
     @Config.LangKey("dashboard.config.editor.show_labels")
     @Config.DefaultBoolean(true)
     public static boolean showLabels;
+
+    @Config.Comment("Show the element position, measured from the middle of the screen, next to its box in the HUD editor")
+    @Config.LangKey("dashboard.config.editor.show_positions")
+    @Config.DefaultBoolean(false)
+    public static boolean showPositions;
 }
