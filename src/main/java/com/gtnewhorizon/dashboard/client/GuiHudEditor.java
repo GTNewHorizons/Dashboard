@@ -38,6 +38,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
     private static final int SNAP_DISTANCE = 4;
+    private static final int CENTER_MARK_LENGTH = 3;
     private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
         "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset" };
     private static final int HELP_ICON_SIZE = 12;
@@ -346,7 +347,13 @@ public class GuiHudEditor extends GuiScreen {
 
         drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
         drawOutline(bounds, borderColor);
+        drawCenterMark(bounds, borderColor);
         drawElementName(element.getDisplayName(), bounds);
+    }
+
+    private static void drawCenterMark(HudBounds bounds, int color) {
+        int centerX = bounds.x + bounds.width / 2;
+        drawRect(centerX, bounds.y, centerX + 1, bounds.y + CENTER_MARK_LENGTH, color);
     }
 
     /**
