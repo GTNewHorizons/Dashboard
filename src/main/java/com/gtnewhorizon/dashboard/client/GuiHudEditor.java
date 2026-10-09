@@ -54,12 +54,11 @@ public class GuiHudEditor extends GuiScreen {
      * Where boxes overlap, elements that are showing come first, then smaller boxes, so small elements on top of big
      * ones can still be grabbed.
      */
-    private static final Comparator<HudElement> PICK_PRIORITY = Comparator
-        .comparing((HudElement element) -> !element.isCurrentlyShowing())
-        .thenComparingInt(
-            element -> element.getDefaultBounds(0, 0)
-                .getArea());
+    private static final Comparator<ElementBox> PICK_PRIORITY = Comparator.comparing((ElementBox box) -> !box.showing)
+        .thenComparingInt(box -> box.bounds.getArea());
 
+    /** Every element's box for the current frame, most important first. */
+    private final List<ElementBox> boxes = new ArrayList<>();
     /** The button rows of the panel, from top to bottom. */
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
@@ -250,19 +249,22 @@ public class GuiHudEditor extends GuiScreen {
             }
         }
 
+        updateBoxes();
         boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY);
-        HudElement highlighted = draggedElement != null ? draggedElement
-            : overMenu ? null : findElementAt(mouseX, mouseY);
+        HudElement highlighted = draggedElement;
+        if (highlighted == null && !overMenu) {
+            ElementBox hovered = findBoxAt(mouseX, mouseY);
+            highlighted = hovered != null ? hovered.element : null;
+        }
 
         if (DashboardConfig.showGrid) {
             drawGrid();
         }
 
         // The most important boxes are drawn last, so they end up on top
-        List<HudElement> drawOrder = new ArrayList<>(HudEditor.getElements());
-        drawOrder.sort(PICK_PRIORITY.reversed());
-        for (HudElement element : drawOrder) {
-            drawElementBox(element, element == highlighted);
+        for (int i = boxes.size() - 1; i >= 0; i--) {
+            ElementBox box = boxes.get(i);
+            drawElementBox(box, box.element == highlighted);
         }
 
         drawMenuPanel(mouseX, mouseY);
@@ -333,17 +335,16 @@ public class GuiHudEditor extends GuiScreen {
         return lines;
     }
 
-    private void drawElementBox(HudElement element, boolean highlighted) {
-        HudBounds bounds = HudLayout.getBounds(element, width, height);
-        boolean visible = HudLayout.isVisible(element);
-        boolean showing = element.isCurrentlyShowing();
+    private void drawElementBox(ElementBox box, boolean highlighted) {
+        HudElement element = box.element;
+        HudBounds bounds = box.bounds;
 
         int fillColor;
         int borderColor;
-        if (!visible) {
+        if (!HudLayout.isVisible(element)) {
             fillColor = ColorUtils.hiddenFill.getColor();
             borderColor = ColorUtils.hiddenBorder.getColor();
-        } else if (showing) {
+        } else if (box.showing) {
             fillColor = ColorUtils.showingFill.getColor();
             borderColor = ColorUtils.showingBorder.getColor();
         } else {
@@ -443,15 +444,36 @@ public class GuiHudEditor extends GuiScreen {
         return lines;
     }
 
-    private HudElement findElementAt(int mouseX, int mouseY) {
-        HudElement best = null;
+    private void updateBoxes() {
+        boxes.clear();
         for (HudElement element : HudEditor.getElements()) {
-            if (HudLayout.getBounds(element, width, height)
-                .contains(mouseX, mouseY) && (best == null || PICK_PRIORITY.compare(element, best) < 0)) {
-                best = element;
+            boxes.add(
+                new ElementBox(element, HudLayout.getBounds(element, width, height), element.isCurrentlyShowing()));
+        }
+        boxes.sort(PICK_PRIORITY);
+    }
+
+    /** The most important box under the mouse. */
+    private ElementBox findBoxAt(int mouseX, int mouseY) {
+        for (ElementBox box : boxes) {
+            if (box.bounds.contains(mouseX, mouseY)) {
+                return box;
             }
         }
-        return best;
+        return null;
+    }
+
+    private static final class ElementBox {
+
+        private final HudElement element;
+        private final HudBounds bounds;
+        private final boolean showing;
+
+        private ElementBox(HudElement element, HudBounds bounds, boolean showing) {
+            this.element = element;
+            this.bounds = bounds;
+            this.showing = showing;
+        }
     }
 
     private boolean isOverButton(int mouseX, int mouseY) {
@@ -480,19 +502,19 @@ public class GuiHudEditor extends GuiScreen {
             return;
         }
 
-        HudElement element = findElementAt(mouseX, mouseY);
-        if (element == null) {
+        ElementBox box = findBoxAt(mouseX, mouseY);
+        if (box == null) {
             return;
         }
 
+        HudElement element = box.element;
         if (mouseButton == 0 && isCtrlKeyDown()) {
             HudLayout.resetPosition(element);
             playClickSound();
         } else if (mouseButton == 0) {
-            HudBounds bounds = HudLayout.getBounds(element, width, height);
             draggedElement = element;
-            grabOffsetX = mouseX - bounds.x;
-            grabOffsetY = mouseY - bounds.y;
+            grabOffsetX = mouseX - box.bounds.x;
+            grabOffsetY = mouseY - box.bounds.y;
         } else if (mouseButton == 1) {
             HudLayout.setVisible(element, !HudLayout.isVisible(element));
             playClickSound();
