@@ -19,3 +19,9 @@ dashboard.editor.help_tooltip.reset=§6Ctrl+click§r to reset position of the el
 ## Element tooltip
 dashboard.editor.element_tooltip.hidden=Hidden
 dashboard.editor.element_tooltip.not_showing=Not showing right now
+
+# Elements
+## Minecraft
+dashboard.element.minecraft.hotbar=Hotbar
+dashboard.element.minecraft.experience=Experience Bar
+dashboard.element.minecraft.jump_bar=Horse Jump Bar
