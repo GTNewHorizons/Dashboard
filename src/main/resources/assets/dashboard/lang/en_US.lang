@@ -25,3 +25,4 @@ dashboard.editor.element_tooltip.not_showing=Not showing right now
 dashboard.element.minecraft.hotbar=Hotbar
 dashboard.element.minecraft.experience=Experience Bar
 dashboard.element.minecraft.jump_bar=Horse Jump Bar
+dashboard.element.minecraft.boss_health=Boss Health

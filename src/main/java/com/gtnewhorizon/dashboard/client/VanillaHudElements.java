@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.entity.boss.BossStatus;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
@@ -36,6 +37,8 @@ public final class VanillaHudElements {
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         add(ElementType.EXPERIENCE, "experience", (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
         add(ElementType.JUMPBAR, "jump_bar", (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
+        // The boss name is drawn 10 pixels above the bar
+        add(ElementType.BOSSHEALTH, "boss_health", (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
     }
 
     private static void add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
@@ -55,11 +58,25 @@ public final class VanillaHudElements {
         }
         endAllShifts();
 
+        if (!willDraw(event.type)) {
+            return;
+        }
         if (HudEditor.beginRender(element, event.resolution)) {
             SHIFTED.add(event.type);
         } else {
             event.setCanceled(true);
         }
+    }
+
+    /**
+     * Forge fires the boss bar's Pre event every frame, but vanilla only draws it with a boss nearby. This is the same
+     * check vanilla makes.
+     */
+    private static boolean willDraw(ElementType type) {
+        return switch (type) {
+            case BOSSHEALTH -> BossStatus.bossName != null && BossStatus.statusBarTime > 0;
+            default -> true;
+        };
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -84,8 +101,3 @@ public final class VanillaHudElements {
         SHIFTED.clear();
     }
 }
-
-
-// Pre HOTBAR: no leftover. Save, shift up 30px, Add shifted(30). [If hidden = cancel POST]
-// Draw in normal spot, then add 30 pixels.
-// Post HOTBAR: remove HOTBAR, restore the position. Remove shifted.
