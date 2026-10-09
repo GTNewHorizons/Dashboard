@@ -260,7 +260,7 @@ public class GuiHudEditor extends GuiScreen {
      */
     private void drawElementName(String name, HudBounds bounds) {
         int maxWidth = bounds.width - 2;
-        // TODO: Fix wrapping (StackOverflow eeror)
+        // Hodge: MixinFontRenderer / Without this, j8 crashes
         if (maxWidth < fontRendererObj.getCharWidth('W')) {
             return;
         }
