@@ -10,6 +10,9 @@ dashboard.editor.title=Dashboard HUD Editor
 ## Buttons
 dashboard.editor.button.done=Done
 dashboard.editor.button.reset_all=Reset All
+dashboard.editor.button.grid=Grid
+dashboard.editor.button.grid.on=Grid: ON
+dashboard.editor.button.grid.off=Grid: OFF
 
 ## Help tooltip
 dashboard.editor.help_tooltip.move=§6Drag§r to move (hold §6Shift§r to stop snapping)

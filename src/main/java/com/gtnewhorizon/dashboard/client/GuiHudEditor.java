@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -14,9 +15,11 @@ import net.minecraft.util.StatCollector;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.gtnewhorizon.dashboard.DashboardConfig;
 import com.gtnewhorizon.dashboard.api.HudBounds;
 import com.gtnewhorizon.dashboard.api.HudEditor;
 import com.gtnewhorizon.dashboard.api.HudElement;
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -29,6 +32,8 @@ public class GuiHudEditor extends GuiScreen {
 
     private static final int BUTTON_DONE = 0;
     private static final int BUTTON_RESET_ALL = 1;
+    private static final int BUTTON_GRID = 2;
+    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID };
     private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
@@ -39,6 +44,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
     private static final int MENU_PADDING = 6;
+    private static final int GRID_SIZE = 20;
 
     /**
      * Where boxes overlap, elements that are showing come first, then smaller boxes, so small elements on top of big
@@ -52,6 +58,7 @@ public class GuiHudEditor extends GuiScreen {
 
     /** The button rows of the panel, from top to bottom. */
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
+    private final List<ToggleButton> toggleButtons = new ArrayList<>();
     private HudElement draggedElement;
     private int grabOffsetX;
     private int grabOffsetY;
@@ -66,6 +73,13 @@ public class GuiHudEditor extends GuiScreen {
     public void initGui() {
         buttonList.clear();
         buttonRows.clear();
+        toggleButtons.clear();
+
+        for (int id : TOGGLE_BUTTON_IDS) {
+            String text = StatCollector.translateToLocal("dashboard.editor.button." + getToggleName(id));
+            toggleButtons.add(new ToggleButton(id, getButtonWidth(text), text));
+        }
+        buttonRows.add(new ArrayList<>(toggleButtons));
 
         List<GuiButton> actionButtons = new ArrayList<>();
         actionButtons.add(createButton(BUTTON_DONE, StatCollector.translateToLocal("dashboard.editor.button.done")));
@@ -76,12 +90,70 @@ public class GuiHudEditor extends GuiScreen {
         for (List<GuiButton> row : buttonRows) {
             buttonList.addAll(row);
         }
+        updateToggleStates();
         positionButtons();
     }
 
     private GuiButton createButton(int id, String text) {
-        int buttonWidth = Math.max(BUTTON_HEIGHT, fontRendererObj.getStringWidth(text) + BUTTON_TEXT_PADDING);
-        return new GuiButton(id, 0, 0, buttonWidth, BUTTON_HEIGHT, text);
+        return new GuiButton(id, 0, 0, getButtonWidth(text), BUTTON_HEIGHT, text);
+    }
+
+    private int getButtonWidth(String text) {
+        return Math.max(BUTTON_HEIGHT, fontRendererObj.getStringWidth(text) + BUTTON_TEXT_PADDING);
+    }
+
+    private static String getToggleName(int buttonId) {
+        return switch (buttonId) {
+            case BUTTON_GRID -> "grid";
+            default -> throw new IllegalArgumentException("Not a toggle button: " + buttonId);
+        };
+    }
+
+    private static boolean isToggleOn(int buttonId) {
+        return switch (buttonId) {
+            case BUTTON_GRID -> DashboardConfig.showGrid;
+            default -> false;
+        };
+    }
+
+    private void toggle(int buttonId) {
+        switch (buttonId) {
+            case BUTTON_GRID -> DashboardConfig.showGrid = !DashboardConfig.showGrid;
+            default -> {}
+        }
+        ConfigurationManager.save(DashboardConfig.class);
+        updateToggleStates();
+    }
+
+    private void updateToggleStates() {
+        for (ToggleButton button : toggleButtons) {
+            button.setOn(isToggleOn(button.id));
+        }
+    }
+
+    private static String getToggleStateText(int buttonId) {
+        String state = isToggleOn(buttonId) ? ".on" : ".off";
+        return StatCollector.translateToLocal("dashboard.editor.button." + getToggleName(buttonId) + state);
+    }
+
+    private static final class ToggleButton extends GuiButton {
+
+        private ToggleButton(int id, int width, String text) {
+            super(id, 0, 0, width, BUTTON_HEIGHT, text);
+        }
+
+        private void setOn(boolean on) {
+            enabled = on;
+        }
+
+        /** Vanilla ignores clicks on disabled buttons. */
+        @Override
+        public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+            return visible && mouseX >= xPosition
+                && mouseY >= yPosition
+                && mouseX < xPosition + width
+                && mouseY < yPosition + height;
+        }
     }
 
     private void positionButtons() {
@@ -172,6 +244,10 @@ public class GuiHudEditor extends GuiScreen {
         HudElement highlighted = draggedElement != null ? draggedElement
             : overMenu ? null : findElementAt(mouseX, mouseY);
 
+        if (DashboardConfig.showGrid) {
+            drawGrid();
+        }
+
         // The most important boxes are drawn last, so they end up on top
         List<HudElement> drawOrder = new ArrayList<>(HudEditor.getElements());
         drawOrder.sort(PICK_PRIORITY.reversed());
@@ -190,6 +266,20 @@ public class GuiHudEditor extends GuiScreen {
             if (!menuTooltip.isEmpty()) {
                 drawHoveringText(menuTooltip, mouseX, mouseY, fontRendererObj);
             }
+        }
+    }
+
+    /** Lines start from the screen center. */
+    private void drawGrid() {
+        int centerX = width / 2;
+        int centerY = height / 2;
+        for (int x = centerX % GRID_SIZE; x < width; x += GRID_SIZE) {
+            int color = x == centerX ? ColorUtils.gridCenter.getColor() : ColorUtils.grid.getColor();
+            drawRect(x, 0, x + 1, height, color);
+        }
+        for (int y = centerY % GRID_SIZE; y < height; y += GRID_SIZE) {
+            int color = y == centerY ? ColorUtils.gridCenter.getColor() : ColorUtils.grid.getColor();
+            drawRect(0, y, width, y + 1, color);
         }
     }
 
@@ -223,6 +313,11 @@ public class GuiHudEditor extends GuiScreen {
         if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
             for (String key : HELP_LINE_KEYS) {
                 lines.add(StatCollector.translateToLocal(key));
+            }
+        }
+        for (ToggleButton button : toggleButtons) {
+            if (button.mousePressed(mc, mouseX, mouseY)) {
+                lines.add(getToggleStateText(button.id));
             }
         }
         return lines;
@@ -417,6 +512,7 @@ public class GuiHudEditor extends GuiScreen {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
             case BUTTON_RESET_ALL -> HudLayout.resetAll();
+            case BUTTON_GRID -> toggle(button.id);
             default -> {}
         }
     }

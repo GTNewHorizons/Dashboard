@@ -21,6 +21,8 @@ public final class ColorUtils {
 
         menuBackground    = color.argb("menuBackground",    "0xA0202020"),
         helpIcon          = color.argb("helpIcon",          "0x30FFFFFF"),
-        helpIconHovered   = color.argb("helpIconHovered",   "0x60FFFFFF");
+        helpIconHovered   = color.argb("helpIconHovered",   "0x60FFFFFF"),
+        grid              = color.argb("grid",              "0x20FFFFFF"),
+        gridCenter        = color.argb("gridCenter",        "0x50FFFFFF");
     // spotless:on
 }
