@@ -10,4 +10,9 @@ public class DashboardConfig {
     @Config.LangKey("dashboard.config.editor.show_grid")
     @Config.DefaultBoolean(true)
     public static boolean showGrid;
+
+    @Config.Comment("Show the element names inside their boxes in the HUD editor")
+    @Config.LangKey("dashboard.config.editor.show_labels")
+    @Config.DefaultBoolean(true)
+    public static boolean showLabels;
 }

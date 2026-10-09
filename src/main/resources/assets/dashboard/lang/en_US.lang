@@ -13,6 +13,9 @@ dashboard.editor.button.reset_all=Reset All
 dashboard.editor.button.grid=Grid
 dashboard.editor.button.grid.on=Grid: ON
 dashboard.editor.button.grid.off=Grid: OFF
+dashboard.editor.button.labels=Labels
+dashboard.editor.button.labels.on=Labels: ON
+dashboard.editor.button.labels.off=Labels: OFF
 
 ## Help tooltip
 dashboard.editor.help_tooltip.move=§6Drag§r to move (hold §6Shift§r to stop snapping)
@@ -40,3 +43,5 @@ dashboard.config.editor=Editor
 dashboard.config.editor.tooltip=Settings of the HUD editor
 dashboard.config.editor.show_grid=Show Grid
 dashboard.config.editor.show_grid.tooltip=Show the grid in the HUD editor and snap elements to it
+dashboard.config.editor.show_labels=Show Labels
+dashboard.config.editor.show_labels.tooltip=Show the element names inside their boxes in the HUD editor

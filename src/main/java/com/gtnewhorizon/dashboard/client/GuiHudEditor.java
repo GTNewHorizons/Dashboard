@@ -33,7 +33,8 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_DONE = 0;
     private static final int BUTTON_RESET_ALL = 1;
     private static final int BUTTON_GRID = 2;
-    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID };
+    private static final int BUTTON_LABELS = 3;
+    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_LABELS };
     private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
@@ -106,6 +107,7 @@ public class GuiHudEditor extends GuiScreen {
     private static String getToggleName(int buttonId) {
         return switch (buttonId) {
             case BUTTON_GRID -> "grid";
+            case BUTTON_LABELS -> "labels";
             default -> throw new IllegalArgumentException("Not a toggle button: " + buttonId);
         };
     }
@@ -113,6 +115,7 @@ public class GuiHudEditor extends GuiScreen {
     private static boolean isToggleOn(int buttonId) {
         return switch (buttonId) {
             case BUTTON_GRID -> DashboardConfig.showGrid;
+            case BUTTON_LABELS -> DashboardConfig.showLabels;
             default -> false;
         };
     }
@@ -120,6 +123,7 @@ public class GuiHudEditor extends GuiScreen {
     private void toggle(int buttonId) {
         switch (buttonId) {
             case BUTTON_GRID -> DashboardConfig.showGrid = !DashboardConfig.showGrid;
+            case BUTTON_LABELS -> DashboardConfig.showLabels = !DashboardConfig.showLabels;
             default -> {}
         }
         ConfigurationManager.save(DashboardConfig.class);
@@ -348,7 +352,9 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
         drawOutline(bounds, borderColor);
         drawCenterMark(bounds, borderColor);
-        drawElementName(element.getDisplayName(), bounds);
+        if (DashboardConfig.showLabels) {
+            drawElementName(element.getDisplayName(), bounds);
+        }
     }
 
     private static void drawCenterMark(HudBounds bounds, int color) {
@@ -536,7 +542,7 @@ public class GuiHudEditor extends GuiScreen {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
             case BUTTON_RESET_ALL -> HudLayout.resetAll();
-            case BUTTON_GRID -> toggle(button.id);
+            case BUTTON_GRID, BUTTON_LABELS -> toggle(button.id);
             default -> {}
         }
     }
