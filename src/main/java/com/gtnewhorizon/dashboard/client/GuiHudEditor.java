@@ -477,14 +477,31 @@ public class GuiHudEditor extends GuiScreen {
         HudLayout.moveTo(draggedElement, x, y, width, height);
     }
 
-    /** Pulls the position onto the screen edges or the center line when it is close to them. */
+    /**
+     * Pulls the position onto the screen edges or the center line when it is close to them. Otherwise, if the grid is
+     * on, pulls either edge of the element onto a close grid line.
+     */
     private static int snap(int position, int elementSize, int screenSize) {
         int centered = (screenSize - elementSize) / 2;
         int farEdge = screenSize - elementSize;
         if (Math.abs(position) <= SNAP_DISTANCE) return 0;
         if (Math.abs(position - farEdge) <= SNAP_DISTANCE) return farEdge;
         if (Math.abs(position - centered) <= SNAP_DISTANCE) return centered;
+        if (!DashboardConfig.showGrid) return position;
+
+        int startOnGrid = nearestGridLine(position, screenSize);
+        int endOnGrid = nearestGridLine(position + elementSize, screenSize) - elementSize;
+        int startDistance = Math.abs(position - startOnGrid);
+        int endDistance = Math.abs(position - endOnGrid);
+        if (startDistance <= endDistance && startDistance <= SNAP_DISTANCE) return startOnGrid;
+        if (endDistance <= SNAP_DISTANCE) return endOnGrid;
         return position;
+    }
+
+    /** Grid lines start from the screen center, like in drawGrid. */
+    private static int nearestGridLine(int position, int screenSize) {
+        int center = screenSize / 2;
+        return center + Math.round((position - center) / (float) GRID_SIZE) * GRID_SIZE;
     }
 
     @Override
