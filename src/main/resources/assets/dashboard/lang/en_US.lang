@@ -31,3 +31,9 @@ dashboard.element.minecraft.armor=Armor
 dashboard.element.minecraft.food=Food
 dashboard.element.minecraft.air=Air
 dashboard.element.minecraft.mount_health=Mount Health
+
+# Config
+dashboard.config.editor=Editor
+dashboard.config.editor.tooltip=Settings of the HUD editor
+dashboard.config.editor.show_grid=Show Grid
+dashboard.config.editor.show_grid.tooltip=Show the grid in the HUD editor and snap elements to it
