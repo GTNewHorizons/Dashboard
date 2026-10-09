@@ -46,6 +46,7 @@ public final class VanillaHudElements {
         add(ElementType.BOSSHEALTH, "boss_health", (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
         addStacked(ElementType.HEALTH, "health", false);
         addStacked(ElementType.ARMOR, "armor", false);
+        addStacked(ElementType.FOOD, "food", true);
     }
 
     private static void add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
