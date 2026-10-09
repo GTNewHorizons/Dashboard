@@ -1,0 +1,428 @@
+package com.gtnewhorizon.dashboard.client;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import com.gtnewhorizon.dashboard.api.HudBounds;
+import com.gtnewhorizon.dashboard.api.HudEditor;
+import com.gtnewhorizon.dashboard.api.HudElement;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/**
+ * Shows a box around every registered HUD element.
+ */
+@SideOnly(Side.CLIENT)
+public class GuiHudEditor extends GuiScreen {
+
+    private static final int BUTTON_DONE = 0;
+    private static final int BUTTON_RESET_ALL = 1;
+    private static final int BUTTON_HEIGHT = 20;
+    private static final int BUTTON_GAP = 3;
+    private static final int BUTTON_TEXT_PADDING = 12;
+    private static final int SNAP_DISTANCE = 4;
+    private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
+        "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset" };
+    private static final int HELP_ICON_SIZE = 12;
+    private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
+    private static final int TITLE_ROW_GAP = 4;
+    private static final int MENU_PADDING = 6;
+
+    /**
+     * Where boxes overlap, elements that are showing come first, then smaller boxes, so small elements on top of big
+     * ones can still be grabbed.
+     */
+    private static final Comparator<HudElement> PICK_PRIORITY = Comparator
+        .comparing((HudElement element) -> !element.isCurrentlyShowing())
+        .thenComparingInt(
+            element -> element.getDefaultBounds(0, 0)
+                .getArea());
+
+    /** The button rows of the panel, from top to bottom. */
+    private final List<List<GuiButton>> buttonRows = new ArrayList<>();
+    private HudElement draggedElement;
+    private int grabOffsetX;
+    private int grabOffsetY;
+    /** How far the menu was dragged from its default spot. Not saved. */
+    private int menuOffsetX;
+    private int menuOffsetY;
+    private boolean draggingMenu;
+    private int menuGrabOffsetX;
+    private int menuGrabOffsetY;
+
+    @Override
+    public void initGui() {
+        buttonList.clear();
+        buttonRows.clear();
+
+        List<GuiButton> actionButtons = new ArrayList<>();
+        actionButtons.add(createButton(BUTTON_DONE, StatCollector.translateToLocal("dashboard.editor.button.done")));
+        actionButtons
+            .add(createButton(BUTTON_RESET_ALL, StatCollector.translateToLocal("dashboard.editor.button.reset_all")));
+        buttonRows.add(actionButtons);
+
+        for (List<GuiButton> row : buttonRows) {
+            buttonList.addAll(row);
+        }
+        positionButtons();
+    }
+
+    private GuiButton createButton(int id, String text) {
+        int buttonWidth = Math.max(BUTTON_HEIGHT, fontRendererObj.getStringWidth(text) + BUTTON_TEXT_PADDING);
+        return new GuiButton(id, 0, 0, buttonWidth, BUTTON_HEIGHT, text);
+    }
+
+    private void positionButtons() {
+        HudBounds menu = getMenuBounds();
+        int centerX = menu.x + menu.width / 2;
+        int y = menu.y + MENU_PADDING + TITLE_ROW_HEIGHT + TITLE_ROW_GAP;
+        for (List<GuiButton> row : buttonRows) {
+            int x = centerX - getRowWidth(row) / 2;
+            for (GuiButton button : row) {
+                button.xPosition = x;
+                button.yPosition = y;
+                x += button.width + BUTTON_GAP;
+            }
+            y += BUTTON_HEIGHT + BUTTON_GAP;
+        }
+    }
+
+    private static int getRowWidth(List<GuiButton> row) {
+        int rowWidth = -BUTTON_GAP;
+        for (GuiButton button : row) {
+            rowWidth += button.width + BUTTON_GAP;
+        }
+        return rowWidth;
+    }
+
+    /** Starts in the middle of the screen and can be dragged from there. */
+    private HudBounds getMenuBounds() {
+        int panelWidth = getMenuWidth();
+        int panelHeight = getMenuHeight();
+        int x = clampToScreen(getMenuDefaultX() + menuOffsetX, panelWidth, width);
+        int y = clampToScreen(getMenuDefaultY() + menuOffsetY, panelHeight, height);
+        return new HudBounds(x, y, panelWidth, panelHeight);
+    }
+
+    private int getMenuWidth() {
+        int contentWidth = fontRendererObj.getStringWidth(getTitle()) + BUTTON_GAP * 2 + HELP_ICON_SIZE;
+        for (List<GuiButton> row : buttonRows) {
+            contentWidth = Math.max(contentWidth, getRowWidth(row));
+        }
+        return contentWidth + MENU_PADDING * 2;
+    }
+
+    private int getMenuHeight() {
+        int rowsHeight = buttonRows.size() * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
+        return MENU_PADDING * 2 + TITLE_ROW_HEIGHT + TITLE_ROW_GAP + rowsHeight;
+    }
+
+    private static String getTitle() {
+        return StatCollector.translateToLocal("dashboard.editor.title");
+    }
+
+    private int getMenuDefaultX() {
+        return width / 2 - getMenuWidth() / 2;
+    }
+
+    private int getMenuDefaultY() {
+        return (height - getMenuHeight()) / 2;
+    }
+
+    private void dragMenuTo(int mouseX, int mouseY) {
+        menuOffsetX = clampToScreen(mouseX - menuGrabOffsetX, getMenuWidth(), width) - getMenuDefaultX();
+        menuOffsetY = clampToScreen(mouseY - menuGrabOffsetY, getMenuHeight(), height) - getMenuDefaultY();
+        positionButtons();
+    }
+
+    private static int clampToScreen(int position, int size, int screenSize) {
+        return Math.max(0, Math.min(position, screenSize - size));
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (draggedElement != null) {
+            if (Mouse.isButtonDown(0)) {
+                dragTo(mouseX, mouseY);
+            } else {
+                draggedElement = null;
+            }
+        }
+        if (draggingMenu) {
+            if (Mouse.isButtonDown(0)) {
+                dragMenuTo(mouseX, mouseY);
+            } else {
+                draggingMenu = false;
+            }
+        }
+
+        boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY);
+        HudElement highlighted = draggedElement != null ? draggedElement
+            : overMenu ? null : findElementAt(mouseX, mouseY);
+
+        // The most important boxes are drawn last, so they end up on top
+        List<HudElement> drawOrder = new ArrayList<>(HudEditor.getElements());
+        drawOrder.sort(PICK_PRIORITY.reversed());
+        for (HudElement element : drawOrder) {
+            drawElementBox(element, element == highlighted);
+        }
+
+        drawMenuPanel(mouseX, mouseY);
+
+        super.drawScreen(mouseX, mouseY, partialTicks);
+
+        if (highlighted != null && draggedElement == null) {
+            drawHoveringText(getTooltip(highlighted), mouseX, mouseY, fontRendererObj);
+        } else if (!draggingMenu) {
+            List<String> menuTooltip = getMenuTooltip(mouseX, mouseY);
+            if (!menuTooltip.isEmpty()) {
+                drawHoveringText(menuTooltip, mouseX, mouseY, fontRendererObj);
+            }
+        }
+    }
+
+    private void drawMenuPanel(int mouseX, int mouseY) {
+        HudBounds menu = getMenuBounds();
+        drawRect(menu.x, menu.y, menu.getRight(), menu.getBottom(), ColorUtils.menuBackground.getColor());
+        int titleY = menu.y + MENU_PADDING + (TITLE_ROW_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
+        fontRendererObj.drawStringWithShadow(getTitle(), menu.x + MENU_PADDING, titleY, ColorUtils.text.getColor());
+
+        HudBounds help = getHelpIconBounds(menu);
+        boolean hovered = help.contains(mouseX, mouseY) && !draggingMenu;
+        drawRect(
+            help.x,
+            help.y,
+            help.getRight(),
+            help.getBottom(),
+            hovered ? ColorUtils.helpIconHovered.getColor() : ColorUtils.helpIcon.getColor());
+        drawCenteredString(fontRendererObj, "?", help.x + help.width / 2, help.y + 2, ColorUtils.text.getColor());
+    }
+
+    private static HudBounds getHelpIconBounds(HudBounds menu) {
+        return new HudBounds(
+            menu.getRight() - MENU_PADDING - HELP_ICON_SIZE,
+            menu.y + MENU_PADDING,
+            HELP_ICON_SIZE,
+            HELP_ICON_SIZE);
+    }
+
+    private List<String> getMenuTooltip(int mouseX, int mouseY) {
+        List<String> lines = new ArrayList<>();
+        if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
+            for (String key : HELP_LINE_KEYS) {
+                lines.add(StatCollector.translateToLocal(key));
+            }
+        }
+        return lines;
+    }
+
+    private void drawElementBox(HudElement element, boolean highlighted) {
+        HudBounds bounds = HudLayout.getBounds(element, width, height);
+        boolean visible = HudLayout.isVisible(element);
+        boolean showing = element.isCurrentlyShowing();
+
+        int fillColor;
+        int borderColor;
+        if (!visible) {
+            fillColor = ColorUtils.hiddenFill.getColor();
+            borderColor = ColorUtils.hiddenBorder.getColor();
+        } else if (showing) {
+            fillColor = ColorUtils.showingFill.getColor();
+            borderColor = ColorUtils.showingBorder.getColor();
+        } else {
+            fillColor = ColorUtils.notShowingFill.getColor();
+            borderColor = ColorUtils.notShowingBorder.getColor();
+        }
+        if (highlighted) {
+            borderColor = ColorUtils.highlightBorder.getColor();
+        }
+
+        drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
+        drawOutline(bounds, borderColor);
+        drawElementName(element.getDisplayName(), bounds);
+    }
+
+    /**
+     * Centered inside the box, wrapped onto several lines if it is too wide. If the lines do not fit either, the name
+     * is shrunk onto one line.
+     */
+    private void drawElementName(String name, HudBounds bounds) {
+        int maxWidth = bounds.width - 2;
+        int lineHeight = fontRendererObj.FONT_HEIGHT;
+        int centerX = bounds.x + bounds.width / 2;
+        List<String> lines = fontRendererObj.listFormattedStringToWidth(name, maxWidth);
+
+        if (lines.size() == 1 || lines.size() * lineHeight <= bounds.height) {
+            int y = bounds.y + (bounds.height - lines.size() * lineHeight) / 2 + 1;
+            for (String line : lines) {
+                drawCenteredString(fontRendererObj, line, centerX, y, ColorUtils.text.getColor());
+                y += lineHeight;
+            }
+            return;
+        }
+
+        float scale = (float) maxWidth / fontRendererObj.getStringWidth(name);
+        GL11.glPushMatrix();
+        GL11.glTranslatef(centerX, bounds.y + bounds.height / 2f, 0);
+        GL11.glScalef(scale, scale, 1);
+        drawCenteredString(fontRendererObj, name, 0, -lineHeight / 2 + 1, ColorUtils.text.getColor());
+        GL11.glPopMatrix();
+    }
+
+    private void drawOutline(HudBounds bounds, int color) {
+        drawRect(bounds.x - 1, bounds.y - 1, bounds.getRight() + 1, bounds.y, color);
+        drawRect(bounds.x - 1, bounds.getBottom(), bounds.getRight() + 1, bounds.getBottom() + 1, color);
+        drawRect(bounds.x - 1, bounds.y, bounds.x, bounds.getBottom(), color);
+        drawRect(bounds.getRight(), bounds.y, bounds.getRight() + 1, bounds.getBottom(), color);
+    }
+
+    private List<String> getTooltip(HudElement element) {
+        List<String> lines = new ArrayList<>();
+        lines.add(element.getDisplayName());
+        if (!HudLayout.isVisible(element)) {
+            lines.add(
+                EnumChatFormatting.RED + StatCollector.translateToLocal("dashboard.editor.element_tooltip.hidden"));
+        }
+        if (!element.isCurrentlyShowing()) {
+            lines.add(
+                EnumChatFormatting.GRAY
+                    + StatCollector.translateToLocal("dashboard.editor.element_tooltip.not_showing"));
+        }
+        lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getModName());
+        return lines;
+    }
+
+    private HudElement findElementAt(int mouseX, int mouseY) {
+        HudElement best = null;
+        for (HudElement element : HudEditor.getElements()) {
+            if (HudLayout.getBounds(element, width, height)
+                .contains(mouseX, mouseY) && (best == null || PICK_PRIORITY.compare(element, best) < 0)) {
+                best = element;
+            }
+        }
+        return best;
+    }
+
+    private boolean isOverButton(int mouseX, int mouseY) {
+        for (Object button : buttonList) {
+            if (((GuiButton) button).mousePressed(mc, mouseX, mouseY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (isOverButton(mouseX, mouseY)) {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+            return;
+        }
+
+        HudBounds menu = getMenuBounds();
+        if (menu.contains(mouseX, mouseY)) {
+            if (mouseButton == 0) {
+                draggingMenu = true;
+                menuGrabOffsetX = mouseX - menu.x;
+                menuGrabOffsetY = mouseY - menu.y;
+            }
+            return;
+        }
+
+        HudElement element = findElementAt(mouseX, mouseY);
+        if (element == null) {
+            return;
+        }
+
+        if (mouseButton == 0 && isCtrlKeyDown()) {
+            HudLayout.resetPosition(element);
+            playClickSound();
+        } else if (mouseButton == 0) {
+            HudBounds bounds = HudLayout.getBounds(element, width, height);
+            draggedElement = element;
+            grabOffsetX = mouseX - bounds.x;
+            grabOffsetY = mouseY - bounds.y;
+        } else if (mouseButton == 1) {
+            HudLayout.setVisible(element, !HudLayout.isVisible(element));
+            playClickSound();
+        }
+    }
+
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+        if (draggedElement != null) {
+            dragTo(mouseX, mouseY);
+        }
+    }
+
+    private void dragTo(int mouseX, int mouseY) {
+        HudBounds bounds = HudLayout.getBounds(draggedElement, width, height);
+        int x = mouseX - grabOffsetX;
+        int y = mouseY - grabOffsetY;
+        if (!isShiftKeyDown()) {
+            x = snap(x, bounds.width, width);
+            y = snap(y, bounds.height, height);
+        }
+        HudLayout.moveTo(draggedElement, x, y, width, height);
+    }
+
+    /** Pulls the position onto the screen edges or the center line when it is close to them. */
+    private static int snap(int position, int elementSize, int screenSize) {
+        int centered = (screenSize - elementSize) / 2;
+        int farEdge = screenSize - elementSize;
+        if (Math.abs(position) <= SNAP_DISTANCE) return 0;
+        if (Math.abs(position - farEdge) <= SNAP_DISTANCE) return farEdge;
+        if (Math.abs(position - centered) <= SNAP_DISTANCE) return centered;
+        return position;
+    }
+
+    @Override
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int state) {
+        super.mouseMovedOrUp(mouseX, mouseY, state);
+        // -1 means the mouse only moved, otherwise it is the released button
+        if (state == 0) {
+            draggedElement = null;
+            draggingMenu = false;
+        }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) {
+        if (keyCode == HudEditorKeybind.OPEN_EDITOR.getKeyCode()) {
+            mc.displayGuiScreen(null);
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton button) {
+        switch (button.id) {
+            case BUTTON_DONE -> mc.displayGuiScreen(null);
+            case BUTTON_RESET_ALL -> HudLayout.resetAll();
+            default -> {}
+        }
+    }
+
+    @Override
+    public void onGuiClosed() {
+        HudLayout.save();
+    }
+
+    private void playClickSound() {
+        mc.getSoundHandler()
+            .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
+    }
+}

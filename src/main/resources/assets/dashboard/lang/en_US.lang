@@ -1,0 +1,21 @@
+# Dashboard en_US translation file
+
+# Keys
+key.categories.dashboard=Dashboard
+key.dashboard.open_editor=Open Dashboard HUD Editor
+
+# Editor gui
+dashboard.editor.title=Dashboard HUD Editor
+
+## Buttons
+dashboard.editor.button.done=Done
+dashboard.editor.button.reset_all=Reset All
+
+## Help tooltip
+dashboard.editor.help_tooltip.move=§6Drag§r to move (hold §6Shift§r to stop snapping)
+dashboard.editor.help_tooltip.toggle=§6Right-click§r to toggle visibility of the element
+dashboard.editor.help_tooltip.reset=§6Ctrl+click§r to reset position of the element
+
+## Element tooltip
+dashboard.editor.element_tooltip.hidden=Hidden
+dashboard.editor.element_tooltip.not_showing=Not showing right now

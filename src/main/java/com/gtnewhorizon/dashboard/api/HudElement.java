@@ -2,6 +2,9 @@ package com.gtnewhorizon.dashboard.api;
 
 import net.minecraft.util.StatCollector;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
+
 /** Something drawn on the HUD that the player can move or hide in the HUD editor. */
 public final class HudElement {
 
@@ -17,6 +20,8 @@ public final class HudElement {
     private final String id;
     private final String translationKey;
     private final DefaultBoundsProvider defaultBoundsProvider;
+    private String modId;
+    private String modName;
     private long lastRenderTime;
 
     /**
@@ -39,6 +44,36 @@ public final class HudElement {
 
     public HudBounds getDefaultBounds(int screenWidth, int screenHeight) {
         return defaultBoundsProvider.getDefaultBounds(screenWidth, screenHeight);
+    }
+
+    /** Only needed when the part of the id before ':' is not the mod id (ignoring case). */
+    public HudElement setModId(String modId) {
+        this.modId = modId;
+        this.modName = null;
+        return this;
+    }
+
+    /** The name of the mod this element belongs to, as shown in the mod list. */
+    public String getModName() {
+        if (modName == null) {
+            modName = findModName();
+        }
+        return modName;
+    }
+
+    private String findModName() {
+        String wantedModId = modId != null ? modId : id.substring(0, Math.max(0, id.indexOf(':')));
+        if (wantedModId.equalsIgnoreCase("minecraft")) {
+            return "Minecraft";
+        }
+        for (ModContainer mod : Loader.instance()
+            .getActiveModList()) {
+            if (mod.getModId()
+                .equalsIgnoreCase(wantedModId)) {
+                return mod.getName();
+            }
+        }
+        return wantedModId;
     }
 
     /** True if the element was drawn recently, even if the player hid it. */
