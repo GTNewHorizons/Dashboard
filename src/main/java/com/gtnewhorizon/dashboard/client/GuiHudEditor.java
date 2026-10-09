@@ -521,13 +521,6 @@ public class GuiHudEditor extends GuiScreen {
         }
     }
 
-    @Override
-    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-        if (draggedElement != null) {
-            dragTo(mouseX, mouseY);
-        }
-    }
-
     private void dragTo(int mouseX, int mouseY) {
         HudBounds bounds = HudLayout.getBounds(draggedElement, width, height);
         int x = mouseX - grabOffsetX;
