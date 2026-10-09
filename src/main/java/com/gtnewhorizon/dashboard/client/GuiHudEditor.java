@@ -285,13 +285,13 @@ public class GuiHudEditor extends GuiScreen {
     private void drawGrid() {
         int centerX = width / 2;
         int centerY = height / 2;
+        int gridColor = ColorUtils.grid.getColor();
+        int centerColor = ColorUtils.gridCenter.getColor();
         for (int x = centerX % GRID_SIZE; x < width; x += GRID_SIZE) {
-            int color = x == centerX ? ColorUtils.gridCenter.getColor() : ColorUtils.grid.getColor();
-            drawRect(x, 0, x + 1, height, color);
+            drawRect(x, 0, x + 1, height, x == centerX ? centerColor : gridColor);
         }
         for (int y = centerY % GRID_SIZE; y < height; y += GRID_SIZE) {
-            int color = y == centerY ? ColorUtils.gridCenter.getColor() : ColorUtils.grid.getColor();
-            drawRect(0, y, width, y + 1, color);
+            drawRect(0, y, width, y + 1, y == centerY ? centerColor : gridColor);
         }
     }
 
