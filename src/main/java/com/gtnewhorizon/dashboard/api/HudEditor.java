@@ -22,6 +22,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 public final class HudEditor {
 
     private static final Map<String, HudElement> ELEMENTS = new LinkedHashMap<>();
+    /** A read-only view, so it always shows the current elements. */
+    private static final Collection<HudElement> ELEMENTS_VIEW = Collections.unmodifiableCollection(ELEMENTS.values());
 
     private HudEditor() {}
 
@@ -34,7 +36,7 @@ public final class HudEditor {
     }
 
     public static Collection<HudElement> getElements() {
-        return Collections.unmodifiableCollection(ELEMENTS.values());
+        return ELEMENTS_VIEW;
     }
 
     /**
