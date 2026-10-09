@@ -5,7 +5,10 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.BossStatus;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -47,6 +50,7 @@ public final class VanillaHudElements {
         addStacked(ElementType.HEALTH, "health", false);
         addStacked(ElementType.ARMOR, "armor", false);
         addStacked(ElementType.FOOD, "food", true);
+        addStacked(ElementType.AIR, "air", true);
     }
 
     private static void add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
@@ -84,10 +88,14 @@ public final class VanillaHudElements {
         }
     }
 
-    /** The boss bar's event fires every frame, but it is only drawn with a boss nearby. */
+    /** These events fire every frame, but are only drawn with a boss nearby or while underwater. */
     private static boolean willDraw(ElementType type) {
         return switch (type) {
             case BOSSHEALTH -> BossStatus.bossName != null && BossStatus.statusBarTime > 0;
+            case AIR -> {
+                EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+                yield player != null && player.isInsideOfMaterial(Material.water);
+            }
             default -> true;
         };
     }
