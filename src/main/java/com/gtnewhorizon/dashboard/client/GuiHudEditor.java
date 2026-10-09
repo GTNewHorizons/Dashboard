@@ -63,6 +63,9 @@ public class GuiHudEditor extends GuiScreen {
     /** The button rows of the panel, from top to bottom. */
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
+    private String title;
+    private int menuWidth;
+    private int menuHeight;
     private HudElement draggedElement;
     private int grabOffsetX;
     private int grabOffsetY;
@@ -94,6 +97,9 @@ public class GuiHudEditor extends GuiScreen {
         for (List<GuiButton> row : buttonRows) {
             buttonList.addAll(row);
         }
+        title = StatCollector.translateToLocal("dashboard.editor.title");
+        menuWidth = calculateMenuWidth();
+        menuHeight = calculateMenuHeight();
         updateToggleStates();
         positionButtons();
     }
@@ -191,41 +197,35 @@ public class GuiHudEditor extends GuiScreen {
 
     /** Starts in the middle of the screen and can be dragged from there. */
     private HudBounds getMenuBounds() {
-        int panelWidth = getMenuWidth();
-        int panelHeight = getMenuHeight();
-        int x = clampToScreen(getMenuDefaultX() + menuOffsetX, panelWidth, width);
-        int y = clampToScreen(getMenuDefaultY() + menuOffsetY, panelHeight, height);
-        return new HudBounds(x, y, panelWidth, panelHeight);
+        int x = clampToScreen(getMenuDefaultX() + menuOffsetX, menuWidth, width);
+        int y = clampToScreen(getMenuDefaultY() + menuOffsetY, menuHeight, height);
+        return new HudBounds(x, y, menuWidth, menuHeight);
     }
 
-    private int getMenuWidth() {
-        int contentWidth = fontRendererObj.getStringWidth(getTitle()) + BUTTON_GAP * 2 + HELP_ICON_SIZE;
+    private int calculateMenuWidth() {
+        int contentWidth = fontRendererObj.getStringWidth(title) + BUTTON_GAP * 2 + HELP_ICON_SIZE;
         for (List<GuiButton> row : buttonRows) {
             contentWidth = Math.max(contentWidth, getRowWidth(row));
         }
         return contentWidth + MENU_PADDING * 2;
     }
 
-    private int getMenuHeight() {
+    private int calculateMenuHeight() {
         int rowsHeight = buttonRows.size() * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
         return MENU_PADDING * 2 + TITLE_ROW_HEIGHT + TITLE_ROW_GAP + rowsHeight;
     }
 
-    private static String getTitle() {
-        return StatCollector.translateToLocal("dashboard.editor.title");
-    }
-
     private int getMenuDefaultX() {
-        return width / 2 - getMenuWidth() / 2;
+        return width / 2 - menuWidth / 2;
     }
 
     private int getMenuDefaultY() {
-        return (height - getMenuHeight()) / 2;
+        return (height - menuHeight) / 2;
     }
 
     private void dragMenuTo(int mouseX, int mouseY) {
-        menuOffsetX = clampToScreen(mouseX - menuGrabOffsetX, getMenuWidth(), width) - getMenuDefaultX();
-        menuOffsetY = clampToScreen(mouseY - menuGrabOffsetY, getMenuHeight(), height) - getMenuDefaultY();
+        menuOffsetX = clampToScreen(mouseX - menuGrabOffsetX, menuWidth, width) - getMenuDefaultX();
+        menuOffsetY = clampToScreen(mouseY - menuGrabOffsetY, menuHeight, height) - getMenuDefaultY();
         positionButtons();
     }
 
@@ -297,7 +297,7 @@ public class GuiHudEditor extends GuiScreen {
         HudBounds menu = getMenuBounds();
         drawRect(menu.x, menu.y, menu.getRight(), menu.getBottom(), ColorUtils.menuBackground.getColor());
         int titleY = menu.y + MENU_PADDING + (TITLE_ROW_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
-        fontRendererObj.drawStringWithShadow(getTitle(), menu.x + MENU_PADDING, titleY, ColorUtils.text.getColor());
+        fontRendererObj.drawStringWithShadow(title, menu.x + MENU_PADDING, titleY, ColorUtils.text.getColor());
 
         HudBounds help = getHelpIconBounds(menu);
         boolean hovered = help.contains(mouseX, mouseY) && !draggingMenu;
