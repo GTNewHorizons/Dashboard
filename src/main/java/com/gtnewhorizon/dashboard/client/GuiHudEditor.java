@@ -260,6 +260,10 @@ public class GuiHudEditor extends GuiScreen {
      */
     private void drawElementName(String name, HudBounds bounds) {
         int maxWidth = bounds.width - 2;
+        // TODO: Fix wrapping (StackOverflow eeror)
+        if (maxWidth < fontRendererObj.getCharWidth('W')) {
+            return;
+        }
         int lineHeight = fontRendererObj.FONT_HEIGHT;
         int centerX = bounds.x + bounds.width / 2;
         List<String> lines = fontRendererObj.listFormattedStringToWidth(name, maxWidth);
@@ -400,7 +404,8 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
-        if (keyCode == HudEditorKeybind.OPEN_EDITOR.getKeyCode()) {
+        int editorKey = HudEditorKeybind.OPEN_EDITOR.getKeyCode();
+        if (editorKey != 0 && keyCode == editorKey) {
             mc.displayGuiScreen(null);
             return;
         }
