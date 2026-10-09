@@ -30,6 +30,7 @@ public final class HudLayout {
     private static final Type STATES_TYPE = new TypeToken<LinkedHashMap<String, HudElementState>>() {}.getType();
 
     private static Map<String, HudElementState> states;
+    private static boolean changed;
 
     private HudLayout() {}
 
@@ -41,6 +42,7 @@ public final class HudLayout {
     public static void setVisible(HudElement element, boolean visible) {
         getOrCreateState(element).visible = visible;
         removeIfDefault(element);
+        changed = true;
     }
 
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {
@@ -75,6 +77,7 @@ public final class HudLayout {
         state.anchorY = closestAnchor(y + defaultBounds.height / 2, screenHeight);
         state.offsetX = x - anchorPosition(state.anchorX, defaultBounds.width, screenWidth);
         state.offsetY = y - anchorPosition(state.anchorY, defaultBounds.height, screenHeight);
+        changed = true;
     }
 
     /** Moves the element back to its default position. A hidden element stays hidden. */
@@ -83,14 +86,20 @@ public final class HudLayout {
         if (state != null) {
             state.moved = false;
             removeIfDefault(element);
+            changed = true;
         }
     }
 
     public static void resetAll() {
         getStates().clear();
+        changed = true;
     }
 
+    /** Only write the file if something changed. */
     public static void save() {
+        if (!changed) {
+            return;
+        }
         File file = getFile();
         try {
             Files.createDirectories(
@@ -99,6 +108,7 @@ public final class HudLayout {
             try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
                 GSON.toJson(getStates(), STATES_TYPE, writer);
             }
+            changed = false;
         } catch (Exception e) {
             Dashboard.LOG.error("Failed to save the HUD layout to {}", file, e);
         }
