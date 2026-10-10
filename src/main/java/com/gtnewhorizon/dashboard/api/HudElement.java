@@ -17,9 +17,20 @@ public final class HudElement {
         HudBounds getDefaultBounds(int screenWidth, int screenHeight);
     }
 
+    @FunctionalInterface
+    public interface PreviewRenderer {
+
+        /**
+         * Draws sample content the same way the real element is drawn, through {@link HudEditor#beginRender} or
+         * {@link HudEditor#render}.
+         */
+        void drawPreview(int screenWidth, int screenHeight);
+    }
+
     private final String id;
     private final String translationKey;
     private final DefaultBoundsProvider defaultBoundsProvider;
+    private PreviewRenderer previewRenderer;
     private String modId;
     private String modName;
     private long lastRenderTime;
@@ -44,6 +55,16 @@ public final class HudElement {
 
     public HudBounds getDefaultBounds(int screenWidth, int screenHeight) {
         return defaultBoundsProvider.getDefaultBounds(screenWidth, screenHeight);
+    }
+
+    /** Sample content the editor shows while the real element is not showing. Optional. */
+    public HudElement setPreview(PreviewRenderer previewRenderer) {
+        this.previewRenderer = previewRenderer;
+        return this;
+    }
+
+    public PreviewRenderer getPreview() {
+        return previewRenderer;
     }
 
     /** Only needed when the part of the id before ':' is not the mod id (ignoring case). */

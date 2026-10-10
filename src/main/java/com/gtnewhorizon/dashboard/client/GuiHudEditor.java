@@ -49,6 +49,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int TITLE_ROW_GAP = 4;
     private static final int MENU_PADDING = 6;
     private static final int GRID_SIZE = 20;
+    private static final int SAME_SPOT_OVERLAP_PERCENT = 75;
 
     /**
      * Where boxes overlap, elements that are showing come first, then smaller boxes, so small elements on top of big
@@ -260,6 +261,7 @@ public class GuiHudEditor extends GuiScreen {
         if (DashboardConfig.showGrid) {
             drawGrid();
         }
+        drawPreviews();
 
         // The most important boxes are drawn last, so they end up on top
         for (int i = boxes.size() - 1; i >= 0; i--) {
@@ -279,6 +281,34 @@ public class GuiHudEditor extends GuiScreen {
                 drawHoveringText(menuTooltip, mouseX, mouseY, fontRendererObj);
             }
         }
+    }
+
+    /**
+     * Sample content for visible elements that are not showing.
+     */
+    private void drawPreviews() {
+        List<HudBounds> taken = new ArrayList<>();
+        for (ElementBox box : boxes) {
+            if (box.showing) {
+                taken.add(box.bounds);
+            }
+        }
+        for (ElementBox box : boxes) {
+            if (box.showing || box.element.getPreview() == null || !HudLayout.isVisible(box.element)) {
+                continue;
+            }
+            if (taken.stream()
+                .noneMatch(other -> isSameSpot(box.bounds, other))) {
+                HudEditor.drawPreview(box.element, width, height);
+                taken.add(box.bounds);
+            }
+        }
+    }
+
+    /** Measured against the bigger box. */
+    private static boolean isSameSpot(HudBounds a, HudBounds b) {
+        int biggerArea = Math.max(a.getArea(), b.getArea());
+        return biggerArea > 0 && a.getOverlapArea(b) >= biggerArea * SAME_SPOT_OVERLAP_PERCENT / 100;
     }
 
     /** Lines start from the screen center. */

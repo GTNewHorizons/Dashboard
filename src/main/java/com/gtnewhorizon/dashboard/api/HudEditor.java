@@ -10,6 +10,7 @@ import net.minecraft.client.gui.ScaledResolution;
 
 import org.lwjgl.opengl.GL11;
 
+import com.gtnewhorizon.dashboard.Dashboard;
 import com.gtnewhorizon.dashboard.client.HudLayout;
 
 import cpw.mods.fml.relauncher.Side;
@@ -24,6 +25,8 @@ public final class HudEditor {
     private static final Map<String, HudElement> ELEMENTS = new LinkedHashMap<>();
     /** A read-only view, so it always shows the current elements. */
     private static final Collection<HudElement> ELEMENTS_VIEW = Collections.unmodifiableCollection(ELEMENTS.values());
+
+    private static boolean drawingPreview;
 
     private HudEditor() {}
 
@@ -85,8 +88,40 @@ public final class HudEditor {
      * @return false if the element should not be drawn
      */
     public static boolean shouldRender(HudElement element) {
-        element.markRendered();
+        if (!drawingPreview) {
+            element.markRendered();
+        }
         return HudLayout.isVisible(element);
+    }
+
+    /**
+     * Draws the element's preview, if it has one.
+     */
+    public static void drawPreview(HudElement element, int screenWidth, int screenHeight) {
+        HudElement.PreviewRenderer preview = element.getPreview();
+        if (preview == null) {
+            return;
+        }
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        drawingPreview = true;
+        try {
+            preview.drawPreview(screenWidth, screenHeight);
+        } catch (RuntimeException e) {
+            Dashboard.LOG.error("HUD preview of {} failed, turning it off", element.getId(), e);
+            element.setPreview(null);
+        } finally {
+            drawingPreview = false;
+            GL11.glMatrixMode(GL11.GL_PROJECTION);
+            GL11.glPopMatrix();
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+            GL11.glPopMatrix();
+            GL11.glPopAttrib();
+        }
     }
 
     /**

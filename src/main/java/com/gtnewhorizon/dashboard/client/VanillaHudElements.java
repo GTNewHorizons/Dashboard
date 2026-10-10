@@ -7,8 +7,11 @@ import java.util.Set;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -46,7 +49,11 @@ public final class VanillaHudElements {
         add(ElementType.EXPERIENCE, "experience", (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
         add(ElementType.JUMPBAR, "jump_bar", (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
         // The boss name is drawn 10 pixels above the bar
-        add(ElementType.BOSSHEALTH, "boss_health", (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
+        HudElement bossHealth = add(
+            ElementType.BOSSHEALTH,
+            "boss_health",
+            (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
+        PreviewDrawing.setImitationInBounds(bossHealth, VanillaHudElements::drawBossHealthPreview);
         addStacked(ElementType.HEALTH, "health", false);
         addStacked(ElementType.ARMOR, "armor", false);
         addStacked(ElementType.FOOD, "food", true);
@@ -54,15 +61,28 @@ public final class VanillaHudElements {
         addStacked(ElementType.HEALTHMOUNT, "mount_health", true);
     }
 
-    private static void add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
+    private static HudElement add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
         String id = "minecraft:" + name;
-        ELEMENTS.put(type, HudEditor.register(new HudElement(id, "dashboard.element.minecraft." + name, bounds)));
+        HudElement element = HudEditor.register(new HudElement(id, "dashboard.element.minecraft." + name, bounds));
+        ELEMENTS.put(type, element);
+        return element;
     }
 
     private static void addStacked(ElementType type, String name, boolean rightSide) {
         StackedIconRow row = new StackedIconRow(rightSide);
         STACKED_ROWS.put(type, row);
         add(type, name, row);
+    }
+
+    /** A Wither boss bar, two thirds full. */
+    private static void drawBossHealthPreview(HudBounds bounds) {
+        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        String name = StatCollector.translateToLocal("entity.WitherBoss.name");
+        int nameX = bounds.x + BAR_WIDTH / 2 - font.getStringWidth(name) / 2;
+        font.drawStringWithShadow(name, nameX, bounds.y, ColorUtils.textPreview.getColor());
+        PreviewDrawing.bindTexture(Gui.icons);
+        PreviewDrawing.drawTexture(bounds.x, bounds.y + 10, 0, 74, BAR_WIDTH, 5);
+        PreviewDrawing.drawTexture(bounds.x, bounds.y + 10, 0, 79, BAR_WIDTH * 2 / 3, 5);
     }
 
     /** Runs first, so other mods drawing this element (like Tinkers' hearts) are moved too. */
