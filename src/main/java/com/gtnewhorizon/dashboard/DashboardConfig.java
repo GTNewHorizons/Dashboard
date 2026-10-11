@@ -11,6 +11,11 @@ public class DashboardConfig {
     @Config.DefaultBoolean(true)
     public static boolean showGrid;
 
+    @Config.Comment("Show sample content for elements that are not showing in the HUD editor")
+    @Config.LangKey("dashboard.config.editor.show_preview")
+    @Config.DefaultBoolean(true)
+    public static boolean showPreview;
+
     @Config.Comment("Show the element names inside their boxes in the HUD editor")
     @Config.LangKey("dashboard.config.editor.show_labels")
     @Config.DefaultBoolean(true)

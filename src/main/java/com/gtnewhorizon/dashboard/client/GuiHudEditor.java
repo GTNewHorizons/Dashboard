@@ -35,7 +35,8 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_GRID = 2;
     private static final int BUTTON_LABELS = 3;
     private static final int BUTTON_POSITIONS = 4;
-    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_LABELS, BUTTON_POSITIONS };
+    private static final int BUTTON_PREVIEW = 5;
+    private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS };
     private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
@@ -115,6 +116,7 @@ public class GuiHudEditor extends GuiScreen {
     private static String getToggleName(int buttonId) {
         return switch (buttonId) {
             case BUTTON_GRID -> "grid";
+            case BUTTON_PREVIEW -> "preview";
             case BUTTON_LABELS -> "labels";
             case BUTTON_POSITIONS -> "positions";
             default -> throw new IllegalArgumentException("Not a toggle button: " + buttonId);
@@ -124,6 +126,7 @@ public class GuiHudEditor extends GuiScreen {
     private static boolean isToggleOn(int buttonId) {
         return switch (buttonId) {
             case BUTTON_GRID -> DashboardConfig.showGrid;
+            case BUTTON_PREVIEW -> DashboardConfig.showPreview;
             case BUTTON_LABELS -> DashboardConfig.showLabels;
             case BUTTON_POSITIONS -> DashboardConfig.showPositions;
             default -> false;
@@ -133,6 +136,7 @@ public class GuiHudEditor extends GuiScreen {
     private void toggle(int buttonId) {
         switch (buttonId) {
             case BUTTON_GRID -> DashboardConfig.showGrid = !DashboardConfig.showGrid;
+            case BUTTON_PREVIEW -> DashboardConfig.showPreview = !DashboardConfig.showPreview;
             case BUTTON_LABELS -> DashboardConfig.showLabels = !DashboardConfig.showLabels;
             case BUTTON_POSITIONS -> DashboardConfig.showPositions = !DashboardConfig.showPositions;
             default -> {}
@@ -261,7 +265,9 @@ public class GuiHudEditor extends GuiScreen {
         if (DashboardConfig.showGrid) {
             drawGrid();
         }
-        drawPreviews();
+        if (DashboardConfig.showPreview) {
+            drawPreviews();
+        }
 
         // The most important boxes are drawn last, so they end up on top
         for (int i = boxes.size() - 1; i >= 0; i--) {
@@ -614,7 +620,7 @@ public class GuiHudEditor extends GuiScreen {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
             case BUTTON_RESET_ALL -> HudLayout.resetAll();
-            case BUTTON_GRID, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
+            case BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}
         }
     }
