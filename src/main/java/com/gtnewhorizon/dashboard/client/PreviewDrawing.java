@@ -25,9 +25,15 @@ public final class PreviewDrawing {
 
     /** Draws the imitation at the element's default position, moved like the real element. */
     public static void setImitation(HudElement element, HudElement.PreviewRenderer draw) {
-        element.setPreview(
-            (screenWidth, screenHeight) -> HudEditor
-                .render(element, () -> draw.drawPreview(screenWidth, screenHeight)));
+        element.setPreview((screenWidth, screenHeight) -> {
+            if (HudEditor.beginRender(element, screenWidth, screenHeight)) {
+                try {
+                    draw.drawPreview(screenWidth, screenHeight);
+                } finally {
+                    HudEditor.endRender();
+                }
+            }
+        });
     }
 
     /** Like {@link #setImitation}, for imitations that only need the element's default bounds. */
