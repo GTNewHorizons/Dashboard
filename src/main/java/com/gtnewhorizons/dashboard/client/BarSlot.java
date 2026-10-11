@@ -1,21 +1,23 @@
 package com.gtnewhorizons.dashboard.client;
 
-/** Bar theme sheet. */
+/**
+ * Bar theme sheet (512 x 512). Each slot is the bar with 8px of space on every side.
+ */
 public enum BarSlot {
 
-    // empty / full / width, height / fills from the right like the vanilla right side rows
-    EXPERIENCE(0, 0, 0, 5, 182, 5, false),
-    JUMP_BAR(0, 10, 0, 15, 182, 5, false),
-    BOSS_HEALTH(0, 83, 0, 88, 182, 5, false),
-    HEALTH(0, 20, 81, 20, 81, 9, false),
-    HEALTH_POISONED(0, 20, 0, 65, 81, 9, false),
-    HEALTH_WITHERED(0, 20, 81, 65, 81, 9, false),
-    HEALTH_ABSORPTION(0, 20, 0, 74, 81, 9, false),
-    ARMOR(0, 29, 81, 29, 81, 9, false),
-    FOOD(0, 38, 81, 38, 81, 9, true),
-    FOOD_HUNGER(0, 38, 81, 74, 81, 9, true),
-    AIR(0, 47, 81, 47, 81, 9, true),
-    MOUNT_HEALTH(0, 56, 81, 56, 81, 9, true);
+    // empty slot / full slot / bar width, height / fills from the right like the vanilla right side rows
+    EXPERIENCE(0, 0, 198, 0, 182, 5, false),
+    JUMP_BAR(0, 21, 198, 21, 182, 5, false),
+    BOSS_HEALTH(0, 42, 198, 42, 182, 5, false),
+    HEALTH(0, 63, 97, 63, 81, 9, false),
+    HEALTH_POISONED(0, 63, 0, 138, 81, 9, false),
+    HEALTH_WITHERED(0, 63, 97, 138, 81, 9, false),
+    HEALTH_ABSORPTION(0, 63, 194, 138, 81, 9, false),
+    ARMOR(194, 63, 291, 63, 81, 9, false),
+    FOOD(0, 88, 97, 88, 81, 9, true),
+    FOOD_HUNGER(0, 88, 291, 138, 81, 9, true),
+    AIR(194, 88, 291, 88, 81, 9, true),
+    MOUNT_HEALTH(0, 113, 97, 113, 81, 9, true);
 
     public final int emptyU;
     public final int emptyV;

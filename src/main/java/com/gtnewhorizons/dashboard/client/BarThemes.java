@@ -24,9 +24,10 @@ public final class BarThemes {
 
     public static final List<String> THEMES = Collections.unmodifiableList(Arrays.asList("test"));
     public static final float PREVIEW_FILL = 2 / 3f;
+    public static final int PADDING = 8;
 
+    private static final int SHEET_SIZE = 512;
     private static final Map<String, ResourceLocation> TEXTURES = new HashMap<>();
-    private static final Gui GUI = new Gui();
 
     private BarThemes() {}
 
@@ -41,7 +42,13 @@ public final class BarThemes {
 
     public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
         bindTexture(theme);
-        GUI.drawTexturedModalRect(x, y, slot.emptyU, slot.emptyV, slot.width, slot.height);
+        drawFromSheet(
+            x - PADDING,
+            y - PADDING,
+            slot.emptyU,
+            slot.emptyV,
+            slot.width + PADDING * 2,
+            slot.height + PADDING * 2);
         drawFill(slot, x, y, fraction, fromRight);
     }
 
@@ -56,7 +63,11 @@ public final class BarThemes {
             return;
         }
         int offset = fromRight ? slot.width - fillWidth : 0;
-        GUI.drawTexturedModalRect(x + offset, y, slot.fullU + offset, slot.fullV, fillWidth, slot.height);
+        drawFromSheet(x + offset, y, slot.fullU + PADDING + offset, slot.fullV + PADDING, fillWidth, slot.height);
+    }
+
+    private static void drawFromSheet(int x, int y, int u, int v, int width, int height) {
+        Gui.func_146110_a(x, y, u, v, width, height, SHEET_SIZE, SHEET_SIZE);
     }
 
     private static void bindTexture(String theme) {

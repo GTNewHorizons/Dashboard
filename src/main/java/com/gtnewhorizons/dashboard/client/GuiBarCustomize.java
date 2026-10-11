@@ -24,12 +24,12 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_FIRST_BAR = 3;
     private static final int BUTTON_FIRST_FLIP = 100;
     private static final int BUTTON_HEIGHT = 20;
-    private static final int ROW_HEIGHT = 21;
+    private static final int ROW_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
     private static final int FLIP_BUTTON_WIDTH = 20;
     private static final int COLUMN_GAP = 6;
-    private static final int TITLE_Y = 12;
-    private static final int LIST_TOP = 28;
+    private static final int TITLE_Y = 10;
+    private static final int LIST_TOP = 24;
     private static final int ALL_ROW_GAP = 4;
 
     private final GuiScreen parent;
@@ -75,11 +75,13 @@ public class GuiBarCustomize extends GuiScreen {
             + COLUMN_GAP
             + FLIP_BUTTON_WIDTH
             + COLUMN_GAP
-            + previewWidth;
+            + BarThemes.PADDING
+            + previewWidth
+            + BarThemes.PADDING;
         nameRight = (width - totalWidth) / 2 + nameWidth;
         int buttonX = nameRight + COLUMN_GAP;
         int flipX = buttonX + THEME_BUTTON_WIDTH + COLUMN_GAP;
-        previewX = flipX + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+        previewX = flipX + FLIP_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
 
         allButton = new GuiButton(BUTTON_ALL, buttonX, LIST_TOP, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
         buttonList.add(allButton);
