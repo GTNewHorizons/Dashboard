@@ -8,10 +8,14 @@ import java.util.Map;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.StatCollector;
+
+import org.lwjgl.input.Mouse;
 
 import com.gtnewhorizons.dashboard.api.HudElement;
 
+import cpw.mods.fml.client.GuiScrollingList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -23,17 +27,18 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_ALL = 1;
     private static final int BUTTON_RESET_FLIPS = 2;
     private static final int BUTTON_STATES = 3;
-    private static final int BUTTON_FIRST_BAR = 4;
-    private static final int BUTTON_FIRST_FLIP = 100;
+    private static final int SCROLL_UP = 4;
+    private static final int SCROLL_DOWN = 5;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
     private static final int FLIP_BUTTON_WIDTH = 20;
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
-    private static final int TITLE_Y = 10;
-    private static final int LIST_TOP = 24;
-    private static final int ALL_ROW_GAP = 4;
+    private static final int TITLE_Y = 8;
+    private static final int ALL_ROW_Y = 20;
+    private static final int LIST_TOP = 46;
+    private static final int LIST_BOTTOM_MARGIN = 30;
 
     private static boolean showStates;
 
@@ -41,12 +46,15 @@ public class GuiBarCustomize extends GuiScreen {
     private final List<HudElement> bars = new ArrayList<>();
     private final List<BarSlot> slots = new ArrayList<>();
     private final List<Row> rows = new ArrayList<>();
-    private final List<GuiButton> barButtons = new ArrayList<>();
-    private final List<GuiButton> flipButtons = new ArrayList<>();
+    private final GuiButton scrollUp = new GuiButton(SCROLL_UP, 0, 0, "");
+    private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
+    private final GuiButton themeButton = new GuiButton(0, 0, 0, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+    private final GuiButton flipButton = new GuiButton(0, 0, 0, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+    private BarList list;
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
-    private int nameRight;
-    private int previewX;
+    private int nameWidth;
+    private int contentWidth;
 
     public GuiBarCustomize(GuiScreen parent) {
         this.parent = parent;
@@ -58,8 +66,6 @@ public class GuiBarCustomize extends GuiScreen {
         bars.clear();
         slots.clear();
         rows.clear();
-        barButtons.clear();
-        flipButtons.clear();
         for (Map.Entry<HudElement, BarSlot> entry : VanillaHudElements.getThemedBars()
             .entrySet()) {
             int barIndex = bars.size();
@@ -81,13 +87,13 @@ public class GuiBarCustomize extends GuiScreen {
         }
 
         // Name, button and preview columns
-        int nameWidth = fontRendererObj.getStringWidth(getAllBarsName());
+        nameWidth = fontRendererObj.getStringWidth(getAllBarsName());
         int previewWidth = 0;
         for (Row row : rows) {
             nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(row.name));
             previewWidth = Math.max(previewWidth, row.slot.width);
         }
-        int totalWidth = nameWidth + COLUMN_GAP
+        contentWidth = nameWidth + COLUMN_GAP
             + THEME_BUTTON_WIDTH
             + COLUMN_GAP
             + FLIP_BUTTON_WIDTH
@@ -95,44 +101,22 @@ public class GuiBarCustomize extends GuiScreen {
             + BarThemes.PADDING
             + previewWidth
             + BarThemes.PADDING;
-        nameRight = (width - totalWidth) / 2 + nameWidth;
-        int buttonX = nameRight + COLUMN_GAP;
-        int flipX = buttonX + THEME_BUTTON_WIDTH + COLUMN_GAP;
-        previewX = flipX + FLIP_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
+        list = new BarList();
+        list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
 
-        allButton = new GuiButton(BUTTON_ALL, buttonX, LIST_TOP, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+        int left = getContentLeft();
+        allButton = new GuiButton(BUTTON_ALL, left + getButtonX(), ALL_ROW_Y, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
         buttonList.add(allButton);
-        resetFlipsButton = new GuiButton(BUTTON_RESET_FLIPS, flipX, LIST_TOP, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, "R");
+        resetFlipsButton = new GuiButton(
+            BUTTON_RESET_FLIPS,
+            left + getFlipX(),
+            ALL_ROW_Y,
+            FLIP_BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            "R");
         buttonList.add(resetFlipsButton);
 
-        for (int i = 0; i < rows.size(); i++) {
-            Row row = rows.get(i);
-            if (row.state) {
-                continue;
-            }
-            int y = getRowY(i);
-            GuiButton button = new GuiButton(
-                BUTTON_FIRST_BAR + row.barIndex,
-                buttonX,
-                y,
-                THEME_BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                "");
-            barButtons.add(button);
-            buttonList.add(button);
-
-            GuiButton flip = new GuiButton(
-                BUTTON_FIRST_FLIP + row.barIndex,
-                flipX,
-                y,
-                FLIP_BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                "");
-            flipButtons.add(flip);
-            buttonList.add(flip);
-        }
-
-        int bottomY = getRowY(rows.size()) + ALL_ROW_GAP;
+        int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
         buttonList.add(
             new GuiButton(
                 BUTTON_STATES,
@@ -144,11 +128,22 @@ public class GuiBarCustomize extends GuiScreen {
                     showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states")));
         String done = StatCollector.translateToLocal("dashboard.editor.button.done");
         buttonList.add(new GuiButton(BUTTON_DONE, width / 2 + 2, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, done));
-        updateButtonTexts();
     }
 
-    private static int getRowY(int index) {
-        return LIST_TOP + ROW_HEIGHT + ALL_ROW_GAP + index * ROW_HEIGHT;
+    private int getContentLeft() {
+        return (width - contentWidth) / 2;
+    }
+
+    private int getButtonX() {
+        return nameWidth + COLUMN_GAP;
+    }
+
+    private int getFlipX() {
+        return getButtonX() + THEME_BUTTON_WIDTH + COLUMN_GAP;
+    }
+
+    private int getPreviewX() {
+        return getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
     }
 
     private static String getAllBarsName() {
@@ -183,25 +178,20 @@ public class GuiBarCustomize extends GuiScreen {
         return true;
     }
 
-    private void updateButtonTexts() {
-        boolean anyFlipped = false;
-        for (int i = 0; i < bars.size(); i++) {
-            HudElement bar = bars.get(i);
-            String theme = HudLayout.getTheme(bar);
-            barButtons.get(i).displayString = getThemeName(theme);
-            GuiButton flip = flipButtons.get(i);
-            flip.displayString = BarThemes.fillsFromRight(bar, slots.get(i)) ? "<" : ">";
-            flip.enabled = theme != null;
-            anyFlipped |= HudLayout.isFlipped(bar);
+    private boolean anyBarFlipped() {
+        for (HudElement bar : bars) {
+            if (HudLayout.isFlipped(bar)) {
+                return true;
+            }
         }
-        resetFlipsButton.enabled = anyFlipped;
-        allButton.displayString = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
-            : StatCollector.translateToLocal("dashboard.customize.mixed");
+        return false;
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
+        list.drawScreen(mouseX, mouseY, partialTicks);
+
         int textColor = ColorUtils.text.getColor();
         drawCenteredString(
             fontRendererObj,
@@ -209,15 +199,11 @@ public class GuiBarCustomize extends GuiScreen {
             width / 2,
             TITLE_Y,
             textColor);
+        drawRowName(getAllBarsName(), ALL_ROW_Y, textColor);
 
-        drawRowName(getAllBarsName(), LIST_TOP, textColor);
-        int stateColor = ColorUtils.textState.getColor();
-        for (int i = 0; i < rows.size(); i++) {
-            Row row = rows.get(i);
-            int rowY = getRowY(i);
-            drawRowName(row.name, rowY, row.state ? stateColor : textColor);
-            drawPreview(row, rowY);
-        }
+        allButton.displayString = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
+            : StatCollector.translateToLocal("dashboard.customize.mixed");
+        resetFlipsButton.enabled = anyBarFlipped();
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (isMouseOver(resetFlipsButton, mouseX, mouseY)) {
@@ -237,52 +223,94 @@ public class GuiBarCustomize extends GuiScreen {
 
     private void drawRowName(String name, int rowY, int color) {
         int y = rowY + (BUTTON_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
-        fontRendererObj.drawStringWithShadow(name, nameRight - fontRendererObj.getStringWidth(name), y, color);
+        int right = getContentLeft() + nameWidth;
+        fontRendererObj.drawStringWithShadow(name, right - fontRendererObj.getStringWidth(name), y, color);
     }
 
-    /** The bar two thirds full in its bar's theme, or its vanilla look. States follow their bar. */
-    private void drawPreview(Row row, int rowY) {
+    private void drawRow(Row row, int rowY, int mouseX, int mouseY) {
         HudElement bar = bars.get(row.barIndex);
         String theme = HudLayout.getTheme(bar);
+        int left = getContentLeft();
+        drawRowName(row.name, rowY, row.state ? ColorUtils.textState.getColor() : ColorUtils.text.getColor());
+
+        if (!row.state) {
+            placeRowButtons(row, rowY);
+            themeButton.drawButton(mc, mouseX, mouseY);
+            flipButton.drawButton(mc, mouseX, mouseY);
+        }
+
+        int x = left + getPreviewX();
         int y = rowY + (BUTTON_HEIGHT - row.slot.height) / 2;
         if (theme == null) {
-            VanillaHudElements.drawVanillaSample(row.slot, previewX, y);
+            VanillaHudElements.drawVanillaSample(row.slot, x, y);
+        } else {
+            boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
+            BarThemes.drawBar(theme, row.slot, x, y, BarThemes.PREVIEW_FILL, fromRight);
+        }
+    }
+
+    private void placeRowButtons(Row row, int rowY) {
+        HudElement bar = bars.get(row.barIndex);
+        String theme = HudLayout.getTheme(bar);
+        int left = getContentLeft();
+        themeButton.xPosition = left + getButtonX();
+        themeButton.yPosition = rowY;
+        themeButton.displayString = getThemeName(theme);
+
+        flipButton.xPosition = left + getFlipX();
+        flipButton.yPosition = rowY;
+        flipButton.displayString = BarThemes.fillsFromRight(bar, slots.get(row.barIndex)) ? "<" : ">";
+        flipButton.enabled = theme != null;
+    }
+
+    private void clickRow(Row row, int rowY, int mouseX, int mouseY) {
+        if (row.state) {
             return;
         }
-        boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
-        BarThemes.drawBar(theme, row.slot, previewX, y, BarThemes.PREVIEW_FILL, fromRight);
+        HudElement bar = bars.get(row.barIndex);
+        placeRowButtons(row, rowY);
+        if (themeButton.mousePressed(mc, mouseX, mouseY)) {
+            themeButton.func_146113_a(mc.getSoundHandler());
+            HudLayout.setTheme(bar, getNextTheme(HudLayout.getTheme(bar)));
+        } else if (flipButton.mousePressed(mc, mouseX, mouseY)) {
+            flipButton.func_146113_a(mc.getSoundHandler());
+            HudLayout.setFlipped(bar, !HudLayout.isFlipped(bar));
+        }
+    }
+
+    /** The Forge list misses wheel events. */
+    @Override
+    public void handleMouseInput() {
+        super.handleMouseInput();
+        int wheel = Mouse.getEventDWheel();
+        if (wheel != 0) {
+            list.actionPerformed(wheel > 0 ? scrollUp : scrollDown);
+        }
     }
 
     @Override
     protected void actionPerformed(GuiButton button) {
-        if (button.id == BUTTON_DONE) {
-            mc.displayGuiScreen(parent);
-            return;
-        }
-        if (button.id == BUTTON_STATES) {
-            showStates = !showStates;
-            initGui();
-            return;
-        }
-        if (button.id == BUTTON_ALL) {
-            // Mixed bars start over from vanilla
-            String current = allBarsMatch() ? HudLayout.getTheme(bars.get(0)) : null;
-            String theme = getNextTheme(current);
-            for (HudElement bar : bars) {
-                HudLayout.setTheme(bar, theme);
+        switch (button.id) {
+            case BUTTON_DONE -> mc.displayGuiScreen(parent);
+            case BUTTON_STATES -> {
+                showStates = !showStates;
+                initGui();
             }
-        } else if (button.id == BUTTON_RESET_FLIPS) {
-            for (HudElement bar : bars) {
-                HudLayout.setFlipped(bar, false);
+            case BUTTON_ALL -> {
+                // Mixed bars start over from vanilla
+                String current = allBarsMatch() ? HudLayout.getTheme(bars.get(0)) : null;
+                String theme = getNextTheme(current);
+                for (HudElement bar : bars) {
+                    HudLayout.setTheme(bar, theme);
+                }
             }
-        } else if (button.id >= BUTTON_FIRST_FLIP) {
-            HudElement bar = bars.get(button.id - BUTTON_FIRST_FLIP);
-            HudLayout.setFlipped(bar, !HudLayout.isFlipped(bar));
-        } else {
-            HudElement bar = bars.get(button.id - BUTTON_FIRST_BAR);
-            HudLayout.setTheme(bar, getNextTheme(HudLayout.getTheme(bar)));
+            case BUTTON_RESET_FLIPS -> {
+                for (HudElement bar : bars) {
+                    HudLayout.setFlipped(bar, false);
+                }
+            }
+            default -> {}
         }
-        updateButtonTexts();
     }
 
     @Override
@@ -295,6 +323,49 @@ public class GuiBarCustomize extends GuiScreen {
     @Override
     public void onGuiClosed() {
         HudLayout.save();
+    }
+
+    private final class BarList extends GuiScrollingList {
+
+        private BarList() {
+            super(
+                GuiBarCustomize.this.mc,
+                GuiBarCustomize.this.width,
+                GuiBarCustomize.this.height,
+                LIST_TOP,
+                GuiBarCustomize.this.height - LIST_BOTTOM_MARGIN,
+                0,
+                ROW_HEIGHT);
+        }
+
+        @Override
+        protected int getSize() {
+            return rows.size();
+        }
+
+        private final int[] rowYs = new int[rows.size()];
+
+        @Override
+        protected void elementClicked(int index, boolean doubleClick) {
+            clickRow(rows.get(index), rowYs[index], mouseX, mouseY);
+        }
+
+        @Override
+        protected boolean isSelected(int index) {
+            return false;
+        }
+
+        @Override
+        protected void drawBackground() {}
+
+        @Override
+        protected void drawGradientRect(int left, int top, int right, int bottom, int topColor, int bottomColor) {}
+
+        @Override
+        protected void drawSlot(int index, int right, int rowY, int slotHeight, Tessellator tessellator) {
+            rowYs[index] = rowY;
+            drawRow(rows.get(index), rowY, mouseX, mouseY);
+        }
     }
 
     /** One line of the list: a bar, or one of its states. */
