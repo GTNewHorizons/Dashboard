@@ -1,12 +1,12 @@
-package com.gtnewhorizon.dashboard.core;
+package com.gtnewhorizons.dashboard.core;
 
 import java.util.List;
 import java.util.Set;
 
-import com.gtnewhorizon.dashboard.mixins.Mixins;
 import com.gtnewhorizon.gtnhmixins.ILateMixinLoader;
 import com.gtnewhorizon.gtnhmixins.LateMixin;
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
+import com.gtnewhorizons.dashboard.mixins.Mixins;
 
 /** Loads the mixins into other mods, which can only be applied once those mods are found. */
 @LateMixin

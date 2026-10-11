@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard;
+package com.gtnewhorizons.dashboard;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;

@@ -1,12 +1,12 @@
-package com.gtnewhorizon.dashboard.core;
+package com.gtnewhorizons.dashboard.core;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.gtnewhorizon.dashboard.mixins.Mixins;
 import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
+import com.gtnewhorizons.dashboard.mixins.Mixins;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 

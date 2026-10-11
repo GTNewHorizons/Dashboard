@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.api;
+package com.gtnewhorizons.dashboard.api;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,10 +10,10 @@ import net.minecraft.client.gui.ScaledResolution;
 
 import org.lwjgl.opengl.GL11;
 
-import com.gtnewhorizon.dashboard.Dashboard;
-import com.gtnewhorizon.dashboard.DashboardConfig;
-import com.gtnewhorizon.dashboard.client.GuiHudEditor;
-import com.gtnewhorizon.dashboard.client.HudLayout;
+import com.gtnewhorizons.dashboard.Dashboard;
+import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.client.GuiHudEditor;
+import com.gtnewhorizons.dashboard.client.HudLayout;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

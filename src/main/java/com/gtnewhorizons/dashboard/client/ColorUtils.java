@@ -1,5 +1,5 @@
 // TODO: Adjust colors
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 import com.gtnewhorizon.gtnhlib.color.ColorResource;
 

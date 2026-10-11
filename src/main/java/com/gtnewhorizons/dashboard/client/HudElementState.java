@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 /**
  * What the player changed about one HUD element. Saved as JSON.

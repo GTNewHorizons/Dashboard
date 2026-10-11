@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 import java.awt.Color;
 import java.util.Collections;
@@ -26,10 +26,10 @@ import net.minecraftforge.common.ForgeHooks;
 
 import org.lwjgl.opengl.GL11;
 
-import com.gtnewhorizon.dashboard.api.HudBounds;
-import com.gtnewhorizon.dashboard.api.HudEditor;
-import com.gtnewhorizon.dashboard.api.HudElement;
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
+import com.gtnewhorizons.dashboard.api.HudBounds;
+import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudElement;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

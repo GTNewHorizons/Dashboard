@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,11 +15,11 @@ import net.minecraft.util.StatCollector;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import com.gtnewhorizon.dashboard.DashboardConfig;
-import com.gtnewhorizon.dashboard.api.HudBounds;
-import com.gtnewhorizon.dashboard.api.HudEditor;
-import com.gtnewhorizon.dashboard.api.HudElement;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
+import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.api.HudBounds;
+import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudElement;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard;
+package com.gtnewhorizons.dashboard;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
 

@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 import java.io.File;
 import java.io.Reader;
@@ -14,9 +14,9 @@ import net.minecraft.client.Minecraft;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.gtnewhorizon.dashboard.Dashboard;
-import com.gtnewhorizon.dashboard.api.HudBounds;
-import com.gtnewhorizon.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.Dashboard;
+import com.gtnewhorizons.dashboard.api.HudBounds;
+import com.gtnewhorizons.dashboard.api.HudElement;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

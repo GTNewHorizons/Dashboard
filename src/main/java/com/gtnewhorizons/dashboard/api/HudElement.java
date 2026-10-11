@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.api;
+package com.gtnewhorizons.dashboard.api;
 
 import net.minecraft.util.StatCollector;
 

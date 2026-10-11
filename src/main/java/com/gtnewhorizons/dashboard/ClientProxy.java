@@ -1,9 +1,9 @@
-package com.gtnewhorizon.dashboard;
+package com.gtnewhorizons.dashboard;
 
-import com.gtnewhorizon.dashboard.client.HudEditorKeybind;
-import com.gtnewhorizon.dashboard.client.VanillaHudElements;
 import com.gtnewhorizon.gtnhlib.config.ConfigException;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
+import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
+import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;

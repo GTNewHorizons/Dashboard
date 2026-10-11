@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.api;
+package com.gtnewhorizons.dashboard.api;
 
 /** A rectangle on the HUD, in GUI scaled pixels. */
 public final class HudBounds {

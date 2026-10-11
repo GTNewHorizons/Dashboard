@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 import java.util.function.Consumer;
 
@@ -8,9 +8,9 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import com.gtnewhorizon.dashboard.api.HudBounds;
-import com.gtnewhorizon.dashboard.api.HudEditor;
-import com.gtnewhorizon.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudBounds;
+import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudElement;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

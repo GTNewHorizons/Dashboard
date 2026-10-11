@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.mixins;
+package com.gtnewhorizons.dashboard.mixins;
 
 import javax.annotation.Nonnull;
 

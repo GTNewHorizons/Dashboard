@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.client;
+package com.gtnewhorizons.dashboard.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;

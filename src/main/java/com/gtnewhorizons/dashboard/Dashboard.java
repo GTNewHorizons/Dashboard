@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard;
+package com.gtnewhorizons.dashboard;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,8 +20,8 @@ public class Dashboard {
     public static final Logger LOG = LogManager.getLogger(MODID);
 
     @SidedProxy(
-        clientSide = "com.gtnewhorizon.dashboard.ClientProxy",
-        serverSide = "com.gtnewhorizon.dashboard.CommonProxy")
+        clientSide = "com.gtnewhorizons.dashboard.ClientProxy",
+        serverSide = "com.gtnewhorizons.dashboard.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler

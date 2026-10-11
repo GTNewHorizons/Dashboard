@@ -1,4 +1,4 @@
-package com.gtnewhorizon.dashboard.mixins.early;
+package com.gtnewhorizons.dashboard.mixins.early;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.client.GuiIngameForge;
@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-import com.gtnewhorizon.dashboard.api.HudEditor;
-import com.gtnewhorizon.dashboard.api.HudElement;
-import com.gtnewhorizon.dashboard.client.VanillaHudElements;
+import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
