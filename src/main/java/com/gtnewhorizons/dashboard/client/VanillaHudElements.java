@@ -85,7 +85,8 @@ public final class VanillaHudElements {
             ElementType.JUMPBAR,
             "jump_bar",
             (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
-        PreviewDrawing.setImitationInBounds(jumpBar, bounds -> drawVanillaSample(BarSlot.JUMP_BAR, bounds.x, bounds.y));
+        PreviewDrawing
+            .setImitationInBounds(jumpBar, bounds -> drawBarSample(jumpBar, BarSlot.JUMP_BAR, bounds.x, bounds.y));
         // The boss name is drawn 10 pixels above the bar
         HudElement bossHealth = add(
             ElementType.BOSSHEALTH,
@@ -205,26 +206,42 @@ public final class VanillaHudElements {
 
     /** A Wither boss bar, two thirds full. */
     private static void drawBossHealthPreview(HudBounds bounds) {
+        drawBossName(bounds, StatCollector.translateToLocal("entity.WitherBoss.name"));
+        drawBarSample(ELEMENTS.get(ElementType.BOSSHEALTH), BarSlot.BOSS_HEALTH, bounds.x, bounds.y + 10);
+    }
+
+    private static void drawBossName(HudBounds bounds, String name) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-        String name = StatCollector.translateToLocal("entity.WitherBoss.name");
         int nameX = bounds.x + BAR_WIDTH / 2 - font.getStringWidth(name) / 2;
         font.drawStringWithShadow(name, nameX, bounds.y, 0xFFFFFF);
-        drawBarPreview(bounds.x, bounds.y + 10, 74);
     }
 
     /** Experience bar, with the number (vanilla colors) */
     private static void drawExperiencePreview(HudBounds bounds) {
-        drawBarPreview(bounds.x, bounds.y, 64);
+        drawBarSample(ELEMENTS.get(ElementType.EXPERIENCE), BarSlot.EXPERIENCE, bounds.x, bounds.y);
+        drawLevelNumber(bounds, 16);
+    }
 
+    /** Themed or vanilla editor sample. */
+    private static void drawBarSample(HudElement element, BarSlot slot, int x, int y) {
+        String theme = HudLayout.getTheme(element);
+        if (theme == null) {
+            drawVanillaSample(slot, x, y);
+        } else {
+            BarThemes.drawBar(theme, slot, x, y, BarThemes.PREVIEW_FILL, BarThemes.fillsFromRight(element, slot));
+        }
+    }
+
+    private static void drawLevelNumber(HudBounds bar, int level) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-        String level = "16";
-        int x = bounds.x + BAR_WIDTH / 2 - font.getStringWidth(level) / 2;
-        int y = bounds.y - 6;
-        font.drawString(level, x + 1, y, 0x000000);
-        font.drawString(level, x - 1, y, 0x000000);
-        font.drawString(level, x, y + 1, 0x000000);
-        font.drawString(level, x, y - 1, 0x000000);
-        font.drawString(level, x, y, 0x80FF20);
+        String text = String.valueOf(level);
+        int x = bar.x + BAR_WIDTH / 2 - font.getStringWidth(text) / 2;
+        int y = bar.y - 6;
+        font.drawString(text, x + 1, y, 0x000000);
+        font.drawString(text, x - 1, y, 0x000000);
+        font.drawString(text, x, y + 1, 0x000000);
+        font.drawString(text, x, y - 1, 0x000000);
+        font.drawString(text, x, y, 0x80FF20);
     }
 
     /** Held item name preview. */
@@ -252,6 +269,10 @@ public final class VanillaHudElements {
         if (!willDraw(event.type)) {
             return;
         }
+        String theme = THEMED_BARS.containsKey(element) ? HudLayout.getTheme(element) : null;
+        if (theme != null && drawThemed(event, element, theme)) {
+            return;
+        }
         if (HudEditor.isHidingContent() && HudLayout.isVisible(element)) {
             // Drawn invisibly instead of skipped, so the rows above keep their place
             HudEditor.shouldRender(element);
@@ -264,8 +285,53 @@ public final class VanillaHudElements {
         if (HudEditor.beginRender(element, event.resolution)) {
             SHIFTED.add(event.type);
         } else {
-            event.setCanceled(true);
+            cancel(event);
         }
+    }
+
+    /** Vanilla counts the boss bar timer down while drawing it. */
+    private static void cancel(RenderGameOverlayEvent.Pre event) {
+        event.setCanceled(true);
+        if (event.type == ElementType.BOSSHEALTH) {
+            BossStatus.statusBarTime--;
+        }
+    }
+
+    /** Draws the theme instead of vanilla. False if the bar is not themable yet. */
+    private static boolean drawThemed(RenderGameOverlayEvent.Pre event, HudElement element, String theme) {
+        Minecraft mc = Minecraft.getMinecraft();
+        float fill = switch (event.type) {
+            case EXPERIENCE -> mc.thePlayer.experience;
+            case JUMPBAR -> mc.thePlayer.getHorseJumpPower();
+            case BOSSHEALTH -> BossStatus.healthScale;
+            default -> -1;
+        };
+        if (fill < 0) {
+            return false;
+        }
+        cancel(event);
+        if (!HudEditor.beginRender(element, event.resolution)) {
+            return true;
+        }
+        BarSlot slot = THEMED_BARS.get(element);
+        HudBounds bounds = element
+            .getDefaultBounds(event.resolution.getScaledWidth(), event.resolution.getScaledHeight());
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
+        try {
+            int barY = bounds.getBottom() - slot.height;
+            BarThemes.drawBar(theme, slot, bounds.x, barY, fill, BarThemes.fillsFromRight(element, slot));
+            if (event.type == ElementType.EXPERIENCE && mc.thePlayer.experienceLevel > 0) {
+                drawLevelNumber(bounds, mc.thePlayer.experienceLevel);
+            } else if (event.type == ElementType.BOSSHEALTH) {
+                drawBossName(bounds, BossStatus.bossName);
+            }
+        } finally {
+            GL11.glPopAttrib();
+            HudEditor.endRender();
+            mc.getTextureManager()
+                .bindTexture(Gui.icons);
+        }
+        return true;
     }
 
     /** These events fire even when nothing is drawn: no boss nearby, in creative, no armor, or not underwater. */
