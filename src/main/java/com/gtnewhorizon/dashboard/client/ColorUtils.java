@@ -11,7 +11,6 @@ public final class ColorUtils {
     // spotless:off
         text              = color.rgb("text",               "0xFFFFFF"),
         textPosition      = color.rgb("textPosition",       "0xFFFF55"),
-        textPreview       = color.rgb("textPreview",        "0xFFFFFF"),
 
         showingFill       = color.argb("showingFill",       "0x2000FF00"),
         showingBorder     = color.argb("showingBorder",     "0xA000FF00"),

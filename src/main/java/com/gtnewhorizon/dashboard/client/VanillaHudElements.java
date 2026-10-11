@@ -12,6 +12,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -48,9 +50,18 @@ public final class VanillaHudElements {
     private static final Set<ElementType> SHIFTED = EnumSet.noneOf(ElementType.class);
     private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
 
+    private static final int ITEM_NAME_WIDTH = 150;
+
+    public static final HudElement ITEM_NAME = new HudElement(
+        "minecraft:item_name",
+        "dashboard.element.minecraft.item_name",
+        VanillaHudElements::getItemNameBounds);
+
     private VanillaHudElements() {}
 
     public static void register() {
+        HudEditor.register(ITEM_NAME);
+        PreviewDrawing.setImitationInBounds(ITEM_NAME, VanillaHudElements::drawItemNamePreview);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
             ElementType.EXPERIENCE,
@@ -93,6 +104,16 @@ public final class VanillaHudElements {
         return add(type, name, row);
     }
 
+    /** 59px above the bottom screen border, or 14px lower without hearts and food (creative). */
+    private static HudBounds getItemNameBounds(int screenWidth, int screenHeight) {
+        PlayerControllerMP controller = Minecraft.getMinecraft().playerController;
+        int y = screenHeight - 59;
+        if (controller != null && !controller.shouldDrawHUD()) {
+            y += 14;
+        }
+        return new HudBounds(screenWidth / 2 - ITEM_NAME_WIDTH / 2, y, ITEM_NAME_WIDTH, ICON_SIZE);
+    }
+
     /** A bar two thirds full. The empty bar is at row v of icons.png, the full bar right below it. */
     private static void drawBarPreview(int x, int y, int v) {
         PreviewDrawing.bindTexture(Gui.icons);
@@ -121,7 +142,7 @@ public final class VanillaHudElements {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
         String name = StatCollector.translateToLocal("entity.WitherBoss.name");
         int nameX = bounds.x + BAR_WIDTH / 2 - font.getStringWidth(name) / 2;
-        font.drawStringWithShadow(name, nameX, bounds.y, ColorUtils.textPreview.getColor());
+        font.drawStringWithShadow(name, nameX, bounds.y, 0xFFFFFF);
         drawBarPreview(bounds.x, bounds.y + 10, 74);
     }
 
@@ -138,6 +159,14 @@ public final class VanillaHudElements {
         font.drawString(level, x, y + 1, 0x000000);
         font.drawString(level, x, y - 1, 0x000000);
         font.drawString(level, x, y, 0x80FF20);
+    }
+
+    /** Held item name preview. */
+    private static void drawItemNamePreview(HudBounds bounds) {
+        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        String name = new ItemStack(Items.diamond_sword).getDisplayName();
+        int x = bounds.x + bounds.width / 2 - font.getStringWidth(name) / 2;
+        font.drawStringWithShadow(name, x, bounds.y, 0xFFFFFF);
     }
 
     /** Runs first, so other mods drawing this element (like Tinkers' hearts) are moved too. */

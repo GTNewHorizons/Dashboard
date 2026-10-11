@@ -49,7 +49,7 @@ public final class HudEditor {
         return Minecraft.getMinecraft().currentScreen instanceof GuiHudEditor;
     }
 
-    /** True while the editor is open and the preview is off (only the boxes are shown).*/
+    /** True while the editor is open and the preview is off (only the boxes are shown). */
     public static boolean isHidingContent() {
         return !drawingPreview && !DashboardConfig.showPreview && isEditorOpen();
     }

@@ -7,7 +7,9 @@ import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
 
 public enum Mixins implements IMixins {
 
-    ;
+    HOTBAR_TEXT(
+        new MixinBuilder("Make the text above the hotbar movable").addClientMixins("MixinGuiIngameForge_HudText")
+            .setPhase(Phase.EARLY));
 
     private final MixinBuilder builder;
 

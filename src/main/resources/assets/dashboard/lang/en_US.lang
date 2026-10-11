@@ -43,6 +43,7 @@ dashboard.element.minecraft.armor=Armor
 dashboard.element.minecraft.food=Food
 dashboard.element.minecraft.air=Air
 dashboard.element.minecraft.mount_health=Mount Health
+dashboard.element.minecraft.item_name=Held Item Name
 
 # Config
 dashboard.config.editor=Editor
