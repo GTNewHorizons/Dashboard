@@ -22,8 +22,9 @@ public class HudElementState {
     public float anchorY;
     public int offsetX;
     public int offsetY;
+    public String theme;
 
     boolean isDefault() {
-        return visible && !moved;
+        return visible && !moved && theme == null;
     }
 }
