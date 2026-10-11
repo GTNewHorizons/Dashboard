@@ -1,10 +1,13 @@
 package com.gtnewhorizon.dashboard.client;
 
 import java.awt.Color;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -50,6 +53,7 @@ public final class VanillaHudElements {
     private static final Map<ElementType, StackedIconRow> STACKED_ROWS = new EnumMap<>(ElementType.class);
     private static final Set<ElementType> SHIFTED = EnumSet.noneOf(ElementType.class);
     private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
+    private static final Map<HudElement, BarSlot> THEMED_BARS = new LinkedHashMap<>();
 
     private static final int ITEM_NAME_WIDTH = 150;
     private static final int ACTION_BAR_WIDTH = 200;
@@ -81,7 +85,7 @@ public final class VanillaHudElements {
             ElementType.JUMPBAR,
             "jump_bar",
             (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
-        PreviewDrawing.setImitationInBounds(jumpBar, bounds -> drawBarPreview(bounds.x, bounds.y, 84));
+        PreviewDrawing.setImitationInBounds(jumpBar, bounds -> drawVanillaSample(BarSlot.JUMP_BAR, bounds.x, bounds.y));
         // The boss name is drawn 10 pixels above the bar
         HudElement bossHealth = add(
             ElementType.BOSSHEALTH,
@@ -89,15 +93,29 @@ public final class VanillaHudElements {
             (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
         PreviewDrawing.setImitationInBounds(bossHealth, VanillaHudElements::drawBossHealthPreview);
         HudElement health = addStacked(ElementType.HEALTH, "health", false);
-        PreviewDrawing.setImitationInBounds(health, bounds -> drawIconRowPreview(bounds, false, 16, 52, 0));
+        PreviewDrawing.setImitationInBounds(health, rowSample(BarSlot.HEALTH));
         HudElement armor = addStacked(ElementType.ARMOR, "armor", false);
-        PreviewDrawing.setImitationInBounds(armor, bounds -> drawIconRowPreview(bounds, false, -1, 34, 9));
+        PreviewDrawing.setImitationInBounds(armor, rowSample(BarSlot.ARMOR));
         HudElement food = addStacked(ElementType.FOOD, "food", true);
-        PreviewDrawing.setImitationInBounds(food, bounds -> drawIconRowPreview(bounds, true, 16, 52, 27));
+        PreviewDrawing.setImitationInBounds(food, rowSample(BarSlot.FOOD));
         HudElement air = addStacked(ElementType.AIR, "air", true);
-        PreviewDrawing.setImitationInBounds(air, bounds -> drawIconRowPreview(bounds, true, -1, 16, 18));
+        PreviewDrawing.setImitationInBounds(air, rowSample(BarSlot.AIR));
         HudElement mountHealth = addStacked(ElementType.HEALTHMOUNT, "mount_health", true);
-        PreviewDrawing.setImitationInBounds(mountHealth, bounds -> drawIconRowPreview(bounds, true, 52, 88, 9));
+        PreviewDrawing.setImitationInBounds(mountHealth, rowSample(BarSlot.MOUNT_HEALTH));
+
+        THEMED_BARS.put(health, BarSlot.HEALTH);
+        THEMED_BARS.put(armor, BarSlot.ARMOR);
+        THEMED_BARS.put(food, BarSlot.FOOD);
+        THEMED_BARS.put(air, BarSlot.AIR);
+        THEMED_BARS.put(mountHealth, BarSlot.MOUNT_HEALTH);
+        THEMED_BARS.put(experience, BarSlot.EXPERIENCE);
+        THEMED_BARS.put(jumpBar, BarSlot.JUMP_BAR);
+        THEMED_BARS.put(bossHealth, BarSlot.BOSS_HEALTH);
+    }
+
+    /** Can use a bar theme. */
+    public static Map<HudElement, BarSlot> getThemedBars() {
+        return Collections.unmodifiableMap(THEMED_BARS);
     }
 
     private static HudElement add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
@@ -123,25 +141,50 @@ public final class VanillaHudElements {
         return new HudBounds(screenWidth / 2 - ITEM_NAME_WIDTH / 2, y, ITEM_NAME_WIDTH, ICON_SIZE);
     }
 
-    /** A bar two thirds full. The empty bar is at row v of icons.png, the full bar right below it. */
+    /** The vanilla look of a bar, as full as the themed previews. Used in the editor and the Customize screen. */
+    public static void drawVanillaSample(BarSlot slot, int x, int y) {
+        switch (slot) {
+            // Texture positions from GuiIngameForge
+            case EXPERIENCE -> drawBarPreview(x, y, 64);
+            case JUMP_BAR -> drawBarPreview(x, y, 84);
+            case BOSS_HEALTH -> drawBarPreview(x, y, 74);
+            // empty u, full u, half u, v
+            case HEALTH -> drawIconRowPreview(x, y, false, 16, 52, 61, 0);
+            case ARMOR -> drawIconRowPreview(x, y, false, 16, 34, 25, 9);
+            case FOOD -> drawIconRowPreview(x, y, true, 16, 52, 61, 27);
+            case AIR -> drawIconRowPreview(x, y, true, -1, 16, -1, 18);
+            case MOUNT_HEALTH -> drawIconRowPreview(x, y, true, 52, 88, 97, 9);
+            default -> {}
+        }
+    }
+
+    /** A stacked row sample. */
+    private static Consumer<HudBounds> rowSample(BarSlot slot) {
+        return bounds -> drawVanillaSample(slot, bounds.x, bounds.getBottom() - ICON_SIZE);
+    }
+
     private static void drawBarPreview(int x, int y, int v) {
         PreviewDrawing.bindTexture(Gui.icons);
         PreviewDrawing.drawTexture(x, y, 0, v, BAR_WIDTH, 5);
-        PreviewDrawing.drawTexture(x, y, 0, v + 5, BAR_WIDTH * 2 / 3, 5);
+        PreviewDrawing.drawTexture(x, y, 0, v + 5, Math.round(BAR_WIDTH * BarThemes.PREVIEW_FILL), 5);
     }
 
-    /** A row of ten icons, like the hearts. A negative u skips that layer. */
-    private static void drawIconRowPreview(HudBounds bounds, boolean fromRight, int backgroundU, int foregroundU,
+    /**
+     * Ten icons worth two points each.
+     */
+    private static void drawIconRowPreview(int left, int y, boolean fromRight, int emptyU, int fullU, int halfU,
         int v) {
         PreviewDrawing.bindTexture(Gui.icons);
-        int y = bounds.getBottom() - ICON_SIZE;
+        int points = Math.round(BarThemes.PREVIEW_FILL * 20);
         for (int i = 0; i < 10; i++) {
-            int x = fromRight ? bounds.getRight() - ICON_SIZE - i * ICON_STEP : bounds.x + i * ICON_STEP;
-            if (backgroundU >= 0) {
-                PreviewDrawing.drawTexture(x, y, backgroundU, v, ICON_SIZE, ICON_SIZE);
+            int x = fromRight ? left + ICON_ROW_WIDTH - ICON_SIZE - i * ICON_STEP : left + i * ICON_STEP;
+            if (emptyU >= 0) {
+                PreviewDrawing.drawTexture(x, y, emptyU, v, ICON_SIZE, ICON_SIZE);
             }
-            if (foregroundU >= 0) {
-                PreviewDrawing.drawTexture(x, y, foregroundU, v, ICON_SIZE, ICON_SIZE);
+            if (i * 2 + 2 <= points) {
+                PreviewDrawing.drawTexture(x, y, fullU, v, ICON_SIZE, ICON_SIZE);
+            } else if (i * 2 + 1 == points && halfU >= 0) {
+                PreviewDrawing.drawTexture(x, y, halfU, v, ICON_SIZE, ICON_SIZE);
             }
         }
     }

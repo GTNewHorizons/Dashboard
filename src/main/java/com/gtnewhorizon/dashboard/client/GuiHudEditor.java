@@ -36,6 +36,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_LABELS = 3;
     private static final int BUTTON_POSITIONS = 4;
     private static final int BUTTON_PREVIEW = 5;
+    private static final int BUTTON_CUSTOMIZE = 6;
     private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS };
     private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 3;
@@ -93,6 +94,8 @@ public class GuiHudEditor extends GuiScreen {
         actionButtons.add(createButton(BUTTON_DONE, StatCollector.translateToLocal("dashboard.editor.button.done")));
         actionButtons
             .add(createButton(BUTTON_RESET_ALL, StatCollector.translateToLocal("dashboard.editor.button.reset_all")));
+        actionButtons
+            .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
         buttonRows.add(actionButtons);
 
         for (List<GuiButton> row : buttonRows) {
@@ -620,6 +623,7 @@ public class GuiHudEditor extends GuiScreen {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
             case BUTTON_RESET_ALL -> HudLayout.resetAll();
+            case BUTTON_CUSTOMIZE -> mc.displayGuiScreen(new GuiBarCustomize(this));
             case BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}
         }

@@ -57,6 +57,17 @@ public final class HudLayout {
         changed = true;
     }
 
+    public static boolean isFlipped(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.flipped;
+    }
+
+    public static void setFlipped(HudElement element, boolean flipped) {
+        getOrCreateState(element).flipped = flipped;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {
         return getBounds(element, element.getDefaultBounds(screenWidth, screenHeight), screenWidth, screenHeight);
     }

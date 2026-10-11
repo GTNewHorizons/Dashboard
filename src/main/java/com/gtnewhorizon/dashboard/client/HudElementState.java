@@ -23,8 +23,9 @@ public class HudElementState {
     public int offsetX;
     public int offsetY;
     public String theme;
+    public boolean flipped;
 
     boolean isDefault() {
-        return visible && !moved && theme == null;
+        return visible && !moved && theme == null && !flipped;
     }
 }

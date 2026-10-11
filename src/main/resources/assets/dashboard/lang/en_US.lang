@@ -10,6 +10,7 @@ dashboard.editor.title=Dashboard HUD Editor
 ## Buttons
 dashboard.editor.button.done=Done
 dashboard.editor.button.reset_all=Reset All
+dashboard.editor.button.customize=Customize
 dashboard.editor.button.grid=Grid
 dashboard.editor.button.grid.on=Grid: ON
 dashboard.editor.button.grid.off=Grid: OFF
@@ -45,6 +46,16 @@ dashboard.element.minecraft.air=Air
 dashboard.element.minecraft.mount_health=Mount Health
 dashboard.element.minecraft.item_name=Held Item Name
 dashboard.element.minecraft.action_bar=Action Bar
+
+# Customize screen
+dashboard.customize.title=Customize Bars
+dashboard.customize.all_bars=All Bars
+dashboard.customize.mixed=Mixed
+dashboard.customize.reset_flips=Reset fill directions
+
+# Bar themes
+dashboard.theme.vanilla=Vanilla
+dashboard.theme.test=Test
 
 # Config
 dashboard.config.editor=Editor
