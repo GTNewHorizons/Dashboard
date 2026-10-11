@@ -36,4 +36,12 @@ public enum BarSlot {
         this.height = height;
         this.fromRight = fromRight;
     }
+
+    public BarSlot[] getStates() {
+        return switch (this) {
+            case HEALTH -> new BarSlot[] { HEALTH_POISONED, HEALTH_WITHERED, HEALTH_ABSORPTION };
+            case FOOD -> new BarSlot[] { FOOD_HUNGER };
+            default -> new BarSlot[0];
+        };
+    }
 }

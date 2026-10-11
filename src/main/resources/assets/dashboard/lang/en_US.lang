@@ -52,6 +52,12 @@ dashboard.customize.title=Customize Bars
 dashboard.customize.all_bars=All Bars
 dashboard.customize.mixed=Mixed
 dashboard.customize.reset_flips=Reset fill directions
+dashboard.customize.show_states=Show States
+dashboard.customize.hide_states=Hide States
+dashboard.customize.state.health_poisoned=Poisoned
+dashboard.customize.state.health_withered=Withered
+dashboard.customize.state.health_absorption=Absorption
+dashboard.customize.state.food_hunger=Hunger Effect
 
 # Bar themes
 dashboard.theme.vanilla=Vanilla

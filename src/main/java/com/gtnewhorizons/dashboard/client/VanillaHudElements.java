@@ -154,6 +154,10 @@ public final class VanillaHudElements {
             case FOOD -> drawIconRowPreview(x, y, true, 16, 52, 61, 27);
             case AIR -> drawIconRowPreview(x, y, true, -1, 16, -1, 18);
             case MOUNT_HEALTH -> drawIconRowPreview(x, y, true, 52, 88, 97, 9);
+            case HEALTH_POISONED -> drawIconRowPreview(x, y, false, 16, 88, 97, 0);
+            case HEALTH_WITHERED -> drawIconRowPreview(x, y, false, 16, 124, 133, 0);
+            case HEALTH_ABSORPTION -> drawIconRowPreview(x, y, false, 16, 160, 169, 0);
+            case FOOD_HUNGER -> drawIconRowPreview(x, y, true, 133, 88, 97, 27);
             default -> {}
         }
     }

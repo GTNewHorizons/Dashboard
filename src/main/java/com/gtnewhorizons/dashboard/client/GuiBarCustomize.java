@@ -3,6 +3,7 @@ package com.gtnewhorizons.dashboard.client;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.minecraft.client.gui.GuiButton;
@@ -21,20 +22,25 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_DONE = 0;
     private static final int BUTTON_ALL = 1;
     private static final int BUTTON_RESET_FLIPS = 2;
-    private static final int BUTTON_FIRST_BAR = 3;
+    private static final int BUTTON_STATES = 3;
+    private static final int BUTTON_FIRST_BAR = 4;
     private static final int BUTTON_FIRST_FLIP = 100;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
     private static final int FLIP_BUTTON_WIDTH = 20;
+    private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 10;
     private static final int LIST_TOP = 24;
     private static final int ALL_ROW_GAP = 4;
 
+    private static boolean showStates;
+
     private final GuiScreen parent;
     private final List<HudElement> bars = new ArrayList<>();
     private final List<BarSlot> slots = new ArrayList<>();
+    private final List<Row> rows = new ArrayList<>();
     private final List<GuiButton> barButtons = new ArrayList<>();
     private final List<GuiButton> flipButtons = new ArrayList<>();
     private GuiButton allButton;
@@ -51,24 +57,35 @@ public class GuiBarCustomize extends GuiScreen {
         buttonList.clear();
         bars.clear();
         slots.clear();
+        rows.clear();
         barButtons.clear();
         flipButtons.clear();
         for (Map.Entry<HudElement, BarSlot> entry : VanillaHudElements.getThemedBars()
             .entrySet()) {
+            int barIndex = bars.size();
             bars.add(entry.getKey());
             slots.add(entry.getValue());
+            rows.add(
+                new Row(
+                    barIndex,
+                    entry.getValue(),
+                    entry.getKey()
+                        .getDisplayName(),
+                    false));
+            if (showStates) {
+                for (BarSlot state : entry.getValue()
+                    .getStates()) {
+                    rows.add(new Row(barIndex, state, getStateName(state), true));
+                }
+            }
         }
 
         // Name, button and preview columns
         int nameWidth = fontRendererObj.getStringWidth(getAllBarsName());
         int previewWidth = 0;
-        for (int i = 0; i < bars.size(); i++) {
-            nameWidth = Math.max(
-                nameWidth,
-                fontRendererObj.getStringWidth(
-                    bars.get(i)
-                        .getDisplayName()));
-            previewWidth = Math.max(previewWidth, slots.get(i).width);
+        for (Row row : rows) {
+            nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(row.name));
+            previewWidth = Math.max(previewWidth, row.slot.width);
         }
         int totalWidth = nameWidth + COLUMN_GAP
             + THEME_BUTTON_WIDTH
@@ -87,11 +104,17 @@ public class GuiBarCustomize extends GuiScreen {
         buttonList.add(allButton);
         resetFlipsButton = new GuiButton(BUTTON_RESET_FLIPS, flipX, LIST_TOP, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, "R");
         buttonList.add(resetFlipsButton);
-        for (int i = 0; i < bars.size(); i++) {
+
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = rows.get(i);
+            if (row.state) {
+                continue;
+            }
+            int y = getRowY(i);
             GuiButton button = new GuiButton(
-                BUTTON_FIRST_BAR + i,
+                BUTTON_FIRST_BAR + row.barIndex,
                 buttonX,
-                getBarRowY(i),
+                y,
                 THEME_BUTTON_WIDTH,
                 BUTTON_HEIGHT,
                 "");
@@ -99,9 +122,9 @@ public class GuiBarCustomize extends GuiScreen {
             buttonList.add(button);
 
             GuiButton flip = new GuiButton(
-                BUTTON_FIRST_FLIP + i,
+                BUTTON_FIRST_FLIP + row.barIndex,
                 flipX,
-                getBarRowY(i),
+                y,
                 FLIP_BUTTON_WIDTH,
                 BUTTON_HEIGHT,
                 "");
@@ -109,18 +132,33 @@ public class GuiBarCustomize extends GuiScreen {
             buttonList.add(flip);
         }
 
+        int bottomY = getRowY(rows.size()) + ALL_ROW_GAP;
+        buttonList.add(
+            new GuiButton(
+                BUTTON_STATES,
+                width / 2 - BOTTOM_BUTTON_WIDTH - 2,
+                bottomY,
+                BOTTOM_BUTTON_WIDTH,
+                BUTTON_HEIGHT,
+                StatCollector.translateToLocal(
+                    showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states")));
         String done = StatCollector.translateToLocal("dashboard.editor.button.done");
-        int doneY = getBarRowY(bars.size()) + ALL_ROW_GAP;
-        buttonList.add(new GuiButton(BUTTON_DONE, width / 2 - 50, doneY, 100, BUTTON_HEIGHT, done));
+        buttonList.add(new GuiButton(BUTTON_DONE, width / 2 + 2, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, done));
         updateButtonTexts();
     }
 
-    private static int getBarRowY(int index) {
+    private static int getRowY(int index) {
         return LIST_TOP + ROW_HEIGHT + ALL_ROW_GAP + index * ROW_HEIGHT;
     }
 
     private static String getAllBarsName() {
         return StatCollector.translateToLocal("dashboard.customize.all_bars");
+    }
+
+    private static String getStateName(BarSlot state) {
+        return StatCollector.translateToLocal(
+            "dashboard.customize.state." + state.name()
+                .toLowerCase(Locale.ROOT));
     }
 
     private static String getThemeName(String theme) {
@@ -173,14 +211,12 @@ public class GuiBarCustomize extends GuiScreen {
             textColor);
 
         drawRowName(getAllBarsName(), LIST_TOP, textColor);
-        for (int i = 0; i < bars.size(); i++) {
-            int rowY = getBarRowY(i);
-            drawRowName(
-                bars.get(i)
-                    .getDisplayName(),
-                rowY,
-                textColor);
-            drawPreview(i, rowY);
+        int stateColor = ColorUtils.textState.getColor();
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = rows.get(i);
+            int rowY = getRowY(i);
+            drawRowName(row.name, rowY, row.state ? stateColor : textColor);
+            drawPreview(row, rowY);
         }
         super.drawScreen(mouseX, mouseY, partialTicks);
 
@@ -204,23 +240,28 @@ public class GuiBarCustomize extends GuiScreen {
         fontRendererObj.drawStringWithShadow(name, nameRight - fontRendererObj.getStringWidth(name), y, color);
     }
 
-    /** The bar two thirds full in its picked theme, or its vanilla look. */
-    private void drawPreview(int index, int rowY) {
-        BarSlot slot = slots.get(index);
-        int y = rowY + (BUTTON_HEIGHT - slot.height) / 2;
-        String theme = HudLayout.getTheme(bars.get(index));
+    /** The bar two thirds full in its bar's theme, or its vanilla look. States follow their bar. */
+    private void drawPreview(Row row, int rowY) {
+        HudElement bar = bars.get(row.barIndex);
+        String theme = HudLayout.getTheme(bar);
+        int y = rowY + (BUTTON_HEIGHT - row.slot.height) / 2;
         if (theme == null) {
-            VanillaHudElements.drawVanillaSample(slot, previewX, y);
-        } else {
-            HudElement bar = bars.get(index);
-            BarThemes.drawBar(theme, slot, previewX, y, BarThemes.PREVIEW_FILL, BarThemes.fillsFromRight(bar, slot));
+            VanillaHudElements.drawVanillaSample(row.slot, previewX, y);
+            return;
         }
+        boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
+        BarThemes.drawBar(theme, row.slot, previewX, y, BarThemes.PREVIEW_FILL, fromRight);
     }
 
     @Override
     protected void actionPerformed(GuiButton button) {
         if (button.id == BUTTON_DONE) {
             mc.displayGuiScreen(parent);
+            return;
+        }
+        if (button.id == BUTTON_STATES) {
+            showStates = !showStates;
+            initGui();
             return;
         }
         if (button.id == BUTTON_ALL) {
@@ -254,5 +295,21 @@ public class GuiBarCustomize extends GuiScreen {
     @Override
     public void onGuiClosed() {
         HudLayout.save();
+    }
+
+    /** One line of the list: a bar, or one of its states. */
+    private static final class Row {
+
+        private final int barIndex;
+        private final BarSlot slot;
+        private final String name;
+        private final boolean state;
+
+        private Row(int barIndex, BarSlot slot, String name, boolean state) {
+            this.barIndex = barIndex;
+            this.slot = slot;
+            this.name = name;
+            this.state = state;
+        }
     }
 }
