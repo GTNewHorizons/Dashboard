@@ -13,10 +13,10 @@ import com.gtnewhorizon.dashboard.client.VanillaHudElements;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-/** Held item name */
 @Mixin(value = GuiIngameForge.class, remap = false)
 public class MixinGuiIngameForge_HudText {
 
+    // Held item name
     @WrapOperation(
         method = "renderToolHightlight",
         at = @At(
@@ -26,6 +26,18 @@ public class MixinGuiIngameForge_HudText {
     private int dashboard$moveItemName(FontRenderer font, String text, int x, int y, int color,
         Operation<Integer> original) {
         return dashboard$drawShifted(VanillaHudElements.ITEM_NAME, font, text, x, y, color, original);
+    }
+
+    // Action bar - music disc message
+    @WrapOperation(
+        method = "renderRecordOverlay",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/FontRenderer;drawString(Ljava/lang/String;III)I",
+            remap = true))
+    private int dashboard$moveActionBar(FontRenderer font, String text, int x, int y, int color,
+        Operation<Integer> original) {
+        return dashboard$drawShifted(VanillaHudElements.ACTION_BAR, font, text, x, y, color, original);
     }
 
     @Unique

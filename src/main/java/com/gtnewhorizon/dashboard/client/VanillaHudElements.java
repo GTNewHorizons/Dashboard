@@ -1,5 +1,6 @@
 package com.gtnewhorizon.dashboard.client;
 
+import java.awt.Color;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -51,17 +52,25 @@ public final class VanillaHudElements {
     private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
 
     private static final int ITEM_NAME_WIDTH = 150;
+    private static final int ACTION_BAR_WIDTH = 200;
 
     public static final HudElement ITEM_NAME = new HudElement(
         "minecraft:item_name",
         "dashboard.element.minecraft.item_name",
         VanillaHudElements::getItemNameBounds);
 
+    public static final HudElement ACTION_BAR = new HudElement(
+        "minecraft:action_bar",
+        "dashboard.element.minecraft.action_bar",
+        (w, h) -> new HudBounds(w / 2 - ACTION_BAR_WIDTH / 2, h - 52, ACTION_BAR_WIDTH, ICON_SIZE));
+
     private VanillaHudElements() {}
 
     public static void register() {
         HudEditor.register(ITEM_NAME);
         PreviewDrawing.setImitationInBounds(ITEM_NAME, VanillaHudElements::drawItemNamePreview);
+        HudEditor.register(ACTION_BAR);
+        PreviewDrawing.setImitationInBounds(ACTION_BAR, VanillaHudElements::drawActionBarPreview);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
             ElementType.EXPERIENCE,
@@ -135,6 +144,16 @@ public final class VanillaHudElements {
                 PreviewDrawing.drawTexture(x, y, foregroundU, v, ICON_SIZE, ICON_SIZE);
             }
         }
+    }
+
+    /** Action bar - music disc message. */
+    private static void drawActionBarPreview(HudBounds bounds) {
+        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        String message = StatCollector.translateToLocalFormatted("record.nowPlaying", "C418 - cat");
+        int x = bounds.x + bounds.width / 2 - font.getStringWidth(message) / 2;
+        float ticks = (System.currentTimeMillis() % 100_000L) / 50f;
+        int color = Color.HSBtoRGB(-ticks / 50f, 0.7f, 0.6f) & 0xFFFFFF;
+        font.drawString(message, x, bounds.y, color);
     }
 
     /** A Wither boss bar, two thirds full. */
