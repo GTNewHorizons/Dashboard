@@ -18,6 +18,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeHooks;
 
+import org.lwjgl.opengl.GL11;
+
 import com.gtnewhorizon.dashboard.api.HudBounds;
 import com.gtnewhorizon.dashboard.api.HudEditor;
 import com.gtnewhorizon.dashboard.api.HudElement;
@@ -44,6 +46,7 @@ public final class VanillaHudElements {
     private static final Map<ElementType, HudElement> ELEMENTS = new EnumMap<>(ElementType.class);
     private static final Map<ElementType, StackedIconRow> STACKED_ROWS = new EnumMap<>(ElementType.class);
     private static final Set<ElementType> SHIFTED = EnumSet.noneOf(ElementType.class);
+    private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
 
     private VanillaHudElements() {}
 
@@ -154,6 +157,15 @@ public final class VanillaHudElements {
         if (!willDraw(event.type)) {
             return;
         }
+        if (HudEditor.isHidingContent() && HudLayout.isVisible(element)) {
+            // Drawn invisibly instead of skipped, so the rows above keep their place
+            HudEditor.shouldRender(element);
+            GL11.glPushMatrix();
+            setColorWrites(false);
+            SHIFTED.add(event.type);
+            INVISIBLE.add(event.type);
+            return;
+        }
         if (HudEditor.beginRender(element, event.resolution)) {
             SHIFTED.add(event.type);
         } else {
@@ -205,6 +217,9 @@ public final class VanillaHudElements {
         if (SHIFTED.remove(type)) {
             HudEditor.endRender();
         }
+        if (INVISIBLE.remove(type)) {
+            setColorWrites(true);
+        }
     }
 
     private static void endAllShifts() {
@@ -212,6 +227,15 @@ public final class VanillaHudElements {
             HudEditor.endRender();
         }
         SHIFTED.clear();
+        if (!INVISIBLE.isEmpty()) {
+            setColorWrites(true);
+            INVISIBLE.clear();
+        }
+    }
+
+    private static void setColorWrites(boolean enabled) {
+        GL11.glColorMask(enabled, enabled, enabled, enabled);
+        GL11.glDepthMask(enabled);
     }
 
     /**

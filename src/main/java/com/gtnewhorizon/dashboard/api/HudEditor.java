@@ -11,6 +11,8 @@ import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizon.dashboard.Dashboard;
+import com.gtnewhorizon.dashboard.DashboardConfig;
+import com.gtnewhorizon.dashboard.client.GuiHudEditor;
 import com.gtnewhorizon.dashboard.client.HudLayout;
 
 import cpw.mods.fml.relauncher.Side;
@@ -40,6 +42,16 @@ public final class HudEditor {
 
     public static Collection<HudElement> getElements() {
         return ELEMENTS_VIEW;
+    }
+
+    /** True while the player is editing the HUD. */
+    public static boolean isEditorOpen() {
+        return Minecraft.getMinecraft().currentScreen instanceof GuiHudEditor;
+    }
+
+    /** True while the editor is open and the preview is off (only the boxes are shown).*/
+    public static boolean isHidingContent() {
+        return !drawingPreview && !DashboardConfig.showPreview && isEditorOpen();
     }
 
     /**
@@ -91,7 +103,7 @@ public final class HudEditor {
         if (!drawingPreview) {
             element.markRendered();
         }
-        return HudLayout.isVisible(element);
+        return HudLayout.isVisible(element) && !isHidingContent();
     }
 
     /**
