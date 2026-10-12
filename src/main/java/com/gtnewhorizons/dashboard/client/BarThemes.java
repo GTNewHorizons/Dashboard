@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.gtnewhorizon.gtnhlib.util.ResourceUtil;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudElement;
 
@@ -69,7 +70,7 @@ public final class BarThemes {
                 for (Map.Entry<String, JsonElement> theme : new JsonParser().parse(reader)
                     .getAsJsonObject()
                     .entrySet()) {
-                    if (textureExists(resources, theme.getKey())) {
+                    if (ResourceUtil.resourceExists(getTexture(theme.getKey()))) {
                         THEMES.put(
                             theme.getKey(),
                             theme.getValue()
@@ -84,15 +85,6 @@ public final class BarThemes {
         }
         THEME_IDS.clear();
         THEME_IDS.addAll(THEMES.keySet());
-    }
-
-    private static boolean textureExists(IResourceManager resources, String theme) {
-        try {
-            resources.getResource(getTexture(theme));
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
     }
 
     private static ResourceLocation getTexture(String theme) {
