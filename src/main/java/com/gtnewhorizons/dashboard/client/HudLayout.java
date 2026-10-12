@@ -48,7 +48,7 @@ public final class HudLayout {
     /** The bar theme the player picked, or null for vanilla. */
     public static String getTheme(HudElement element) {
         HudElementState state = getStates().get(element.getId());
-        return state == null ? null : state.theme;
+        return state == null || !BarThemes.isAvailable(state.theme) ? null : state.theme;
     }
 
     public static void setTheme(HudElement element, String theme) {

@@ -1,18 +1,26 @@
 package com.gtnewhorizons.dashboard.client;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudElement;
 
@@ -22,17 +30,73 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public final class BarThemes {
 
-    public static final List<String> THEMES = Collections.unmodifiableList(Arrays.asList("test"));
     public static final float PREVIEW_FILL = 2 / 3f;
     public static final int PADDING = 8;
 
     private static final int SHEET_SIZE = 512;
+    private static final String FOLDER = "textures/gui/bars/";
     private static final Map<String, ResourceLocation> TEXTURES = new HashMap<>();
+    private static final Map<String, String> THEMES = new LinkedHashMap<>();
+    private static final List<String> THEME_IDS = new ArrayList<>();
 
     private BarThemes() {}
 
+    /** Themes whose texture exists, in the order they were listed. */
+    public static List<String> getThemes() {
+        return Collections.unmodifiableList(THEME_IDS);
+    }
+
+    public static boolean isAvailable(String theme) {
+        return THEMES.containsKey(theme);
+    }
+
     public static String getDisplayName(String theme) {
-        return StatCollector.translateToLocal("dashboard.theme." + theme);
+        return THEMES.getOrDefault(theme, theme);
+    }
+
+    /** Called again whenever resource packs change. */
+    public static void load(IResourceManager resources) {
+        THEMES.clear();
+        List<?> lists;
+        try {
+            lists = resources.getAllResources(new ResourceLocation(Dashboard.MODID, FOLDER + "themes.json"));
+        } catch (IOException e) {
+            lists = Collections.emptyList();
+        }
+        for (Object entry : lists) {
+            IResource list = (IResource) entry;
+            try (Reader reader = new InputStreamReader(list.getInputStream(), StandardCharsets.UTF_8)) {
+                for (Map.Entry<String, JsonElement> theme : new JsonParser().parse(reader)
+                    .getAsJsonObject()
+                    .entrySet()) {
+                    if (textureExists(resources, theme.getKey())) {
+                        THEMES.put(
+                            theme.getKey(),
+                            theme.getValue()
+                                .getAsString());
+                    } else {
+                        Dashboard.LOG.warn("Bar theme {} has no texture, skipping it", theme.getKey());
+                    }
+                }
+            } catch (IOException | RuntimeException e) {
+                Dashboard.LOG.error("Could not read a bar themes.json", e);
+            }
+        }
+        THEME_IDS.clear();
+        THEME_IDS.addAll(THEMES.keySet());
+    }
+
+    private static boolean textureExists(IResourceManager resources, String theme) {
+        try {
+            resources.getResource(getTexture(theme));
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private static ResourceLocation getTexture(String theme) {
+        return TEXTURES.computeIfAbsent(theme, id -> new ResourceLocation(Dashboard.MODID, FOLDER + id + ".png"));
     }
 
     /** The slot's vanilla side. */
@@ -130,11 +194,9 @@ public final class BarThemes {
     }
 
     private static void bindTexture(String theme) {
-        ResourceLocation texture = TEXTURES
-            .computeIfAbsent(theme, id -> new ResourceLocation(Dashboard.MODID, "textures/gui/bars/" + id + ".png"));
         Minecraft.getMinecraft()
             .getTextureManager()
-            .bindTexture(texture);
+            .bindTexture(getTexture(theme));
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(1, 1, 1, 1);

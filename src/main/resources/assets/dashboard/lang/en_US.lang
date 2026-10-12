@@ -75,7 +75,6 @@ dashboard.customize.state.air_pop=Pop
 
 # Bar themes
 dashboard.theme.vanilla=Vanilla
-dashboard.theme.test=Test
 
 # Config
 dashboard.config.editor=Editor

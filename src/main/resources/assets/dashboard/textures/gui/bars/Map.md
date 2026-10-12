@@ -1,7 +1,23 @@
 # Dashboard bar themes
 
-Each PNG in this folder is one bar theme. The file name is the theme id (`test.png` is the theme `test`).
+Each PNG in this folder is one bar theme. The file name is the theme id (`simple.png` is the theme `simple`).
 Every theme uses the same layout, shown below.
+
+## themes.json
+
+Themes are listed in `themes.json`, next to the PNGs: theme id on the left, the name players see on the right.
+
+```json
+{
+  "simple": "Simple",
+  "super_funky": "Super Funky Theme"
+}
+```
+
+- A resource pack adds themes with its own `assets/dashboard/textures/gui/bars/themes.json` and PNGs. The lists of
+  all packs are merged, so a pack only needs to list its own themes.
+- A theme whose PNG is missing is skipped (and noted in the log).
+- Use lowercase file names without spaces.
 
 ## Sheet
 

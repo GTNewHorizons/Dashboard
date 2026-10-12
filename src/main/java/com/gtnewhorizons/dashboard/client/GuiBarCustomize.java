@@ -49,6 +49,8 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int ALL_ROW_Y = 46;
     private static final int LIST_TOP = 72;
     private static final int LIST_BOTTOM_MARGIN = 30;
+    private static final int LABEL_MARGIN = 8;
+    private static final String ELLIPSIS = "...";
 
     private static boolean showStates;
 
@@ -68,6 +70,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton crosshairSizeButton;
     private int nameWidth;
     private int contentWidth;
+    private String allBarsLabel;
     private String rowTooltip;
 
     public GuiBarCustomize(GuiScreen parent) {
@@ -167,8 +170,9 @@ public class GuiBarCustomize extends GuiScreen {
 
     /** Only changes after a click. */
     private void updateAllBarsRow() {
-        allButton.displayString = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
+        allBarsLabel = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
             : StatCollector.translateToLocal("dashboard.customize.mixed");
+        allButton.displayString = fitToButton(allBarsLabel, allButton);
         resetFlipsButton.enabled = anyBarFlipped();
         resetButton.enabled = resetFlipsButton.enabled || anyBarThemed();
     }
@@ -255,8 +259,9 @@ public class GuiBarCustomize extends GuiScreen {
         if (isCtrlKeyDown()) {
             return null;
         }
-        int index = wrap(BarThemes.THEMES.indexOf(theme) + 1 + getClickStep(), BarThemes.THEMES.size() + 1);
-        return index == 0 ? null : BarThemes.THEMES.get(index - 1);
+        List<String> themes = BarThemes.getThemes();
+        int index = wrap(themes.indexOf(theme) + 1 + getClickStep(), themes.size() + 1);
+        return index == 0 ? null : themes.get(index - 1);
     }
 
     private void stepAllBars() {
@@ -307,20 +312,26 @@ public class GuiBarCustomize extends GuiScreen {
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (isMouseOver(resetFlipsButton, mouseX, mouseY)) {
-            drawTooltip("dashboard.customize.reset_flips", mouseX, mouseY);
+            drawTooltip(StatCollector.translateToLocal("dashboard.customize.reset_flips"), mouseX, mouseY);
         } else if (isMouseOver(crosshairSizeButton, mouseX, mouseY)) {
-            drawTooltip("dashboard.customize.crosshair_size", mouseX, mouseY);
+            drawTooltip(StatCollector.translateToLocal("dashboard.customize.crosshair_size"), mouseX, mouseY);
+        } else if (isMouseOver(allButton, mouseX, mouseY) && !allButton.displayString.equals(allBarsLabel)) {
+            drawTooltip(allBarsLabel, mouseX, mouseY);
         } else if (rowTooltip != null) {
             drawTooltip(rowTooltip, mouseX, mouseY);
         }
     }
 
-    private void drawTooltip(String key, int mouseX, int mouseY) {
-        drawHoveringText(
-            Collections.singletonList(StatCollector.translateToLocal(key)),
-            mouseX,
-            mouseY,
-            fontRendererObj);
+    private void drawTooltip(String text, int mouseX, int mouseY) {
+        drawHoveringText(Collections.singletonList(text), mouseX, mouseY, fontRendererObj);
+    }
+
+    private String fitToButton(String text, GuiButton button) {
+        int maxWidth = button.width - LABEL_MARGIN;
+        if (fontRendererObj.getStringWidth(text) <= maxWidth) {
+            return text;
+        }
+        return fontRendererObj.trimStringToWidth(text, maxWidth - fontRendererObj.getStringWidth(ELLIPSIS)) + ELLIPSIS;
     }
 
     /** On a few backgrounds, to show the inverting. Always at x1, since x5 would not fit the row. */
@@ -358,8 +369,11 @@ public class GuiBarCustomize extends GuiScreen {
             placeRowButtons(row, rowY);
             themeButton.drawButton(mc, mouseX, mouseY);
             flipButton.drawButton(mc, mouseX, mouseY);
-            if (isMouseOver(flipButton, mouseX, mouseY)) {
-                rowTooltip = "dashboard.customize.fill_direction";
+            String themeName = getThemeName(theme);
+            if (isMouseOver(themeButton, mouseX, mouseY) && !themeButton.displayString.equals(themeName)) {
+                rowTooltip = themeName;
+            } else if (isMouseOver(flipButton, mouseX, mouseY)) {
+                rowTooltip = StatCollector.translateToLocal("dashboard.customize.fill_direction");
             }
         }
 
@@ -383,7 +397,7 @@ public class GuiBarCustomize extends GuiScreen {
         int left = getContentLeft();
         themeButton.xPosition = left + getButtonX();
         themeButton.yPosition = rowY;
-        themeButton.displayString = getThemeName(theme);
+        themeButton.displayString = fitToButton(getThemeName(theme), themeButton);
 
         flipButton.xPosition = left + getFlipX();
         flipButton.yPosition = rowY;
