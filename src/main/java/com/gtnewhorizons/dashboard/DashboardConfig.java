@@ -32,7 +32,7 @@ public class DashboardConfig {
     @Config.Comment("Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet")
     @Config.LangKey("dashboard.config.editor.crosshair_style")
     @Config.DefaultInt(0)
-    @Config.RangeInt(min = 0, max = Crosshairs.STYLE_COUNT)
+    @Config.RangeInt(min = 0, max = Crosshairs.MAX_STYLES)
     public static int crosshairStyle;
 
     @Config.Comment("Crosshair size, 1 to 5 times")

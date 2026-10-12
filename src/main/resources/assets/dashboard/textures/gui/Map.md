@@ -1,6 +1,7 @@
 # Dashboard bar themes
 
-Each PNG in this folder is one bar theme. The file name is the theme id (`simple.png` is the theme `simple`).
+Each PNG listed in `themes.json` is one bar theme. The file name is the theme id (`simple.png` is the theme `simple`).
+`crosshairs.png` in this folder is the crosshair sheet, not a theme.
 Every theme uses the same layout, shown below.
 
 ## themes.json
@@ -14,10 +15,16 @@ Themes are listed in `themes.json`, next to the PNGs: theme id on the left, the 
 }
 ```
 
-- A resource pack adds themes with its own `assets/dashboard/textures/gui/bars/themes.json` and PNGs. The lists of
+- A resource pack adds themes with its own `assets/dashboard/textures/gui/themes.json` and PNGs. The lists of
   all packs are merged, so a pack only needs to list its own themes.
 - A theme whose PNG is missing is skipped (and noted in the log).
 - Use lowercase file names without spaces.
+
+## Crosshairs
+
+The `"crosshairs": 34` entry in `themes.json` is not a theme: it says how many crosshairs `crosshairs.png` holds.
+The sheet is 256 x 256 with one 16 x 16 cell per crosshair, filled left to right, then top to bottom (up to 256).
+A resource pack that replaces `crosshairs.png` sets its own count the same way. The top pack's count is used.
 
 ## Sheet
 

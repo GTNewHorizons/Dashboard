@@ -33,7 +33,8 @@ public final class BarThemes {
     public static final int PADDING = 8;
 
     private static final int SHEET_SIZE = 512;
-    private static final String FOLDER = "textures/gui/bars/";
+    private static final String FOLDER = "textures/gui/";
+    private static final String CROSSHAIRS_KEY = "crosshairs";
     private static final Map<String, ResourceLocation> TEXTURES = new HashMap<>();
     private static final Map<String, String> THEMES = new LinkedHashMap<>();
     private static final List<String> THEME_IDS = new ArrayList<>();
@@ -56,6 +57,7 @@ public final class BarThemes {
     /** Called again whenever resource packs change. */
     public static void load(IResourceManager resources) {
         THEMES.clear();
+        Crosshairs.setStyleCount(0);
         List<?> lists;
         try {
             lists = resources.getAllResources(new ResourceLocation(Dashboard.MODID, FOLDER + "themes.json"));
@@ -68,7 +70,13 @@ public final class BarThemes {
                 for (Map.Entry<String, JsonElement> theme : new JsonParser().parse(reader)
                     .getAsJsonObject()
                     .entrySet()) {
-                    if (ResourceUtil.resourceExists(getTexture(theme.getKey()))) {
+                    // Not a theme: how many crosshairs crosshairs.png holds
+                    if (theme.getKey()
+                        .equals(CROSSHAIRS_KEY)) {
+                        Crosshairs.setStyleCount(
+                            theme.getValue()
+                                .getAsInt());
+                    } else if (ResourceUtil.resourceExists(getTexture(theme.getKey()))) {
                         THEMES.put(
                             theme.getKey(),
                             theme.getValue()

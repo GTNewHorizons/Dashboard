@@ -18,30 +18,48 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Crosshair shapes, one 16 x 16 cell each in textures/gui/crosshairs/crosshairs.png. Style 0 is vanilla's. */
+/**
+ * Crosshair shapes, one 16 x 16 cell each in textures/gui/crosshairs.png. Style 0 is vanilla's. How many cells are
+ * filled comes from the "crosshairs" entry in themes.json, so resource packs can add their own.
+ */
 @SideOnly(Side.CLIENT)
 @EventBusSubscriber(side = Side.CLIENT)
 public final class Crosshairs {
 
     public static final int VANILLA = 0;
-    public static final int STYLE_COUNT = 34;
+    /** A full 256 x 256 sheet of 16 x 16 cells. */
+    public static final int MAX_STYLES = 256;
     public static final int MAX_SIZE = 5;
     public static final int CELL_SIZE = 16;
     /** Like vanilla's, pixel 7, 7 of a cell lands on the middle of the screen. */
     private static final int CENTER = 7;
 
-    static final ResourceLocation TEXTURE = new ResourceLocation(
-        Dashboard.MODID,
-        "textures/gui/crosshairs/crosshairs.png");
+    static final ResourceLocation TEXTURE = new ResourceLocation(Dashboard.MODID, "textures/gui/crosshairs.png");
+
+    private static int styleCount;
 
     private Crosshairs() {}
+
+    public static int getStyleCount() {
+        return styleCount;
+    }
+
+    static void setStyleCount(int count) {
+        styleCount = MathHelper.clamp_int(count, 0, MAX_STYLES);
+    }
+
+    /** The saved style, or vanilla if the current resource packs have fewer crosshairs. */
+    public static int getStyle() {
+        int style = DashboardConfig.crosshairStyle;
+        return style > styleCount ? VANILLA : Math.max(VANILLA, style);
+    }
 
     @SubscribeEvent
     public static void onPreRender(RenderGameOverlayEvent.Pre event) {
         if (event.type != ElementType.CROSSHAIRS) {
             return;
         }
-        int style = MathHelper.clamp_int(DashboardConfig.crosshairStyle, VANILLA, STYLE_COUNT);
+        int style = getStyle();
         int size = MathHelper.clamp_int(DashboardConfig.crosshairSize, 1, MAX_SIZE);
         if (style == VANILLA && size == 1) {
             return;

@@ -457,10 +457,10 @@ public class GuiBarCustomize extends GuiScreen {
     }
 
     private void updateCrosshairButtons() {
-        int style = DashboardConfig.crosshairStyle;
+        int style = Crosshairs.getStyle();
         crosshairStyleButton.displayString = style == Crosshairs.VANILLA
             ? StatCollector.translateToLocal("dashboard.theme.vanilla")
-            : style + " / " + Crosshairs.STYLE_COUNT;
+            : style + " / " + Crosshairs.getStyleCount();
         crosshairSizeButton.displayString = "x" + DashboardConfig.crosshairSize;
         resetCrosshairButton.enabled = style != Crosshairs.VANILLA || DashboardConfig.crosshairSize != 1;
     }
@@ -468,7 +468,7 @@ public class GuiBarCustomize extends GuiScreen {
     /** Ctrl goes back to vanilla. */
     private void changeCrosshairStyle() {
         DashboardConfig.crosshairStyle = isCtrlKeyDown() ? Crosshairs.VANILLA
-            : wrap(DashboardConfig.crosshairStyle + getClickStep(), Crosshairs.STYLE_COUNT + 1);
+            : wrap(Crosshairs.getStyle() + getClickStep(), Crosshairs.getStyleCount() + 1);
         ConfigurationManager.save(DashboardConfig.class);
         updateCrosshairButtons();
     }
@@ -660,7 +660,7 @@ public class GuiBarCustomize extends GuiScreen {
         int x = crosshairSizeButton.xPosition + FLIP_BUTTON_WIDTH + COLUMN_GAP;
         for (ColorResource background : CROSSHAIR_BACKGROUNDS) {
             drawRect(x, y, x + SWATCH_SIZE, y + SWATCH_SIZE, background.getColor());
-            Crosshairs.draw(DashboardConfig.crosshairStyle, 1, x + SWATCH_SIZE / 2, y + SWATCH_SIZE / 2);
+            Crosshairs.draw(Crosshairs.getStyle(), 1, x + SWATCH_SIZE / 2, y + SWATCH_SIZE / 2);
             x += SWATCH_SIZE;
         }
     }
