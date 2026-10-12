@@ -56,6 +56,26 @@ public final class BarThemes {
             slot.height + PADDING * 2);
     }
 
+    /** Two thirds full. Overlays like the regen shine are shown over a health bar. */
+    public static void drawSample(String theme, BarSlot slot, int x, int y, boolean fromRight) {
+        switch (slot) {
+            case HEALTH_REGEN -> {
+                drawBar(theme, BarSlot.HEALTH, x, y, PREVIEW_FILL, fromRight);
+                drawRegenShine(theme, x, y, getSampleRegenStep(), fromRight);
+            }
+            case HEALTH_HARDCORE -> {
+                drawBar(theme, BarSlot.HEALTH, x, y, PREVIEW_FILL, fromRight);
+                drawEmpty(theme, BarSlot.HEALTH_HARDCORE, x, y);
+            }
+            default -> drawBar(theme, slot, x, y, PREVIEW_FILL, fromRight);
+        }
+    }
+
+    /** From the clock, since samples have no game ticks. */
+    public static int getSampleRegenStep() {
+        return getRegenStep((int) (System.currentTimeMillis() / 50 % 100_000));
+    }
+
     /** Vanilla's regen heart wave. */
     public static int getRegenStep(int ticks) {
         int step = ticks % 25;

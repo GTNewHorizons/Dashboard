@@ -169,7 +169,7 @@ public final class VanillaHudElements {
             case HEALTH_FLASH -> drawIconRowPreview(x, y, false, 25, 70, 79, 0);
             case HEALTH_FLASH_POISONED -> drawIconRowPreview(x, y, false, 25, 106, 115, 0);
             case HEALTH_FLASH_WITHERED -> drawIconRowPreview(x, y, false, 25, 142, 151, 0);
-            case HEALTH_REGEN -> drawIconRowPreview(x, y, false, 16, 52, 61, 0, getSampleRegenStep());
+            case HEALTH_REGEN -> drawIconRowPreview(x, y, false, 16, 52, 61, 0, BarThemes.getSampleRegenStep());
             case HEALTH_HARDCORE -> drawIconRowPreview(x, y, false, 16, 52, 61, 45);
             default -> {}
         }
@@ -212,11 +212,6 @@ public final class VanillaHudElements {
         }
     }
 
-    /** The regeneration step for samples, from the clock since samples have no game ticks. */
-    static int getSampleRegenStep() {
-        return BarThemes.getRegenStep((int) (System.currentTimeMillis() / 50 % 100_000));
-    }
-
     /** Action bar - music disc message. */
     private static void drawActionBarPreview(HudBounds bounds) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
@@ -251,7 +246,7 @@ public final class VanillaHudElements {
         if (theme == null) {
             drawVanillaSample(slot, x, y);
         } else {
-            BarThemes.drawBar(theme, slot, x, y, BarThemes.PREVIEW_FILL, BarThemes.fillsFromRight(element, slot));
+            BarThemes.drawSample(theme, slot, x, y, BarThemes.fillsFromRight(element, slot));
         }
     }
 
@@ -292,8 +287,9 @@ public final class VanillaHudElements {
         if (!willDraw(event.type)) {
             return;
         }
-        String theme = THEMED_BARS.containsKey(element) ? HudLayout.getTheme(element) : null;
-        if (theme != null && drawThemed(event, element, theme)) {
+        BarSlot themedSlot = THEMED_BARS.get(element);
+        String theme = themedSlot != null ? HudLayout.getTheme(element) : null;
+        if (theme != null && drawThemed(event, element, themedSlot, theme)) {
             return;
         }
         if (HudEditor.isHidingContent() && HudLayout.isVisible(element)) {
@@ -321,7 +317,8 @@ public final class VanillaHudElements {
     }
 
     /** Draws the theme instead of vanilla. False if the bar is not themable yet. */
-    private static boolean drawThemed(RenderGameOverlayEvent.Pre event, HudElement element, String theme) {
+    private static boolean drawThemed(RenderGameOverlayEvent.Pre event, HudElement element, BarSlot slot,
+        String theme) {
         Minecraft mc = Minecraft.getMinecraft();
         float fill = switch (event.type) {
             case EXPERIENCE -> mc.thePlayer.experience;
@@ -354,39 +351,19 @@ public final class VanillaHudElements {
         if (!HudEditor.beginRender(element, event.resolution)) {
             return true;
         }
-        BarSlot slot = THEMED_BARS.get(element);
         boolean fromRight = BarThemes.fillsFromRight(element, slot);
         HudBounds bounds = element
             .getDefaultBounds(event.resolution.getScaledWidth(), event.resolution.getScaledHeight());
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
         try {
             int barY = bounds.getBottom() - slot.height;
-            if (event.type == ElementType.HEALTH && mc.thePlayer.getHealth() <= 4) {
-                barY += getLowHealthShake(mc);
-            } else if (event.type == ElementType.FOOD) {
-                barY += getHungerShake(mc);
-            }
-            BarSlot stateSlot = getStateSlot(slot, mc.thePlayer);
-            if (event.type == ElementType.HEALTH && isHealthFlashing(mc.thePlayer)) {
-                float lastFill = mc.thePlayer.prevHealth / mc.thePlayer.getMaxHealth();
-                BarThemes.drawEmpty(theme, BarSlot.HEALTH_FLASH_EMPTY, bounds.x, barY);
-                BarThemes.drawFillRange(theme, getFlashSlot(stateSlot), bounds.x, barY, fill, lastFill, fromRight);
-                BarThemes.drawFillRange(theme, stateSlot, bounds.x, barY, 0, fill, fromRight);
+            if (event.type == ElementType.HEALTH) {
+                drawThemedHealth(mc, theme, bounds.x, barY, fill, absorption, fromRight);
             } else {
-                BarThemes.drawBar(theme, stateSlot, bounds.x, barY, fill, fromRight);
-            }
-            if (event.type == ElementType.HEALTH && mc.thePlayer.isPotionActive(Potion.regeneration)) {
-                int step = BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter());
-                BarThemes.drawRegenShine(theme, bounds.x, barY, step, fromRight);
-            }
-            if (event.type == ElementType.HEALTH && mc.theWorld.getWorldInfo()
-                .isHardcoreModeEnabled()) {
-                BarThemes.drawEmpty(theme, BarSlot.HEALTH_HARDCORE, bounds.x, barY);
-            }
-            if (absorption > 0) {
-                float absorptionFill = Math.min(1, absorption / mc.thePlayer.getMaxHealth());
-                BarThemes
-                    .drawBar(theme, BarSlot.HEALTH_ABSORPTION, bounds.x, barY - ROW_HEIGHT, absorptionFill, fromRight);
+                if (event.type == ElementType.FOOD) {
+                    barY += getHungerShake(mc);
+                }
+                BarThemes.drawBar(theme, getStateSlot(slot, mc.thePlayer), bounds.x, barY, fill, fromRight);
             }
             if (event.type == ElementType.EXPERIENCE && mc.thePlayer.experienceLevel > 0) {
                 drawLevelNumber(bounds, mc.thePlayer.experienceLevel);
@@ -400,6 +377,36 @@ public final class VanillaHudElements {
                 .bindTexture(Gui.icons);
         }
         return true;
+    }
+
+    /** With its shake, flash, regeneration, hardcore overlay and the absorption bar above it. */
+    private static void drawThemedHealth(Minecraft mc, String theme, int x, int barY, float fill, float absorption,
+        boolean fromRight) {
+        EntityPlayer player = mc.thePlayer;
+        if (player.getHealth() <= 4) {
+            barY += getLowHealthShake(mc);
+        }
+        BarSlot stateSlot = getStateSlot(BarSlot.HEALTH, player);
+        if (isHealthFlashing(player)) {
+            float lastFill = player.prevHealth / player.getMaxHealth();
+            BarThemes.drawEmpty(theme, BarSlot.HEALTH_FLASH_EMPTY, x, barY);
+            BarThemes.drawFillRange(theme, getFlashSlot(stateSlot), x, barY, fill, lastFill, fromRight);
+            BarThemes.drawFillRange(theme, stateSlot, x, barY, 0, fill, fromRight);
+        } else {
+            BarThemes.drawBar(theme, stateSlot, x, barY, fill, fromRight);
+        }
+        if (player.isPotionActive(Potion.regeneration)) {
+            int step = BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter());
+            BarThemes.drawRegenShine(theme, x, barY, step, fromRight);
+        }
+        if (mc.theWorld.getWorldInfo()
+            .isHardcoreModeEnabled()) {
+            BarThemes.drawEmpty(theme, BarSlot.HEALTH_HARDCORE, x, barY);
+        }
+        if (absorption > 0) {
+            float absorptionFill = Math.min(1, absorption / player.getMaxHealth());
+            BarThemes.drawBar(theme, BarSlot.HEALTH_ABSORPTION, x, barY - ROW_HEIGHT, absorptionFill, fromRight);
+        }
     }
 
     private static BarSlot getStateSlot(BarSlot slot, EntityPlayer player) {
