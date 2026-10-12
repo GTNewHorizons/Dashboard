@@ -67,6 +67,10 @@ public final class BarThemes {
                 drawBar(theme, BarSlot.HEALTH, x, y, PREVIEW_FILL, fromRight);
                 drawEmpty(theme, BarSlot.HEALTH_HARDCORE, x, y);
             }
+            case AIR_POP -> {
+                drawBar(theme, BarSlot.AIR, x, y, PREVIEW_FILL, fromRight);
+                drawAirPop(theme, x, y, PREVIEW_FILL, fromRight);
+            }
             default -> drawBar(theme, slot, x, y, PREVIEW_FILL, fromRight);
         }
     }
@@ -90,6 +94,14 @@ public final class BarThemes {
         int offset = step * 8;
         int x = fromRight ? barX + BarSlot.HEALTH.width - BarSlot.HEALTH_REGEN.width - offset : barX + offset;
         drawEmpty(theme, BarSlot.HEALTH_REGEN, x, barY);
+    }
+
+    public static void drawAirPop(String theme, int barX, int barY, float fill, boolean fromRight) {
+        int width = BarSlot.AIR.width;
+        int pop = BarSlot.AIR_POP.width;
+        int edge = Math.min(Math.round(clamp(fill) * width), width - pop);
+        int x = fromRight ? barX + width - edge - pop : barX + edge;
+        drawEmpty(theme, BarSlot.AIR_POP, x, barY);
     }
 
     /** Only the stretch between two fractions. */

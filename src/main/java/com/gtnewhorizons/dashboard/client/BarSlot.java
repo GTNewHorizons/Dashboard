@@ -22,8 +22,10 @@ public enum BarSlot {
     HEALTH_FLASH(0, 163, 97, 163, 81, 9, false),
     HEALTH_FLASH_POISONED(0, 163, 194, 163, 81, 9, false),
     HEALTH_FLASH_WITHERED(0, 163, 291, 163, 81, 9, false),
+    HEALTH_HARDCORE(97, 188, 97, 188, 81, 9, false),
+
     HEALTH_REGEN(0, 188, 0, 188, 9, 9, false),
-    HEALTH_HARDCORE(97, 188, 97, 188, 81, 9, false);
+    AIR_POP(25, 188, 25, 188, 9, 9, true);
 
     public final int emptyU;
     public final int emptyV;
@@ -48,6 +50,7 @@ public enum BarSlot {
             case HEALTH -> new BarSlot[] { HEALTH_POISONED, HEALTH_WITHERED, HEALTH_ABSORPTION, HEALTH_FLASH_EMPTY,
                 HEALTH_FLASH, HEALTH_FLASH_POISONED, HEALTH_FLASH_WITHERED, HEALTH_REGEN, HEALTH_HARDCORE };
             case FOOD -> new BarSlot[] { FOOD_HUNGER };
+            case AIR -> new BarSlot[] { AIR_POP };
             default -> new BarSlot[0];
         };
     }

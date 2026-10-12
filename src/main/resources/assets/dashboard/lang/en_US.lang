@@ -64,6 +64,7 @@ dashboard.customize.state.health_flash_withered=Flash (Withered)
 dashboard.customize.state.health_regen=Regeneration
 dashboard.customize.state.health_hardcore=Hardcore
 dashboard.customize.state.food_hunger=Hunger Effect
+dashboard.customize.state.air_pop=Pop
 
 # Bar themes
 dashboard.theme.vanilla=Vanilla

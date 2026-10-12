@@ -165,6 +165,7 @@ public final class VanillaHudElements {
             case HEALTH_WITHERED -> drawIconRowPreview(x, y, false, 16, 124, 133, 0);
             case HEALTH_ABSORPTION -> drawIconRowPreview(x, y, false, 16, 160, 169, 0);
             case FOOD_HUNGER -> drawIconRowPreview(x, y, true, 133, 88, 97, 27);
+            case AIR_POP -> drawIconRowPreview(x, y, true, -1, 16, 25, 18);
             case HEALTH_FLASH_EMPTY -> drawIconRowPreview(x, y, false, 25, 52, 61, 0);
             case HEALTH_FLASH -> drawIconRowPreview(x, y, false, 25, 70, 79, 0);
             case HEALTH_FLASH_POISONED -> drawIconRowPreview(x, y, false, 25, 106, 115, 0);
@@ -364,6 +365,9 @@ public final class VanillaHudElements {
                     barY += getHungerShake(mc);
                 }
                 BarThemes.drawBar(theme, getStateSlot(slot, mc.thePlayer), bounds.x, barY, fill, fromRight);
+                if (event.type == ElementType.AIR && isBubblePopping(mc.thePlayer.getAir())) {
+                    BarThemes.drawAirPop(theme, bounds.x, barY, fill, fromRight);
+                }
             }
             if (event.type == ElementType.EXPERIENCE && mc.thePlayer.experienceLevel > 0) {
                 drawLevelNumber(bounds, mc.thePlayer.experienceLevel);
@@ -431,6 +435,11 @@ public final class VanillaHudElements {
     private static int getLowHealthShake(Minecraft mc) {
         SHAKE.setSeed(mc.ingameGUI.getUpdateCounter() * 312871L);
         return SHAKE.nextInt(2);
+    }
+
+    /** Vanilla's popping bubble: the last 2 air ticks of each bubble. */
+    private static boolean isBubblePopping(int air) {
+        return Math.ceil(air * 10 / 300.0) - Math.ceil((air - 2) * 10 / 300.0) == 1;
     }
 
     /** -1 to 1 px without saturation, more often the hungrier you are. */
