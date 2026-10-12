@@ -24,8 +24,10 @@ public class HudElementState {
     public int offsetY;
     public String theme;
     public boolean flipped;
+    public boolean numberOn;
+    public NumberStyle numberStyle;
 
     boolean isDefault() {
-        return visible && !moved && theme == null && !flipped;
+        return visible && !moved && theme == null && !flipped && !numberOn && numberStyle == null;
     }
 }

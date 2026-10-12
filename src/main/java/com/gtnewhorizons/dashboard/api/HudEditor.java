@@ -100,6 +100,9 @@ public final class HudEditor {
      * @return false if the element should not be drawn
      */
     public static boolean shouldRender(HudElement element) {
+        if (!element.isActive()) {
+            return false;
+        }
         if (!drawingPreview) {
             element.markRendered();
         }

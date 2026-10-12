@@ -68,6 +68,29 @@ public final class HudLayout {
         changed = true;
     }
 
+    public static boolean isNumberOn(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.numberOn;
+    }
+
+    public static void setNumberOn(HudElement element, boolean on) {
+        getOrCreateState(element).numberOn = on;
+        removeIfDefault(element);
+        changed = true;
+    }
+
+    public static NumberStyle getNumberStyle(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.numberStyle == null ? NumberStyle.SLASH : state.numberStyle;
+    }
+
+    /** SLASH is saved as no style. */
+    public static void setNumberStyle(HudElement element, NumberStyle style) {
+        getOrCreateState(element).numberStyle = style == NumberStyle.SLASH ? null : style;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {
         return getBounds(element, element.getDefaultBounds(screenWidth, screenHeight), screenWidth, screenHeight);
     }

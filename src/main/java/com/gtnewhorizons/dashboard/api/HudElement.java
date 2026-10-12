@@ -1,5 +1,7 @@
 package com.gtnewhorizons.dashboard.api;
 
+import java.util.function.BooleanSupplier;
+
 import net.minecraft.util.StatCollector;
 
 import cpw.mods.fml.common.Loader;
@@ -31,6 +33,7 @@ public final class HudElement {
     private final String translationKey;
     private final DefaultBoundsProvider defaultBoundsProvider;
     private PreviewRenderer previewRenderer;
+    private BooleanSupplier activeCheck = () -> true;
     private String modId;
     private String modName;
     private long lastRenderTime;
@@ -65,6 +68,15 @@ public final class HudElement {
 
     public PreviewRenderer getPreview() {
         return previewRenderer;
+    }
+
+    public HudElement setActiveCheck(BooleanSupplier activeCheck) {
+        this.activeCheck = activeCheck;
+        return this;
+    }
+
+    public boolean isActive() {
+        return activeCheck.getAsBoolean();
     }
 
     /** Only needed when the part of the id before ':' is not the mod id (ignoring case). */

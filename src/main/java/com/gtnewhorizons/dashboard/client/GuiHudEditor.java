@@ -481,6 +481,9 @@ public class GuiHudEditor extends GuiScreen {
     private void updateBoxes() {
         boxes.clear();
         for (HudElement element : HudEditor.getElements()) {
+            if (!element.isActive()) {
+                continue;
+            }
             boxes.add(
                 new ElementBox(element, HudLayout.getBounds(element, width, height), element.isCurrentlyShowing()));
         }
