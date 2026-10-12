@@ -57,6 +57,7 @@ dashboard.element.minecraft.saturation_number=Saturation Number
 dashboard.element.minecraft.air_number=Air Number
 dashboard.element.minecraft.mount_health_number=Mount Health Number
 dashboard.element.minecraft.boss_health_number=Boss Health Number
+dashboard.element.minecraft.status_effects=Status Effects
 
 # Customize screen
 dashboard.customize.title=Customize
@@ -94,6 +95,28 @@ dashboard.customize.state.health_regen=Regeneration
 dashboard.customize.state.health_hardcore=Hardcore
 dashboard.customize.state.food_hunger=Hunger Effect
 dashboard.customize.state.air_pop=Pop
+dashboard.customize.status_effects=Status Effects
+
+# Status effects screen
+dashboard.status_effects.title=Status Effects
+dashboard.status_effects.background=Background
+dashboard.status_effects.icon=Icon
+dashboard.status_effects.name=Name
+dashboard.status_effects.time=Time
+dashboard.status_effects.stack=Stack
+dashboard.status_effects.stack.vertical=Vertical
+dashboard.status_effects.stack.horizontal=Horizontal
+dashboard.status_effects.spacing=Spacing
+dashboard.status_effects.pulse=Pulse
+dashboard.status_effects.infinite=Infinite
+dashboard.status_effects.permanent=Permanent
+dashboard.status_effects.permanent.show=Show
+dashboard.status_effects.permanent.hide=Hide
+dashboard.status_effects.group=Good First
+dashboard.status_effects.sort=Sort
+dashboard.status_effects.sort.added=Added
+dashboard.status_effects.sort.time=Time Left
+dashboard.status_effects.pulse.seconds=%ss left
 
 # Bar themes
 dashboard.theme.vanilla=Vanilla
@@ -113,3 +136,23 @@ dashboard.config.editor.crosshair_style=Crosshair Style
 dashboard.config.editor.crosshair_style.tooltip=Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet
 dashboard.config.editor.crosshair_size=Crosshair Size
 dashboard.config.editor.crosshair_size.tooltip=Crosshair size, 1 to 5 times
+dashboard.config.editor.status_effect_background=Status Effect Background
+dashboard.config.editor.status_effect_background.tooltip=Show the background behind each status effect
+dashboard.config.editor.status_effect_icon=Status Effect Icon
+dashboard.config.editor.status_effect_icon.tooltip=Show the icon of each status effect
+dashboard.config.editor.status_effect_name=Status Effect Name
+dashboard.config.editor.status_effect_name.tooltip=Show the name and level of each status effect
+dashboard.config.editor.status_effect_time=Status Effect Time
+dashboard.config.editor.status_effect_time.tooltip=Show the time left of each status effect
+dashboard.config.editor.status_effect_horizontal=Status Effects in a Row
+dashboard.config.editor.status_effect_horizontal.tooltip=Put the status effects in a row instead of a column
+dashboard.config.editor.status_effect_spacing=Status Effect Spacing
+dashboard.config.editor.status_effect_spacing.tooltip=Pixels between the status effects, negative to overlap them
+dashboard.config.editor.status_effect_pulse_seconds=Status Effect Pulse
+dashboard.config.editor.status_effect_group=Status Effects Good First
+dashboard.config.editor.status_effect_group.tooltip=Show good status effects before bad ones
+dashboard.config.editor.status_effect_permanent=Show Permanent Status Effects
+dashboard.config.editor.status_effect_permanent.tooltip=Show infinite status effects and the ones kept up by a beacon
+dashboard.config.editor.status_effect_sort_by_time=Sort Status Effects by Time
+dashboard.config.editor.status_effect_sort_by_time.tooltip=Sort status effects by time left instead of the order they were added
+dashboard.config.editor.status_effect_pulse_seconds.tooltip=Pulse status effects with this many seconds left, in steps of 5, 0 to never pulse

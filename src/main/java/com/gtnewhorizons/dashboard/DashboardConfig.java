@@ -2,6 +2,7 @@ package com.gtnewhorizons.dashboard;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
 import com.gtnewhorizons.dashboard.client.Crosshairs;
+import com.gtnewhorizons.dashboard.client.StatusEffects;
 
 @Config(modid = Dashboard.MODID, category = "editor", configSubDirectory = "dashboard", filename = "editor")
 @Config.LangKey("dashboard.config.editor")
@@ -38,4 +39,56 @@ public class DashboardConfig {
     @Config.DefaultInt(1)
     @Config.RangeInt(min = 1, max = Crosshairs.MAX_SIZE)
     public static int crosshairSize;
+
+    @Config.Comment("Show the background behind each status effect")
+    @Config.LangKey("dashboard.config.editor.status_effect_background")
+    @Config.DefaultBoolean(true)
+    public static boolean statusEffectBackground;
+
+    @Config.Comment("Show the icon of each status effect")
+    @Config.LangKey("dashboard.config.editor.status_effect_icon")
+    @Config.DefaultBoolean(true)
+    public static boolean statusEffectIcon;
+
+    @Config.Comment("Show the name and level of each status effect")
+    @Config.LangKey("dashboard.config.editor.status_effect_name")
+    @Config.DefaultBoolean(true)
+    public static boolean statusEffectName;
+
+    @Config.Comment("Show the time left of each status effect")
+    @Config.LangKey("dashboard.config.editor.status_effect_time")
+    @Config.DefaultBoolean(true)
+    public static boolean statusEffectTime;
+
+    @Config.Comment("Put the status effects in a row instead of a column")
+    @Config.LangKey("dashboard.config.editor.status_effect_horizontal")
+    @Config.DefaultBoolean(false)
+    public static boolean statusEffectHorizontal;
+
+    @Config.Comment("Pixels between the status effects, negative to overlap them")
+    @Config.LangKey("dashboard.config.editor.status_effect_spacing")
+    @Config.DefaultInt(StatusEffects.DEFAULT_SPACING)
+    @Config.RangeInt(min = StatusEffects.MIN_SPACING, max = StatusEffects.MAX_SPACING)
+    public static int statusEffectSpacing;
+
+    @Config.Comment("Pulse status effects with this many seconds left, in steps of 5, 0 to never pulse")
+    @Config.LangKey("dashboard.config.editor.status_effect_pulse_seconds")
+    @Config.DefaultInt(StatusEffects.DEFAULT_PULSE_SECONDS)
+    @Config.RangeInt(min = 0, max = StatusEffects.MAX_PULSE_SECONDS)
+    public static int statusEffectPulseSeconds;
+
+    @Config.Comment("Show good status effects before bad ones")
+    @Config.LangKey("dashboard.config.editor.status_effect_group")
+    @Config.DefaultBoolean(true)
+    public static boolean statusEffectGroup;
+
+    @Config.Comment("Sort status effects by time left instead of the order they were added")
+    @Config.LangKey("dashboard.config.editor.status_effect_sort_by_time")
+    @Config.DefaultBoolean(false)
+    public static boolean statusEffectSortByTime;
+
+    @Config.Comment("Show infinite status effects and the ones kept up by a beacon")
+    @Config.LangKey("dashboard.config.editor.status_effect_permanent")
+    @Config.DefaultBoolean(true)
+    public static boolean statusEffectPermanent;
 }
