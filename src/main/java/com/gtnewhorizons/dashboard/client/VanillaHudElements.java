@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.FoodStats;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -361,6 +362,8 @@ public final class VanillaHudElements {
             int barY = bounds.getBottom() - slot.height;
             if (event.type == ElementType.HEALTH && mc.thePlayer.getHealth() <= 4) {
                 barY += getLowHealthShake(mc);
+            } else if (event.type == ElementType.FOOD) {
+                barY += getHungerShake(mc);
             }
             BarSlot stateSlot = getStateSlot(slot, mc.thePlayer);
             if (event.type == ElementType.HEALTH && isHealthFlashing(mc.thePlayer)) {
@@ -416,6 +419,17 @@ public final class VanillaHudElements {
     private static int getLowHealthShake(Minecraft mc) {
         SHAKE.setSeed(mc.ingameGUI.getUpdateCounter() * 312871L);
         return SHAKE.nextInt(2);
+    }
+
+    /** -1 to 1 px without saturation, more often the hungrier you are. */
+    private static int getHungerShake(Minecraft mc) {
+        FoodStats food = mc.thePlayer.getFoodStats();
+        int tick = mc.ingameGUI.getUpdateCounter();
+        if (food.getSaturationLevel() > 0 || tick % (food.getFoodLevel() * 3 + 1) != 0) {
+            return 0;
+        }
+        SHAKE.setSeed(tick * 312871L);
+        return SHAKE.nextInt(3) - 1;
     }
 
     private static BarSlot getFlashSlot(BarSlot healthSlot) {
