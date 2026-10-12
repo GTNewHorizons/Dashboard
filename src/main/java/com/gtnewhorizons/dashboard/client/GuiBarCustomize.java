@@ -128,6 +128,14 @@ public class GuiBarCustomize extends GuiScreen {
                     showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states")));
         String done = StatCollector.translateToLocal("dashboard.editor.button.done");
         buttonList.add(new GuiButton(BUTTON_DONE, width / 2 + 2, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, done));
+        updateAllBarsRow();
+    }
+
+    /** Only changes after a click. */
+    private void updateAllBarsRow() {
+        allButton.displayString = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
+            : StatCollector.translateToLocal("dashboard.customize.mixed");
+        resetFlipsButton.enabled = anyBarFlipped();
     }
 
     private int getContentLeft() {
@@ -200,10 +208,6 @@ public class GuiBarCustomize extends GuiScreen {
             TITLE_Y,
             textColor);
         drawRowName(getAllBarsName(), ALL_ROW_Y, textColor);
-
-        allButton.displayString = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
-            : StatCollector.translateToLocal("dashboard.customize.mixed");
-        resetFlipsButton.enabled = anyBarFlipped();
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (isMouseOver(resetFlipsButton, mouseX, mouseY)) {
@@ -276,6 +280,7 @@ public class GuiBarCustomize extends GuiScreen {
             flipButton.func_146113_a(mc.getSoundHandler());
             HudLayout.setFlipped(bar, !HudLayout.isFlipped(bar));
         }
+        updateAllBarsRow();
     }
 
     /** The Forge list misses wheel events. */
@@ -311,6 +316,7 @@ public class GuiBarCustomize extends GuiScreen {
             }
             default -> {}
         }
+        updateAllBarsRow();
     }
 
     @Override
