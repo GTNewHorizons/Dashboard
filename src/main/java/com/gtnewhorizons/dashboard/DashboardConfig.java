@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
+import com.gtnewhorizons.dashboard.client.Crosshairs;
 
 @Config(modid = Dashboard.MODID, category = "editor", configSubDirectory = "dashboard", filename = "editor")
 @Config.LangKey("dashboard.config.editor")
@@ -25,4 +26,16 @@ public class DashboardConfig {
     @Config.LangKey("dashboard.config.editor.show_positions")
     @Config.DefaultBoolean(false)
     public static boolean showPositions;
+
+    @Config.Comment("Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet")
+    @Config.LangKey("dashboard.config.editor.crosshair_style")
+    @Config.DefaultInt(0)
+    @Config.RangeInt(min = 0, max = Crosshairs.STYLE_COUNT)
+    public static int crosshairStyle;
+
+    @Config.Comment("Crosshair size, 1 to 5 times")
+    @Config.LangKey("dashboard.config.editor.crosshair_size")
+    @Config.DefaultInt(1)
+    @Config.RangeInt(min = 1, max = Crosshairs.MAX_SIZE)
+    public static int crosshairSize;
 }

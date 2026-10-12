@@ -85,3 +85,7 @@ dashboard.config.editor.show_labels=Show Labels
 dashboard.config.editor.show_labels.tooltip=Show the element names inside their boxes in the HUD editor
 dashboard.config.editor.show_positions=Show Positions
 dashboard.config.editor.show_positions.tooltip=Show the element position, measured from the middle of the screen, next to its box in the HUD editor
+dashboard.config.editor.crosshair_style=Crosshair Style
+dashboard.config.editor.crosshair_style.tooltip=Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet
+dashboard.config.editor.crosshair_size=Crosshair Size
+dashboard.config.editor.crosshair_size.tooltip=Crosshair size, 1 to 5 times

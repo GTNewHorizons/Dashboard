@@ -165,8 +165,8 @@ public final class VanillaHudElements {
         return add(type, name, row);
     }
 
-        /** Scoreboard sidebar bounds */
-        private static HudBounds getScoreboardBounds(int screenWidth, int screenHeight) {
+    /** Scoreboard sidebar bounds */
+    private static HudBounds getScoreboardBounds(int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getMinecraft();
         FontRenderer font = mc.fontRenderer;
         ScoreObjective objective = mc.theWorld == null ? null
