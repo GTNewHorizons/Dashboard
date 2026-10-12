@@ -105,6 +105,15 @@ public final class StatusEffects {
         return getWidth(SAMPLES.size(), getBoxWidth(SAMPLES));
     }
 
+    static int getSamplesHeight() {
+        return getHeight(SAMPLES.size());
+    }
+
+    /** The tallest the samples get, so the Customize preview keeps one size. */
+    static int getMaxSamplesHeight() {
+        return SAMPLES.size() * (BOX_HEIGHT + MAX_SPACING) - MAX_SPACING;
+    }
+
     /** The poison sample counts down through the pulse time, so the pulsing can be seen. */
     static void drawSamples(int x, int y) {
         List<PotionEffect> samples = SAMPLES;

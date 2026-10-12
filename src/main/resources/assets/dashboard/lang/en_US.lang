@@ -66,8 +66,10 @@ dashboard.element.minecraft.status_effects=Status Effects
 
 # Customize screen
 dashboard.customize.title=Customize
+dashboard.customize.section.bars=Bars
 dashboard.customize.all_bars=All Bars
 dashboard.customize.crosshair=Crosshair
+dashboard.customize.crosshair_style=Style
 dashboard.customize.crosshair_size=Crosshair size
 dashboard.customize.fill_direction=Fill direction
 dashboard.customize.mixed=Mixed
@@ -120,7 +122,6 @@ dashboard.screen_overlays.overlays=Overlays
 dashboard.screen_overlays.camera=Camera
 
 # Status effects screen
-dashboard.status_effects.title=Status Effects
 dashboard.status_effects.background=Background
 dashboard.status_effects.icon=Icon
 dashboard.status_effects.name=Name

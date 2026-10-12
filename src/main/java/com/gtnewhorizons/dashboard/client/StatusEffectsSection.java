@@ -1,7 +1,6 @@
 package com.gtnewhorizons.dashboard.client;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.StatCollector;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
@@ -11,62 +10,42 @@ import cpw.mods.fml.client.config.GuiSlider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Status effect customization gui. */
+/** The status effect buttons and sliders of the Customize screen, in two columns. */
 @SideOnly(Side.CLIENT)
-public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
+final class StatusEffectsSection implements GuiSlider.ISlider {
 
-    private static final int BUTTON_DONE = 0;
-    private static final int BUTTON_BACKGROUND = 1;
-    private static final int BUTTON_ICON = 2;
-    private static final int BUTTON_NAME = 3;
-    private static final int BUTTON_TIME = 4;
-    private static final int BUTTON_STACK = 5;
-    private static final int BUTTON_RESET = 6;
-    private static final int BUTTON_SPACING = 7;
-    private static final int BUTTON_PULSE = 8;
-    private static final int BUTTON_GROUP = 9;
-    private static final int BUTTON_SORT = 10;
-    private static final int BUTTON_PERMANENT = 11;
-    private static final int BUTTON_WIDTH = 150;
+    private static final int BUTTON_BACKGROUND = 101;
+    private static final int BUTTON_ICON = 102;
+    private static final int BUTTON_NAME = 103;
+    private static final int BUTTON_TIME = 104;
+    private static final int BUTTON_STACK = 105;
+    private static final int BUTTON_RESET = 106;
+    private static final int BUTTON_SPACING = 107;
+    private static final int BUTTON_PULSE = 108;
+    private static final int BUTTON_GROUP = 109;
+    private static final int BUTTON_SORT = 110;
+    private static final int BUTTON_PERMANENT = 111;
     private static final int BUTTON_HEIGHT = 20;
-    private static final int BUTTON_STEP = 22;
-    private static final int COLUMN_GAP = 4;
-    private static final int ROWS = 5;
-    private static final int BOTTOM_BUTTON_WIDTH = 100;
-    private static final int BOTTOM_BUTTON_GAP = 4;
-    private static final int TITLE_Y = 8;
-    private static final int TOP = 24;
-    private static final int PREVIEW_GAP = 6;
-    private static final int BOTTOM_MARGIN = 30;
 
-    private final GuiScreen parent;
-    private GuiButton resetButton;
-    private GuiSlider spacingSlider;
-    private GuiSlider pulseSlider;
+    private final GuiButton[][] rows;
+    private final GuiButton resetButton;
+    private final GuiSlider spacingSlider;
+    private final GuiSlider pulseSlider;
     private boolean sliderChanged;
 
-    public GuiStatusEffects(GuiScreen parent) {
-        this.parent = parent;
-    }
-
-    @Override
-    public void initGui() {
-        buttonList.clear();
-        int leftX = width / 2 - BUTTON_WIDTH - COLUMN_GAP / 2;
-        int rightX = width / 2 + COLUMN_GAP / 2;
-        int[] leftColumn = { BUTTON_BACKGROUND, BUTTON_ICON, BUTTON_NAME, BUTTON_TIME, BUTTON_PERMANENT };
-        for (int row = 0; row < leftColumn.length; row++) {
-            buttonList.add(new GuiButton(leftColumn[row], leftX, getRowY(row), BUTTON_WIDTH, BUTTON_HEIGHT, ""));
-        }
-        int[] rightColumn = { BUTTON_STACK, BUTTON_GROUP, BUTTON_SORT };
-        for (int row = 0; row < rightColumn.length; row++) {
-            buttonList.add(new GuiButton(rightColumn[row], rightX, getRowY(row), BUTTON_WIDTH, BUTTON_HEIGHT, ""));
-        }
+    StatusEffectsSection(int leftX, int rightX, int buttonWidth, int resetWidth) {
+        resetButton = new GuiButton(
+            BUTTON_RESET,
+            0,
+            0,
+            resetWidth,
+            BUTTON_HEIGHT,
+            StatCollector.translateToLocal("dashboard.customize.reset"));
         spacingSlider = new GuiSlider(
             BUTTON_SPACING,
             rightX,
-            getRowY(3),
-            BUTTON_WIDTH,
+            0,
+            buttonWidth,
             BUTTON_HEIGHT,
             getName(BUTTON_SPACING) + ": ",
             " px",
@@ -76,12 +55,11 @@ public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
             false,
             true,
             this);
-        buttonList.add(spacingSlider);
         pulseSlider = new GuiSlider(
             BUTTON_PULSE,
             rightX,
-            getRowY(4),
-            BUTTON_WIDTH,
+            0,
+            buttonWidth,
             BUTTON_HEIGHT,
             "",
             "",
@@ -92,55 +70,75 @@ public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
             true,
             this);
         pulseSlider.displayString = getPulseLabel();
-        buttonList.add(pulseSlider);
-        int bottomY = height - BOTTOM_MARGIN + (BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
-        int bottomX = width / 2 - BOTTOM_BUTTON_WIDTH - BOTTOM_BUTTON_GAP / 2;
-        resetButton = new GuiButton(
-            BUTTON_RESET,
-            bottomX,
-            bottomY,
-            BOTTOM_BUTTON_WIDTH,
-            BUTTON_HEIGHT,
-            StatCollector.translateToLocal("dashboard.customize.reset"));
-        buttonList.add(resetButton);
-        buttonList.add(
-            new GuiButton(
-                BUTTON_DONE,
-                bottomX + BOTTOM_BUTTON_WIDTH + BOTTOM_BUTTON_GAP,
-                bottomY,
-                BOTTOM_BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                StatCollector.translateToLocal("dashboard.editor.button.done")));
+        int[] leftColumn = { BUTTON_BACKGROUND, BUTTON_ICON, BUTTON_NAME, BUTTON_TIME, BUTTON_PERMANENT };
+        int[] rightColumn = { BUTTON_STACK, BUTTON_GROUP, BUTTON_SORT };
+        rows = new GuiButton[leftColumn.length][];
+        for (int row = 0; row < leftColumn.length; row++) {
+            GuiButton left = new GuiButton(leftColumn[row], leftX, 0, buttonWidth, BUTTON_HEIGHT, "");
+            GuiButton right = row < rightColumn.length
+                ? new GuiButton(rightColumn[row], rightX, 0, buttonWidth, BUTTON_HEIGHT, "")
+                : row == rightColumn.length ? spacingSlider : pulseSlider;
+            rows[row] = new GuiButton[] { left, right };
+        }
         updateButtons();
+        // Creating the sliders counts as a change
+        sliderChanged = false;
     }
 
-    private static int getRowY(int row) {
-        return TOP + row * BUTTON_STEP;
+    GuiButton getResetButton() {
+        return resetButton;
+    }
+
+    /** Each row holds a left and a right button. */
+    GuiButton[][] getRows() {
+        return rows;
+    }
+
+    boolean isDragging() {
+        return spacingSlider.dragging || pulseSlider.dragging;
+    }
+
+    void releaseSliders(int mouseX, int mouseY) {
+        spacingSlider.mouseReleased(mouseX, mouseY);
+        pulseSlider.mouseReleased(mouseX, mouseY);
+    }
+
+    /** Sliders are saved here, since dragging changes them every step. */
+    void save() {
+        if (sliderChanged) {
+            ConfigurationManager.save(DashboardConfig.class);
+            sliderChanged = false;
+        }
     }
 
     private void updateButtons() {
-        for (Object entry : buttonList) {
-            GuiButton button = (GuiButton) entry;
-            if (button.id == BUTTON_STACK) {
-                String stack = DashboardConfig.statusEffectHorizontal ? "horizontal" : "vertical";
-                button.displayString = getName(button.id) + ": "
-                    + StatCollector.translateToLocal("dashboard.status_effects.stack." + stack);
-            } else if (button.id == BUTTON_GROUP) {
-                button.displayString = getName(button.id) + ": " + getOnOff(DashboardConfig.statusEffectGroup);
-            } else if (button.id == BUTTON_PERMANENT) {
-                String permanent = DashboardConfig.statusEffectPermanent ? "show" : "hide";
-                button.displayString = getName(button.id) + ": "
-                    + StatCollector.translateToLocal("dashboard.status_effects.permanent." + permanent);
-            } else if (button.id == BUTTON_SORT) {
-                String sort = DashboardConfig.statusEffectSortByTime ? "time" : "added";
-                button.displayString = getName(button.id) + ": "
-                    + StatCollector.translateToLocal("dashboard.status_effects.sort." + sort);
-            } else if (button.id >= BUTTON_BACKGROUND && button.id <= BUTTON_TIME) {
-                button.displayString = getName(button.id) + ": " + getOnOff(isOn(button.id));
-                button.enabled = !isLastShownPart(button.id);
+        for (GuiButton[] row : rows) {
+            for (GuiButton button : row) {
+                updateButton(button);
             }
         }
         resetButton.enabled = !isDefault();
+    }
+
+    private static void updateButton(GuiButton button) {
+        if (button.id == BUTTON_STACK) {
+            String stack = DashboardConfig.statusEffectHorizontal ? "horizontal" : "vertical";
+            button.displayString = getName(button.id) + ": "
+                + StatCollector.translateToLocal("dashboard.status_effects.stack." + stack);
+        } else if (button.id == BUTTON_GROUP) {
+            button.displayString = getName(button.id) + ": " + getOnOff(DashboardConfig.statusEffectGroup);
+        } else if (button.id == BUTTON_PERMANENT) {
+            String permanent = DashboardConfig.statusEffectPermanent ? "show" : "hide";
+            button.displayString = getName(button.id) + ": "
+                + StatCollector.translateToLocal("dashboard.status_effects.permanent." + permanent);
+        } else if (button.id == BUTTON_SORT) {
+            String sort = DashboardConfig.statusEffectSortByTime ? "time" : "added";
+            button.displayString = getName(button.id) + ": "
+                + StatCollector.translateToLocal("dashboard.status_effects.sort." + sort);
+        } else if (button.id >= BUTTON_BACKGROUND && button.id <= BUTTON_TIME) {
+            button.displayString = getName(button.id) + ": " + getOnOff(isOn(button.id));
+            button.enabled = !isLastShownPart(button.id);
+        }
     }
 
     private static String getOnOff(boolean on) {
@@ -198,8 +196,9 @@ public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
             && DashboardConfig.statusEffectPermanent;
     }
 
-    private void toggle(int buttonId) {
-        switch (buttonId) {
+    /** False if the button is not one of this section's. */
+    boolean actionPerformed(GuiButton button) {
+        switch (button.id) {
             case BUTTON_BACKGROUND -> DashboardConfig.statusEffectBackground = !DashboardConfig.statusEffectBackground;
             case BUTTON_ICON -> DashboardConfig.statusEffectIcon = !DashboardConfig.statusEffectIcon;
             case BUTTON_NAME -> DashboardConfig.statusEffectName = !DashboardConfig.statusEffectName;
@@ -222,36 +221,18 @@ public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
                 pulseSlider.setValue(StatusEffects.DEFAULT_PULSE_SECONDS / StatusEffects.PULSE_STEP_SECONDS);
                 pulseSlider.updateSlider();
             }
-            default -> {}
+            case BUTTON_SPACING, BUTTON_PULSE -> {
+                return true;
+            }
+            default -> {
+                return false;
+            }
         }
         ConfigurationManager.save(DashboardConfig.class);
         updateButtons();
+        return true;
     }
 
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
-        drawCenteredString(
-            fontRendererObj,
-            StatCollector.translateToLocal("dashboard.status_effects.title"),
-            width / 2,
-            TITLE_Y,
-            ColorUtils.text.getColor());
-        int previewY = getRowY(ROWS) + PREVIEW_GAP;
-        StatusEffects.drawSamples(width / 2 - StatusEffects.getSamplesWidth() / 2, previewY);
-        super.drawScreen(mouseX, mouseY, partialTicks);
-    }
-
-    @Override
-    protected void actionPerformed(GuiButton button) {
-        if (button.id == BUTTON_DONE) {
-            mc.displayGuiScreen(parent);
-        } else {
-            toggle(button.id);
-        }
-    }
-
-    /** Saved when the screen closes, since dragging changes it every step. */
     @Override
     public void onChangeSliderValue(GuiSlider slider) {
         if (slider.id == BUTTON_SPACING) {
@@ -261,9 +242,7 @@ public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
             slider.displayString = getPulseLabel();
         }
         sliderChanged = true;
-        if (resetButton != null) {
-            resetButton.enabled = !isDefault();
-        }
+        resetButton.enabled = !isDefault();
     }
 
     private static String getPulseLabel() {
@@ -271,19 +250,5 @@ public class GuiStatusEffects extends GuiScreen implements GuiSlider.ISlider {
         String value = seconds == 0 ? StatCollector.translateToLocal("dashboard.customize.number.off")
             : StatCollector.translateToLocalFormatted("dashboard.status_effects.pulse.seconds", seconds);
         return getName(BUTTON_PULSE) + ": " + value;
-    }
-
-    @Override
-    public void onGuiClosed() {
-        if (sliderChanged) {
-            ConfigurationManager.save(DashboardConfig.class);
-        }
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) {
-        if (keyCode == 1) {
-            mc.displayGuiScreen(parent);
-        }
     }
 }

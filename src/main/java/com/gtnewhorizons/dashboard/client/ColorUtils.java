@@ -26,6 +26,7 @@ public final class ColorUtils {
         helpIconHovered   = color.argb("helpIconHovered",   "0x60FFFFFF"),
         grid              = color.argb("grid",              "0x20FFFFFF"),
         gridCenter        = color.argb("gridCenter",        "0x50FFFFFF"),
+        sectionHeader     = color.argb("sectionHeader",     "0x50A0A0A0"),
 
         crosshairBackground1 = color.argb("crosshairBackground1", "0xFFC6C6C6"),
         crosshairBackground2 = color.argb("crosshairBackground2", "0xFF2B2B2B"),
