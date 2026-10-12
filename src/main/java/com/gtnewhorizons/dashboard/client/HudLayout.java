@@ -113,8 +113,14 @@ public final class HudLayout {
         }
     }
 
+    /** Positions and visibility. */
     public static void resetAll() {
-        getStates().clear();
+        for (HudElementState state : getStates().values()) {
+            state.visible = true;
+            state.moved = false;
+        }
+        getStates().values()
+            .removeIf(HudElementState::isDefault);
         changed = true;
     }
 
