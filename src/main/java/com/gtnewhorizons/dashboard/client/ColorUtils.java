@@ -25,7 +25,13 @@ public final class ColorUtils {
         helpIcon          = color.argb("helpIcon",          "0x30FFFFFF"),
         helpIconHovered   = color.argb("helpIconHovered",   "0x60FFFFFF"),
         grid              = color.argb("grid",              "0x20FFFFFF"),
-        gridCenter        = color.argb("gridCenter",        "0x50FFFFFF")
+        gridCenter        = color.argb("gridCenter",        "0x50FFFFFF"),
+
+        crosshairBackground1 = color.argb("crosshairBackground1", "0xFFC6C6C6"),
+        crosshairBackground2 = color.argb("crosshairBackground2", "0xFF2B2B2B"),
+        crosshairBackground3 = color.argb("crosshairBackground3", "0xFF7BA4FF"),
+        crosshairBackground4 = color.argb("crosshairBackground4", "0xFF5D8C3A"),
+        crosshairBackground5 = color.argb("crosshairBackground5", "0xFFDBD3A0")
 
         ;
     // spotless:on

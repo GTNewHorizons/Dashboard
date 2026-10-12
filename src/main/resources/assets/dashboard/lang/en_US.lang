@@ -53,6 +53,8 @@ dashboard.preview.scoreboard=Scores
 # Customize screen
 dashboard.customize.title=Customize Bars
 dashboard.customize.all_bars=All Bars
+dashboard.customize.crosshair=Crosshair
+dashboard.customize.crosshair_size=Crosshair size
 dashboard.customize.mixed=Mixed
 dashboard.customize.reset_flips=Reset fill directions
 dashboard.customize.show_states=Show States

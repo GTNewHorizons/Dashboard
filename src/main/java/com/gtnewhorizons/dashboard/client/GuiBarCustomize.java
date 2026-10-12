@@ -13,6 +13,9 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Mouse;
 
+import com.gtnewhorizon.gtnhlib.color.ColorResource;
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
+import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 
@@ -31,6 +34,9 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int SCROLL_UP = 4;
     private static final int SCROLL_DOWN = 5;
     private static final int BUTTON_RESET = 6;
+    private static final int BUTTON_CROSSHAIR_STYLE = 7;
+    private static final int BUTTON_CROSSHAIR_SIZE = 8;
+    private static final int SWATCH_SIZE = 20;
     private static final int BOTTOM_BUTTON_GAP = 4;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
@@ -39,8 +45,9 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 8;
-    private static final int ALL_ROW_Y = 20;
-    private static final int LIST_TOP = 46;
+    private static final int CROSSHAIR_ROW_Y = 20;
+    private static final int ALL_ROW_Y = 46;
+    private static final int LIST_TOP = 72;
     private static final int LIST_BOTTOM_MARGIN = 30;
 
     private static boolean showStates;
@@ -57,6 +64,8 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
     private GuiButton resetButton;
+    private GuiButton crosshairStyleButton;
+    private GuiButton crosshairSizeButton;
     private int nameWidth;
     private int contentWidth;
 
@@ -91,7 +100,8 @@ public class GuiBarCustomize extends GuiScreen {
         }
 
         // Name, button and preview columns
-        nameWidth = fontRendererObj.getStringWidth(getAllBarsName());
+        nameWidth = Math
+            .max(fontRendererObj.getStringWidth(getAllBarsName()), fontRendererObj.getStringWidth(getCrosshairName()));
         int previewWidth = 0;
         for (Row row : rows) {
             nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(row.name));
@@ -109,6 +119,24 @@ public class GuiBarCustomize extends GuiScreen {
         list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
 
         int left = getContentLeft();
+        crosshairStyleButton = new GuiButton(
+            BUTTON_CROSSHAIR_STYLE,
+            left + getButtonX(),
+            CROSSHAIR_ROW_Y,
+            THEME_BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            "");
+        buttonList.add(crosshairStyleButton);
+        crosshairSizeButton = new GuiButton(
+            BUTTON_CROSSHAIR_SIZE,
+            left + getFlipX(),
+            CROSSHAIR_ROW_Y,
+            FLIP_BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            "");
+        buttonList.add(crosshairSizeButton);
+        updateCrosshairButtons();
+
         allButton = new GuiButton(BUTTON_ALL, left + getButtonX(), ALL_ROW_Y, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
         buttonList.add(allButton);
         resetFlipsButton = new GuiButton(
@@ -142,6 +170,43 @@ public class GuiBarCustomize extends GuiScreen {
             : StatCollector.translateToLocal("dashboard.customize.mixed");
         resetFlipsButton.enabled = anyBarFlipped();
         resetButton.enabled = resetFlipsButton.enabled || anyBarThemed();
+    }
+
+    private void updateCrosshairButtons() {
+        int style = DashboardConfig.crosshairStyle;
+        crosshairStyleButton.displayString = style == Crosshairs.VANILLA
+            ? StatCollector.translateToLocal("dashboard.theme.vanilla")
+            : style + " / " + Crosshairs.STYLE_COUNT;
+        crosshairSizeButton.displayString = "x" + DashboardConfig.crosshairSize;
+    }
+
+    /** Ctrl goes back to vanilla. */
+    private void changeCrosshairStyle() {
+        DashboardConfig.crosshairStyle = isCtrlKeyDown() ? Crosshairs.VANILLA
+            : wrap(DashboardConfig.crosshairStyle + getClickStep(), Crosshairs.STYLE_COUNT + 1);
+        ConfigurationManager.save(DashboardConfig.class);
+        updateCrosshairButtons();
+    }
+
+    private void changeCrosshairSize() {
+        DashboardConfig.crosshairSize = isCtrlKeyDown() ? 1
+            : wrap(DashboardConfig.crosshairSize - 1 + getClickStep(), Crosshairs.MAX_SIZE) + 1;
+        ConfigurationManager.save(DashboardConfig.class);
+        updateCrosshairButtons();
+    }
+
+    /** Forward, or back with Shift. */
+    private static int getClickStep() {
+        return isShiftKeyDown() ? -1 : 1;
+    }
+
+    /** Wraps around in both directions. */
+    private static int wrap(int value, int count) {
+        return (value % count + count) % count;
+    }
+
+    private static String getCrosshairName() {
+        return StatCollector.translateToLocal("dashboard.customize.crosshair");
     }
 
     private boolean anyBarThemed() {
@@ -184,10 +249,22 @@ public class GuiBarCustomize extends GuiScreen {
             : BarThemes.getDisplayName(theme);
     }
 
-    /** Vanilla, then each theme in order, then back to vanilla. */
-    private static String getNextTheme(String theme) {
-        int index = BarThemes.THEMES.indexOf(theme);
-        return index + 1 < BarThemes.THEMES.size() ? BarThemes.THEMES.get(index + 1) : null;
+    /** Vanilla, then each theme in order, either way. Ctrl goes back to vanilla. */
+    private static String stepTheme(String theme) {
+        if (isCtrlKeyDown()) {
+            return null;
+        }
+        int index = wrap(BarThemes.THEMES.indexOf(theme) + 1 + getClickStep(), BarThemes.THEMES.size() + 1);
+        return index == 0 ? null : BarThemes.THEMES.get(index - 1);
+    }
+
+    private void stepAllBars() {
+        // Mixed bars start over from vanilla
+        String current = allBarsMatch() ? HudLayout.getTheme(bars.get(0)) : null;
+        String theme = stepTheme(current);
+        for (HudElement bar : bars) {
+            HudLayout.setTheme(bar, theme);
+        }
     }
 
     private boolean allBarsMatch() {
@@ -223,14 +300,35 @@ public class GuiBarCustomize extends GuiScreen {
             TITLE_Y,
             textColor);
         drawRowName(getAllBarsName(), ALL_ROW_Y, textColor);
+        drawRowName(getCrosshairName(), CROSSHAIR_ROW_Y, textColor);
+        drawCrosshairPreview();
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (isMouseOver(resetFlipsButton, mouseX, mouseY)) {
-            drawHoveringText(
-                Collections.singletonList(StatCollector.translateToLocal("dashboard.customize.reset_flips")),
-                mouseX,
-                mouseY,
-                fontRendererObj);
+            drawTooltip("dashboard.customize.reset_flips", mouseX, mouseY);
+        } else if (isMouseOver(crosshairSizeButton, mouseX, mouseY)) {
+            drawTooltip("dashboard.customize.crosshair_size", mouseX, mouseY);
+        }
+    }
+
+    private void drawTooltip(String key, int mouseX, int mouseY) {
+        drawHoveringText(
+            Collections.singletonList(StatCollector.translateToLocal(key)),
+            mouseX,
+            mouseY,
+            fontRendererObj);
+    }
+
+    /** On a few backgrounds, to show the inverting. Always at x1, since x5 would not fit the row. */
+    private void drawCrosshairPreview() {
+        ColorResource[] backgrounds = { ColorUtils.crosshairBackground1, ColorUtils.crosshairBackground2,
+            ColorUtils.crosshairBackground3, ColorUtils.crosshairBackground4, ColorUtils.crosshairBackground5 };
+        int x = getContentLeft() + getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+        int y = CROSSHAIR_ROW_Y;
+        for (ColorResource background : backgrounds) {
+            drawRect(x, y, x + SWATCH_SIZE, y + SWATCH_SIZE, background.getColor());
+            Crosshairs.draw(DashboardConfig.crosshairStyle, 1, x + SWATCH_SIZE / 2, y + SWATCH_SIZE / 2);
+            x += SWATCH_SIZE;
         }
     }
 
@@ -294,10 +392,10 @@ public class GuiBarCustomize extends GuiScreen {
         placeRowButtons(row, rowY);
         if (themeButton.mousePressed(mc, mouseX, mouseY)) {
             themeButton.func_146113_a(mc.getSoundHandler());
-            HudLayout.setTheme(bar, getNextTheme(HudLayout.getTheme(bar)));
+            HudLayout.setTheme(bar, stepTheme(HudLayout.getTheme(bar)));
         } else if (flipButton.mousePressed(mc, mouseX, mouseY)) {
             flipButton.func_146113_a(mc.getSoundHandler());
-            HudLayout.setFlipped(bar, !HudLayout.isFlipped(bar));
+            HudLayout.setFlipped(bar, !isCtrlKeyDown() && !HudLayout.isFlipped(bar));
         }
         updateAllBarsRow();
     }
@@ -320,19 +418,14 @@ public class GuiBarCustomize extends GuiScreen {
                 showStates = !showStates;
                 initGui();
             }
-            case BUTTON_ALL -> {
-                // Mixed bars start over from vanilla
-                String current = allBarsMatch() ? HudLayout.getTheme(bars.get(0)) : null;
-                String theme = getNextTheme(current);
-                for (HudElement bar : bars) {
-                    HudLayout.setTheme(bar, theme);
-                }
-            }
+            case BUTTON_ALL -> stepAllBars();
             case BUTTON_RESET_FLIPS -> {
                 for (HudElement bar : bars) {
                     HudLayout.setFlipped(bar, false);
                 }
             }
+            case BUTTON_CROSSHAIR_STYLE -> changeCrosshairStyle();
+            case BUTTON_CROSSHAIR_SIZE -> changeCrosshairSize();
             case BUTTON_RESET -> {
                 for (HudElement bar : bars) {
                     HudLayout.setTheme(bar, null);
