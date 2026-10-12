@@ -53,15 +53,10 @@ public final class BarNumbers {
     private BarNumbers() {}
 
     public static void register() {
-        add(
-            ElementType.HEALTH,
-            "health_number",
-            true,
-            null,
-            0,
-            player -> new float[] { player.getHealth(), player.getMaxHealth() },
-            previewFill(20),
-            20);
+        add(ElementType.HEALTH, "health_number", true, null, 0, player -> {
+            float absorption = player.getAbsorptionAmount();
+            return new float[] { player.getHealth() + absorption, player.getMaxHealth() + absorption };
+        }, previewFill(20), 20);
         add(
             ElementType.ARMOR,
             "armor_number",
