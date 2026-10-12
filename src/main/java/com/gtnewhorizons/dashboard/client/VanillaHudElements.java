@@ -99,7 +99,7 @@ public final class VanillaHudElements {
         HudElement armor = addStacked(ElementType.ARMOR, "armor", false);
         PreviewDrawing.setImitationInBounds(armor, rowSample(armor, BarSlot.ARMOR));
         HudElement food = addStacked(ElementType.FOOD, "food", true);
-        PreviewDrawing.setImitationInBounds(food, rowSample(BarSlot.FOOD));
+        PreviewDrawing.setImitationInBounds(food, rowSample(food, BarSlot.FOOD));
         HudElement air = addStacked(ElementType.AIR, "air", true);
         PreviewDrawing.setImitationInBounds(air, rowSample(BarSlot.AIR));
         HudElement mountHealth = addStacked(ElementType.HEALTHMOUNT, "mount_health", true);
@@ -312,6 +312,8 @@ public final class VanillaHudElements {
             case BOSSHEALTH -> BossStatus.healthScale;
             case HEALTH -> mc.thePlayer.getHealth() / mc.thePlayer.getMaxHealth();
             case ARMOR -> ForgeHooks.getTotalArmorValue(mc.thePlayer) / 20f;
+            case FOOD -> mc.thePlayer.getFoodStats()
+                .getFoodLevel() / 20f;
             default -> -1;
         };
         if (fill < 0) {
@@ -363,6 +365,9 @@ public final class VanillaHudElements {
         }
         if (slot == BarSlot.HEALTH && player.isPotionActive(Potion.wither)) {
             return BarSlot.HEALTH_WITHERED;
+        }
+        if (slot == BarSlot.FOOD && player.isPotionActive(Potion.hunger)) {
+            return BarSlot.FOOD_HUNGER;
         }
         return slot;
     }
