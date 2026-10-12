@@ -48,8 +48,8 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int THEME_BUTTON_WIDTH = 120;
     private static final int FLIP_BUTTON_WIDTH = 20;
     private static final int NUMBER_BUTTON_WIDTH = 40;
-    private static final int NUMBER_STYLE_BUTTON_WIDTH = 50;
-    private static final int DECIMALS_BUTTON_WIDTH = 30;
+    private static final int NUMBER_STYLE_BUTTON_WIDTH = 52;
+    private static final int DECIMALS_BUTTON_WIDTH = 40;
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 8;

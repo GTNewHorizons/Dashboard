@@ -59,7 +59,7 @@ dashboard.element.minecraft.mount_health_number=Mount Health Number
 dashboard.element.minecraft.boss_health_number=Boss Health Number
 
 # Customize screen
-dashboard.customize.title=Customize Bars
+dashboard.customize.title=Customize
 dashboard.customize.all_bars=All Bars
 dashboard.customize.crosshair=Crosshair
 dashboard.customize.crosshair_size=Crosshair size
