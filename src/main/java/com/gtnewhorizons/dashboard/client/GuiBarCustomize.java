@@ -68,6 +68,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton crosshairSizeButton;
     private int nameWidth;
     private int contentWidth;
+    private String rowTooltip;
 
     public GuiBarCustomize(GuiScreen parent) {
         this.parent = parent;
@@ -290,6 +291,7 @@ public class GuiBarCustomize extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
+        rowTooltip = null;
         list.drawScreen(mouseX, mouseY, partialTicks);
 
         int textColor = ColorUtils.text.getColor();
@@ -308,6 +310,8 @@ public class GuiBarCustomize extends GuiScreen {
             drawTooltip("dashboard.customize.reset_flips", mouseX, mouseY);
         } else if (isMouseOver(crosshairSizeButton, mouseX, mouseY)) {
             drawTooltip("dashboard.customize.crosshair_size", mouseX, mouseY);
+        } else if (rowTooltip != null) {
+            drawTooltip(rowTooltip, mouseX, mouseY);
         }
     }
 
@@ -354,6 +358,9 @@ public class GuiBarCustomize extends GuiScreen {
             placeRowButtons(row, rowY);
             themeButton.drawButton(mc, mouseX, mouseY);
             flipButton.drawButton(mc, mouseX, mouseY);
+            if (isMouseOver(flipButton, mouseX, mouseY)) {
+                rowTooltip = "dashboard.customize.fill_direction";
+            }
         }
 
         int x = left + getPreviewX();
