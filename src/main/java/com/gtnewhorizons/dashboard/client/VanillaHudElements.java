@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -103,7 +104,7 @@ public final class VanillaHudElements {
         HudElement air = addStacked(ElementType.AIR, "air", true);
         PreviewDrawing.setImitationInBounds(air, rowSample(air, BarSlot.AIR));
         HudElement mountHealth = addStacked(ElementType.HEALTHMOUNT, "mount_health", true);
-        PreviewDrawing.setImitationInBounds(mountHealth, rowSample(BarSlot.MOUNT_HEALTH));
+        PreviewDrawing.setImitationInBounds(mountHealth, rowSample(mountHealth, BarSlot.MOUNT_HEALTH));
 
         THEMED_BARS.put(health, BarSlot.HEALTH);
         THEMED_BARS.put(armor, BarSlot.ARMOR);
@@ -164,12 +165,7 @@ public final class VanillaHudElements {
         }
     }
 
-    /** A stacked row sample. */
-    private static Consumer<HudBounds> rowSample(BarSlot slot) {
-        return bounds -> drawVanillaSample(slot, bounds.x, bounds.getBottom() - ICON_SIZE);
-    }
-
-    /** Follows the row's theme. */
+    /** A stacked row sample, following the row's theme. */
     private static Consumer<HudBounds> rowSample(HudElement element, BarSlot slot) {
         return bounds -> drawBarSample(element, slot, bounds.x, bounds.getBottom() - ICON_SIZE);
     }
@@ -315,6 +311,9 @@ public final class VanillaHudElements {
             case FOOD -> mc.thePlayer.getFoodStats()
                 .getFoodLevel() / 20f;
             case AIR -> Math.max(0, mc.thePlayer.getAir()) / 300f;
+            case HEALTHMOUNT -> mc.thePlayer.ridingEntity instanceof EntityLivingBase mount
+                ? mount.getHealth() / mount.getMaxHealth()
+                : -1;
             default -> -1;
         };
         if (fill < 0) {
