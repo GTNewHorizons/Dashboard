@@ -171,6 +171,10 @@ public final class VanillaHudElements {
         return Collections.unmodifiableMap(THEMED_BARS);
     }
 
+    static HudElement getElement(ElementType type) {
+        return ELEMENTS.get(type);
+    }
+
     private static HudElement add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
         String id = "minecraft:" + name;
         HudElement element = HudEditor.register(new HudElement(id, "dashboard.element.minecraft." + name, bounds));
@@ -294,8 +298,8 @@ public final class VanillaHudElements {
             }
             if (i * 2 + 2 <= points) {
                 PreviewDrawing.drawTexture(x, iconY, fullU, v, ICON_SIZE, ICON_SIZE);
-            } else if (i * 2 + 1 == points && halfU >= 0) {
-                PreviewDrawing.drawTexture(x, iconY, halfU, v, ICON_SIZE, ICON_SIZE);
+            } else if (i * 2 + 1 == points) {
+                PreviewDrawing.drawTexture(x, iconY, halfU >= 0 ? halfU : fullU, v, ICON_SIZE, ICON_SIZE);
             }
         }
     }
@@ -611,7 +615,7 @@ public final class VanillaHudElements {
     }
 
     /** These events fire even when nothing is drawn: no boss nearby, in creative, no armor, or not underwater. */
-    private static boolean willDraw(ElementType type) {
+    static boolean willDraw(ElementType type) {
         return switch (type) {
             case BOSSHEALTH -> BossStatus.bossName != null && BossStatus.statusBarTime > 0;
             case EXPERIENCE -> {

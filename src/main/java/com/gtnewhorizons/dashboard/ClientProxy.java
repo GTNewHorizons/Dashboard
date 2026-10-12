@@ -5,6 +5,7 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigException;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
+import com.gtnewhorizons.dashboard.client.BarNumbers;
 import com.gtnewhorizons.dashboard.client.BarThemes;
 import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
@@ -29,6 +30,7 @@ public class ClientProxy extends CommonProxy {
         super.init(event);
         HudEditorKeybind.register();
         VanillaHudElements.register();
+        BarNumbers.register();
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);
     }

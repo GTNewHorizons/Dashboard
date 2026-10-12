@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -9,6 +10,7 @@ import java.util.Map;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Mouse;
@@ -36,12 +38,16 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_RESET = 6;
     private static final int BUTTON_CROSSHAIR_STYLE = 7;
     private static final int BUTTON_CROSSHAIR_SIZE = 8;
+    private static final int BUTTON_ALL_NUMBERS = 9;
+    private static final int BUTTON_ALL_NUMBER_STYLES = 10;
     private static final int SWATCH_SIZE = 20;
     private static final int BOTTOM_BUTTON_GAP = 4;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
     private static final int FLIP_BUTTON_WIDTH = 20;
+    private static final int NUMBER_BUTTON_WIDTH = 40;
+    private static final int NUMBER_STYLE_BUTTON_WIDTH = 50;
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 8;
@@ -58,20 +64,25 @@ public class GuiBarCustomize extends GuiScreen {
     private final List<HudElement> bars = new ArrayList<>();
     private final List<BarSlot> slots = new ArrayList<>();
     private final List<Row> rows = new ArrayList<>();
+    private final List<HudElement> numbers = new ArrayList<>();
     private final GuiButton scrollUp = new GuiButton(SCROLL_UP, 0, 0, "");
     private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
     private final GuiButton themeButton = new GuiButton(0, 0, 0, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private final GuiButton flipButton = new GuiButton(0, 0, 0, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+    private final GuiButton numberButton = new GuiButton(0, 0, 0, NUMBER_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+    private final GuiButton numberStyleButton = new GuiButton(0, 0, 0, NUMBER_STYLE_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private BarList list;
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
+    private GuiButton allNumbersButton;
+    private GuiButton allNumberStylesButton;
     private GuiButton resetButton;
     private GuiButton crosshairStyleButton;
     private GuiButton crosshairSizeButton;
     private int nameWidth;
     private int contentWidth;
     private String allBarsLabel;
-    private String rowTooltip;
+    private List<String> rowTooltip;
 
     public GuiBarCustomize(GuiScreen parent) {
         this.parent = parent;
@@ -83,22 +94,30 @@ public class GuiBarCustomize extends GuiScreen {
         bars.clear();
         slots.clear();
         rows.clear();
+        numbers.clear();
         for (Map.Entry<HudElement, BarSlot> entry : VanillaHudElements.getThemedBars()
             .entrySet()) {
             int barIndex = bars.size();
             bars.add(entry.getKey());
             slots.add(entry.getValue());
-            rows.add(
+            HudElement number = BarNumbers.getNumber(entry.getKey());
+            addRow(
                 new Row(
                     barIndex,
                     entry.getValue(),
                     entry.getKey()
                         .getDisplayName(),
+                    false,
+                    number,
                     false));
+            if (entry.getValue() == BarSlot.FOOD) {
+                String saturation = StatCollector.translateToLocal("dashboard.customize.saturation");
+                addRow(new Row(barIndex, BarSlot.FOOD, saturation, false, BarNumbers.getSaturationNumber(), true));
+            }
             if (showStates) {
                 for (BarSlot state : entry.getValue()
                     .getStates()) {
-                    rows.add(new Row(barIndex, state, getStateName(state), true));
+                    addRow(new Row(barIndex, state, getStateName(state), true, null, false));
                 }
             }
         }
@@ -107,14 +126,20 @@ public class GuiBarCustomize extends GuiScreen {
         nameWidth = Math
             .max(fontRendererObj.getStringWidth(getAllBarsName()), fontRendererObj.getStringWidth(getCrosshairName()));
         int previewWidth = 0;
+        int numberSampleWidth = BarThemes.PADDING + fontRendererObj.getStringWidth("000 / 000");
         for (Row row : rows) {
             nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(row.name));
-            previewWidth = Math.max(previewWidth, row.slot.width);
+            int rowWidth = row.number != null && !row.numberOnly ? row.slot.width + numberSampleWidth : row.slot.width;
+            previewWidth = Math.max(previewWidth, rowWidth);
         }
         contentWidth = nameWidth + COLUMN_GAP
             + THEME_BUTTON_WIDTH
             + COLUMN_GAP
             + FLIP_BUTTON_WIDTH
+            + COLUMN_GAP
+            + NUMBER_BUTTON_WIDTH
+            + COLUMN_GAP
+            + NUMBER_STYLE_BUTTON_WIDTH
             + COLUMN_GAP
             + BarThemes.PADDING
             + previewWidth
@@ -151,6 +176,22 @@ public class GuiBarCustomize extends GuiScreen {
             BUTTON_HEIGHT,
             "R");
         buttonList.add(resetFlipsButton);
+        allNumbersButton = new GuiButton(
+            BUTTON_ALL_NUMBERS,
+            left + getNumberX(),
+            ALL_ROW_Y,
+            NUMBER_BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            "");
+        buttonList.add(allNumbersButton);
+        allNumberStylesButton = new GuiButton(
+            BUTTON_ALL_NUMBER_STYLES,
+            left + getNumberStyleX(),
+            ALL_ROW_Y,
+            NUMBER_STYLE_BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            "");
+        buttonList.add(allNumberStylesButton);
 
         // Show States, Reset and Done, centered
         int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
@@ -168,13 +209,82 @@ public class GuiBarCustomize extends GuiScreen {
         updateAllBarsRow();
     }
 
+    private void addRow(Row row) {
+        rows.add(row);
+        if (row.number != null) {
+            numbers.add(row.number);
+        }
+    }
+
     /** Only changes after a click. */
     private void updateAllBarsRow() {
-        allBarsLabel = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
-            : StatCollector.translateToLocal("dashboard.customize.mixed");
+        String mixed = StatCollector.translateToLocal("dashboard.customize.mixed");
+        allBarsLabel = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0))) : mixed;
         allButton.displayString = fitToButton(allBarsLabel, allButton);
         resetFlipsButton.enabled = anyBarFlipped();
-        resetButton.enabled = resetFlipsButton.enabled || anyBarThemed();
+
+        int numbersOn = countNumbersOn();
+        allNumbersButton.displayString = numbersOn == numbers.size() ? getNumberToggleName(true)
+            : numbersOn == 0 ? getNumberToggleName(false) : mixed;
+        NumberStyle style = getCommonNumberStyle();
+        allNumberStylesButton.displayString = style != null ? getStyleSample(style) : mixed;
+        allNumberStylesButton.enabled = numbersOn > 0;
+
+        resetButton.enabled = resetFlipsButton.enabled || anyBarThemed() || numbersOn > 0 || style != NumberStyle.SLASH;
+    }
+
+    private int countNumbersOn() {
+        int count = 0;
+        for (HudElement number : numbers) {
+            if (HudLayout.isNumberOn(number)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /** Null if the numbers use different styles. */
+    private NumberStyle getCommonNumberStyle() {
+        NumberStyle first = HudLayout.getNumberStyle(numbers.get(0));
+        for (HudElement number : numbers) {
+            if (HudLayout.getNumberStyle(number) != first) {
+                return null;
+            }
+        }
+        return first;
+    }
+
+    /** All on, unless all are on already. */
+    private void toggleAllNumbers() {
+        boolean on = !isCtrlKeyDown() && countNumbersOn() < numbers.size();
+        for (HudElement number : numbers) {
+            HudLayout.setNumberOn(number, on);
+        }
+    }
+
+    private void stepAllNumberStyles() {
+        NumberStyle common = getCommonNumberStyle();
+        NumberStyle style = stepNumberStyle(common != null ? common : NumberStyle.SLASH);
+        for (HudElement number : numbers) {
+            HudLayout.setNumberStyle(number, style);
+        }
+    }
+
+    /** Ctrl goes back to the first style. */
+    private static NumberStyle stepNumberStyle(NumberStyle style) {
+        if (isCtrlKeyDown()) {
+            return NumberStyle.SLASH;
+        }
+        NumberStyle[] styles = NumberStyle.values();
+        return styles[wrap(style.ordinal() + getClickStep(), styles.length)];
+    }
+
+    private static String getNumberToggleName(boolean on) {
+        return StatCollector.translateToLocal(on ? "dashboard.customize.number.on" : "dashboard.customize.number.off");
+    }
+
+    private static String getStyleSample(NumberStyle style) {
+        return style.format("13", "20", "65");
     }
 
     private void updateCrosshairButtons() {
@@ -235,8 +345,16 @@ public class GuiBarCustomize extends GuiScreen {
         return getButtonX() + THEME_BUTTON_WIDTH + COLUMN_GAP;
     }
 
+    private int getNumberX() {
+        return getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+    }
+
+    private int getNumberStyleX() {
+        return getNumberX() + NUMBER_BUTTON_WIDTH + COLUMN_GAP;
+    }
+
     private int getPreviewX() {
-        return getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
+        return getNumberStyleX() + NUMBER_STYLE_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
     }
 
     private static String getAllBarsName() {
@@ -317,13 +435,29 @@ public class GuiBarCustomize extends GuiScreen {
             drawTooltip(StatCollector.translateToLocal("dashboard.customize.crosshair_size"), mouseX, mouseY);
         } else if (allButton.func_146115_a() && !allButton.displayString.equals(allBarsLabel)) {
             drawTooltip(allBarsLabel, mouseX, mouseY);
+        } else if (allNumbersButton.func_146115_a()) {
+            drawTooltip(StatCollector.translateToLocal("dashboard.customize.number"), mouseX, mouseY);
+        } else if (allNumberStylesButton.func_146115_a()) {
+            drawTooltip(getStyleTooltip(getCommonNumberStyle()), mouseX, mouseY);
         } else if (rowTooltip != null) {
             drawTooltip(rowTooltip, mouseX, mouseY);
         }
     }
 
     private void drawTooltip(String text, int mouseX, int mouseY) {
-        drawHoveringText(Collections.singletonList(text), mouseX, mouseY, fontRendererObj);
+        drawTooltip(Collections.singletonList(text), mouseX, mouseY);
+    }
+
+    private void drawTooltip(List<String> lines, int mouseX, int mouseY) {
+        drawHoveringText(lines, mouseX, mouseY, fontRendererObj);
+    }
+
+    /** Null style means mixed. */
+    private static List<String> getStyleTooltip(NumberStyle style) {
+        String name = style != null ? style.getDisplayName()
+            : StatCollector.translateToLocal("dashboard.customize.mixed");
+        return Arrays
+            .asList(StatCollector.translateToLocal("dashboard.customize.number_style"), EnumChatFormatting.GRAY + name);
     }
 
     private String fitToButton(String text, GuiButton button) {
@@ -361,17 +495,36 @@ public class GuiBarCustomize extends GuiScreen {
 
         if (!row.state) {
             placeRowButtons(row, rowY);
+        }
+        if (!row.state && !row.numberOnly) {
             themeButton.drawButton(mc, mouseX, mouseY);
             flipButton.drawButton(mc, mouseX, mouseY);
             String themeName = getThemeName(theme);
             if (themeButton.func_146115_a() && !themeButton.displayString.equals(themeName)) {
-                rowTooltip = themeName;
+                rowTooltip = Collections.singletonList(themeName);
             } else if (flipButton.func_146115_a()) {
-                rowTooltip = StatCollector.translateToLocal("dashboard.customize.fill_direction");
+                rowTooltip = Collections
+                    .singletonList(StatCollector.translateToLocal("dashboard.customize.fill_direction"));
             }
         }
-
+        if (row.number != null) {
+            numberButton.drawButton(mc, mouseX, mouseY);
+            numberStyleButton.drawButton(mc, mouseX, mouseY);
+            if (numberButton.func_146115_a()) {
+                rowTooltip = Collections.singletonList(StatCollector.translateToLocal("dashboard.customize.number"));
+            } else if (numberStyleButton.func_146115_a()) {
+                rowTooltip = getStyleTooltip(HudLayout.getNumberStyle(row.number));
+            }
+        }
         int x = left + getPreviewX();
+        if (row.numberOnly) {
+            drawNumberSample(row.number, x, rowY);
+            return;
+        }
+        if (row.number != null) {
+            drawNumberSample(row.number, x + row.slot.width + BarThemes.PADDING, rowY);
+        }
+
         int y = rowY + (BUTTON_HEIGHT - row.slot.height) / 2;
         if (theme == null) {
             VanillaHudElements.drawVanillaSample(row.slot, x, y);
@@ -383,6 +536,14 @@ public class GuiBarCustomize extends GuiScreen {
             HudBounds bounds = new HudBounds(x, y - 6, row.slot.width, row.slot.height);
             VanillaHudElements.drawLevelNumber(bounds, VanillaHudElements.SAMPLE_LEVEL);
         }
+    }
+
+    private void drawNumberSample(HudElement number, int x, int rowY) {
+        if (!HudLayout.isNumberOn(number)) {
+            return;
+        }
+        int y = rowY + (BUTTON_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
+        fontRendererObj.drawStringWithShadow(BarNumbers.getSampleText(number), x, y, 0xFFFFFF);
     }
 
     private void placeRowButtons(Row row, int rowY) {
@@ -397,6 +558,17 @@ public class GuiBarCustomize extends GuiScreen {
         flipButton.yPosition = rowY;
         flipButton.displayString = BarThemes.fillsFromRight(bar, slots.get(row.barIndex)) ? "<" : ">";
         flipButton.enabled = theme != null;
+
+        if (row.number != null) {
+            boolean on = HudLayout.isNumberOn(row.number);
+            numberButton.xPosition = left + getNumberX();
+            numberButton.yPosition = rowY;
+            numberButton.displayString = getNumberToggleName(on);
+            numberStyleButton.xPosition = left + getNumberStyleX();
+            numberStyleButton.yPosition = rowY;
+            numberStyleButton.displayString = getStyleSample(HudLayout.getNumberStyle(row.number));
+            numberStyleButton.enabled = on;
+        }
     }
 
     private void clickRow(Row row, int rowY, int mouseX, int mouseY) {
@@ -405,12 +577,18 @@ public class GuiBarCustomize extends GuiScreen {
         }
         HudElement bar = bars.get(row.barIndex);
         placeRowButtons(row, rowY);
-        if (themeButton.mousePressed(mc, mouseX, mouseY)) {
+        if (!row.numberOnly && themeButton.mousePressed(mc, mouseX, mouseY)) {
             themeButton.func_146113_a(mc.getSoundHandler());
             HudLayout.setTheme(bar, stepTheme(HudLayout.getTheme(bar)));
-        } else if (flipButton.mousePressed(mc, mouseX, mouseY)) {
+        } else if (!row.numberOnly && flipButton.mousePressed(mc, mouseX, mouseY)) {
             flipButton.func_146113_a(mc.getSoundHandler());
             HudLayout.setFlipped(bar, !isCtrlKeyDown() && !HudLayout.isFlipped(bar));
+        } else if (row.number != null && numberButton.mousePressed(mc, mouseX, mouseY)) {
+            numberButton.func_146113_a(mc.getSoundHandler());
+            HudLayout.setNumberOn(row.number, !isCtrlKeyDown() && !HudLayout.isNumberOn(row.number));
+        } else if (row.number != null && numberStyleButton.mousePressed(mc, mouseX, mouseY)) {
+            numberStyleButton.func_146113_a(mc.getSoundHandler());
+            HudLayout.setNumberStyle(row.number, stepNumberStyle(HudLayout.getNumberStyle(row.number)));
         }
         updateAllBarsRow();
     }
@@ -439,12 +617,18 @@ public class GuiBarCustomize extends GuiScreen {
                     HudLayout.setFlipped(bar, false);
                 }
             }
+            case BUTTON_ALL_NUMBERS -> toggleAllNumbers();
+            case BUTTON_ALL_NUMBER_STYLES -> stepAllNumberStyles();
             case BUTTON_CROSSHAIR_STYLE -> changeCrosshairStyle();
             case BUTTON_CROSSHAIR_SIZE -> changeCrosshairSize();
             case BUTTON_RESET -> {
                 for (HudElement bar : bars) {
                     HudLayout.setTheme(bar, null);
                     HudLayout.setFlipped(bar, false);
+                }
+                for (HudElement number : numbers) {
+                    HudLayout.setNumberOn(number, false);
+                    HudLayout.setNumberStyle(number, NumberStyle.SLASH);
                 }
             }
             default -> {}
@@ -507,19 +691,23 @@ public class GuiBarCustomize extends GuiScreen {
         }
     }
 
-    /** One line of the list: a bar, or one of its states. */
+    /** One line of the list: a bar, one of its states, or a number without a bar (saturation). */
     private static final class Row {
 
         private final int barIndex;
         private final BarSlot slot;
         private final String name;
         private final boolean state;
+        private final HudElement number;
+        private final boolean numberOnly;
 
-        private Row(int barIndex, BarSlot slot, String name, boolean state) {
+        private Row(int barIndex, BarSlot slot, String name, boolean state, HudElement number, boolean numberOnly) {
             this.barIndex = barIndex;
             this.slot = slot;
             this.name = name;
             this.state = state;
+            this.number = number;
+            this.numberOnly = numberOnly;
         }
     }
 }
