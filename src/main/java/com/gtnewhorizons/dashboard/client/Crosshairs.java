@@ -38,9 +38,12 @@ public final class Crosshairs {
 
     @SubscribeEvent
     public static void onPreRender(RenderGameOverlayEvent.Pre event) {
+        if (event.type != ElementType.CROSSHAIRS) {
+            return;
+        }
         int style = MathHelper.clamp_int(DashboardConfig.crosshairStyle, VANILLA, STYLE_COUNT);
         int size = MathHelper.clamp_int(DashboardConfig.crosshairSize, 1, MAX_SIZE);
-        if (event.type != ElementType.CROSSHAIRS || style == VANILLA && size == 1) {
+        if (style == VANILLA && size == 1) {
             return;
         }
         event.setCanceled(true);
