@@ -14,6 +14,7 @@ import java.util.Map;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
 import com.google.gson.JsonElement;
@@ -152,7 +153,7 @@ public final class BarThemes {
     public static void drawAirPop(String theme, int barX, int barY, float fill, boolean fromRight) {
         int width = BarSlot.AIR.width;
         int pop = BarSlot.AIR_POP.width;
-        int edge = Math.min(Math.round(clamp(fill) * width), width - pop);
+        int edge = Math.min(Math.round(MathHelper.clamp_float(fill, 0, 1) * width), width - pop);
         int x = fromRight ? barX + width - edge - pop : barX + edge;
         drawEmpty(theme, BarSlot.AIR_POP, x, barY);
     }
@@ -165,17 +166,13 @@ public final class BarThemes {
     }
 
     private static void drawFill(BarSlot slot, int x, int y, float from, float to, boolean fromRight) {
-        int start = Math.round(clamp(from) * slot.width);
-        int end = Math.round(clamp(to) * slot.width);
+        int start = Math.round(MathHelper.clamp_float(from, 0, 1) * slot.width);
+        int end = Math.round(MathHelper.clamp_float(to, 0, 1) * slot.width);
         if (end <= start) {
             return;
         }
         int offset = fromRight ? slot.width - end : start;
         drawFromSheet(x + offset, y, slot.fullU + PADDING + offset, slot.fullV + PADDING, end - start, slot.height);
-    }
-
-    private static float clamp(float fraction) {
-        return Math.max(0, Math.min(1, fraction));
     }
 
     private static void drawFromSheet(int x, int y, int u, int v, int width, int height) {

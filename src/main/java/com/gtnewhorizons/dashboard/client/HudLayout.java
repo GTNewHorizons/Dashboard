@@ -82,8 +82,8 @@ public final class HudLayout {
         int x = anchorPosition(state.anchorX, defaultBounds.width, screenWidth) + state.offsetX;
         int y = anchorPosition(state.anchorY, defaultBounds.height, screenHeight) + state.offsetY;
         return new HudBounds(
-            clamp(x, defaultBounds.width, screenWidth),
-            clamp(y, defaultBounds.height, screenHeight),
+            clampToScreen(x, defaultBounds.width, screenWidth),
+            clampToScreen(y, defaultBounds.height, screenHeight),
             defaultBounds.width,
             defaultBounds.height);
     }
@@ -91,8 +91,8 @@ public final class HudLayout {
     /** Moves the element's top left corner to the given position, anchored to the closest edge or the center. */
     public static void moveTo(HudElement element, int x, int y, int screenWidth, int screenHeight) {
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
-        x = clamp(x, defaultBounds.width, screenWidth);
-        y = clamp(y, defaultBounds.height, screenHeight);
+        x = clampToScreen(x, defaultBounds.width, screenWidth);
+        y = clampToScreen(y, defaultBounds.height, screenHeight);
 
         HudElementState state = getOrCreateState(element);
         state.moved = true;
@@ -191,7 +191,8 @@ public final class HudLayout {
         return Math.round(anchor * (screenSize - elementSize));
     }
 
-    private static int clamp(int position, int elementSize, int screenSize) {
+    /** Stays at 0 if the element is bigger than the screen. */
+    static int clampToScreen(int position, int elementSize, int screenSize) {
         return Math.max(0, Math.min(position, screenSize - elementSize));
     }
 }

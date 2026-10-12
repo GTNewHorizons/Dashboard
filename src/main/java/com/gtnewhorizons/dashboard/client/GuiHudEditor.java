@@ -203,8 +203,8 @@ public class GuiHudEditor extends GuiScreen {
 
     /** Starts in the middle of the screen and can be dragged from there. */
     private HudBounds getMenuBounds() {
-        int x = clampToScreen(getMenuDefaultX() + menuOffsetX, menuWidth, width);
-        int y = clampToScreen(getMenuDefaultY() + menuOffsetY, menuHeight, height);
+        int x = HudLayout.clampToScreen(getMenuDefaultX() + menuOffsetX, menuWidth, width);
+        int y = HudLayout.clampToScreen(getMenuDefaultY() + menuOffsetY, menuHeight, height);
         return new HudBounds(x, y, menuWidth, menuHeight);
     }
 
@@ -230,13 +230,9 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     private void dragMenuTo(int mouseX, int mouseY) {
-        menuOffsetX = clampToScreen(mouseX - menuGrabOffsetX, menuWidth, width) - getMenuDefaultX();
-        menuOffsetY = clampToScreen(mouseY - menuGrabOffsetY, menuHeight, height) - getMenuDefaultY();
+        menuOffsetX = HudLayout.clampToScreen(mouseX - menuGrabOffsetX, menuWidth, width) - getMenuDefaultX();
+        menuOffsetY = HudLayout.clampToScreen(mouseY - menuGrabOffsetY, menuHeight, height) - getMenuDefaultY();
         positionButtons();
-    }
-
-    private static int clampToScreen(int position, int size, int screenSize) {
-        return Math.max(0, Math.min(position, screenSize - size));
     }
 
     @Override

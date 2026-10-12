@@ -3,6 +3,7 @@ package com.gtnewhorizons.dashboard.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -37,8 +38,8 @@ public final class Crosshairs {
 
     @SubscribeEvent
     public static void onPreRender(RenderGameOverlayEvent.Pre event) {
-        int style = Math.max(VANILLA, Math.min(STYLE_COUNT, DashboardConfig.crosshairStyle));
-        int size = Math.max(1, Math.min(MAX_SIZE, DashboardConfig.crosshairSize));
+        int style = MathHelper.clamp_int(DashboardConfig.crosshairStyle, VANILLA, STYLE_COUNT);
+        int size = MathHelper.clamp_int(DashboardConfig.crosshairSize, 1, MAX_SIZE);
         if (event.type != ElementType.CROSSHAIRS || style == VANILLA && size == 1) {
             return;
         }
