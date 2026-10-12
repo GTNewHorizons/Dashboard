@@ -253,6 +253,9 @@ public class GuiBarCustomize extends GuiScreen {
             if (row.slot == BarSlot.HEALTH_REGEN) {
                 BarThemes.drawBar(theme, BarSlot.HEALTH, x, y, BarThemes.PREVIEW_FILL, fromRight);
                 BarThemes.drawRegenShine(theme, x, y, VanillaHudElements.getSampleRegenStep(), fromRight);
+            } else if (row.slot == BarSlot.HEALTH_HARDCORE) {
+                BarThemes.drawBar(theme, BarSlot.HEALTH, x, y, BarThemes.PREVIEW_FILL, fromRight);
+                BarThemes.drawEmpty(theme, BarSlot.HEALTH_HARDCORE, x, y);
             } else {
                 BarThemes.drawBar(theme, row.slot, x, y, BarThemes.PREVIEW_FILL, fromRight);
             }

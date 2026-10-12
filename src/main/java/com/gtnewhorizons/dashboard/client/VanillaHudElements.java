@@ -170,6 +170,7 @@ public final class VanillaHudElements {
             case HEALTH_FLASH_POISONED -> drawIconRowPreview(x, y, false, 25, 106, 115, 0);
             case HEALTH_FLASH_WITHERED -> drawIconRowPreview(x, y, false, 25, 142, 151, 0);
             case HEALTH_REGEN -> drawIconRowPreview(x, y, false, 16, 52, 61, 0, getSampleRegenStep());
+            case HEALTH_HARDCORE -> drawIconRowPreview(x, y, false, 16, 52, 61, 45);
             default -> {}
         }
     }
@@ -377,6 +378,10 @@ public final class VanillaHudElements {
             if (event.type == ElementType.HEALTH && mc.thePlayer.isPotionActive(Potion.regeneration)) {
                 int step = BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter());
                 BarThemes.drawRegenShine(theme, bounds.x, barY, step, fromRight);
+            }
+            if (event.type == ElementType.HEALTH && mc.theWorld.getWorldInfo()
+                .isHardcoreModeEnabled()) {
+                BarThemes.drawEmpty(theme, BarSlot.HEALTH_HARDCORE, bounds.x, barY);
             }
             if (absorption > 0) {
                 float absorptionFill = Math.min(1, absorption / mc.thePlayer.getMaxHealth());
