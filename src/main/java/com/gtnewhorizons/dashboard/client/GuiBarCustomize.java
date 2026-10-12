@@ -40,6 +40,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_CROSSHAIR_SIZE = 8;
     private static final int BUTTON_ALL_NUMBERS = 9;
     private static final int BUTTON_ALL_NUMBER_STYLES = 10;
+    private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
     private static final int SWATCH_SIZE = 20;
     private static final int BOTTOM_BUTTON_GAP = 4;
     private static final int BUTTON_HEIGHT = 20;
@@ -48,6 +49,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int FLIP_BUTTON_WIDTH = 20;
     private static final int NUMBER_BUTTON_WIDTH = 40;
     private static final int NUMBER_STYLE_BUTTON_WIDTH = 50;
+    private static final int DECIMALS_BUTTON_WIDTH = 30;
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 8;
@@ -71,11 +73,13 @@ public class GuiBarCustomize extends GuiScreen {
     private final GuiButton flipButton = new GuiButton(0, 0, 0, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private final GuiButton numberButton = new GuiButton(0, 0, 0, NUMBER_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private final GuiButton numberStyleButton = new GuiButton(0, 0, 0, NUMBER_STYLE_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+    private final GuiButton decimalsButton = new GuiButton(0, 0, 0, DECIMALS_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private BarList list;
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
     private GuiButton allNumbersButton;
     private GuiButton allNumberStylesButton;
+    private GuiButton allDecimalsButton;
     private GuiButton resetButton;
     private GuiButton crosshairStyleButton;
     private GuiButton crosshairSizeButton;
@@ -141,6 +145,8 @@ public class GuiBarCustomize extends GuiScreen {
             + COLUMN_GAP
             + NUMBER_STYLE_BUTTON_WIDTH
             + COLUMN_GAP
+            + DECIMALS_BUTTON_WIDTH
+            + COLUMN_GAP
             + BarThemes.PADDING
             + previewWidth
             + BarThemes.PADDING;
@@ -192,6 +198,14 @@ public class GuiBarCustomize extends GuiScreen {
             BUTTON_HEIGHT,
             "");
         buttonList.add(allNumberStylesButton);
+        allDecimalsButton = new GuiButton(
+            BUTTON_ALL_NUMBER_DECIMALS,
+            left + getDecimalsX(),
+            ALL_ROW_Y,
+            DECIMALS_BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            "");
+        buttonList.add(allDecimalsButton);
 
         // Show States, Reset and Done, centered
         int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
@@ -229,8 +243,69 @@ public class GuiBarCustomize extends GuiScreen {
         NumberStyle style = getCommonNumberStyle();
         allNumberStylesButton.displayString = style != null ? getStyleSample(style) : mixed;
         allNumberStylesButton.enabled = numbersOn > 0;
+        Integer decimals = getCommonDecimals();
+        allDecimalsButton.displayString = decimals != null ? getDecimalsLabel(decimals) : mixed;
+        allDecimalsButton.enabled = numbersOn > 0;
 
-        resetButton.enabled = resetFlipsButton.enabled || anyBarThemed() || numbersOn > 0 || style != NumberStyle.SLASH;
+        resetButton.enabled = resetFlipsButton.enabled || anyBarThemed()
+            || numbersOn > 0
+            || style != NumberStyle.SLASH
+            || anyDecimalsChanged();
+    }
+
+    /** Null if the numbers use different decimals. */
+    private Integer getCommonDecimals() {
+        int first = BarNumbers.getDecimals(numbers.get(0));
+        for (HudElement number : numbers) {
+            if (BarNumbers.getDecimals(number) != first) {
+                return null;
+            }
+        }
+        return first;
+    }
+
+    private boolean anyDecimalsChanged() {
+        for (HudElement number : numbers) {
+            if (HudLayout.getNumberDecimals(number) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Ctrl goes back to the number's default. */
+    private static void stepDecimals(HudElement number, int decimals) {
+        if (isCtrlKeyDown()) {
+            HudLayout.setNumberDecimals(number, null);
+        } else {
+            BarNumbers.setDecimals(number, wrap(decimals + getClickStep(), BarNumbers.MAX_DECIMALS + 1));
+        }
+    }
+
+    private void stepAllDecimals() {
+        Integer common = getCommonDecimals();
+        int decimals = common != null ? common : 0;
+        for (HudElement number : numbers) {
+            stepDecimals(number, decimals);
+        }
+    }
+
+    private static String getDecimalsLabel(int decimals) {
+        return switch (decimals) {
+            case 0 -> "#";
+            case 1 -> "#.#";
+            default -> "#.##";
+        };
+    }
+
+    /** Null decimals means mixed. */
+    private static List<String> getDecimalsTooltip(Integer decimals) {
+        String name = decimals != null
+            ? StatCollector.translateToLocal("dashboard.customize.number_decimals." + decimals)
+            : StatCollector.translateToLocal("dashboard.customize.mixed");
+        return Arrays.asList(
+            StatCollector.translateToLocal("dashboard.customize.number_decimals"),
+            EnumChatFormatting.GRAY + name);
     }
 
     private int countNumbersOn() {
@@ -353,8 +428,12 @@ public class GuiBarCustomize extends GuiScreen {
         return getNumberX() + NUMBER_BUTTON_WIDTH + COLUMN_GAP;
     }
 
+    private int getDecimalsX() {
+        return getNumberStyleX() + NUMBER_STYLE_BUTTON_WIDTH + COLUMN_GAP;
+    }
+
     private int getPreviewX() {
-        return getNumberStyleX() + NUMBER_STYLE_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
+        return getDecimalsX() + DECIMALS_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
     }
 
     private static String getAllBarsName() {
@@ -439,6 +518,8 @@ public class GuiBarCustomize extends GuiScreen {
             drawTooltip(StatCollector.translateToLocal("dashboard.customize.number"), mouseX, mouseY);
         } else if (allNumberStylesButton.func_146115_a()) {
             drawTooltip(getStyleTooltip(getCommonNumberStyle()), mouseX, mouseY);
+        } else if (allDecimalsButton.func_146115_a()) {
+            drawTooltip(getDecimalsTooltip(getCommonDecimals()), mouseX, mouseY);
         } else if (rowTooltip != null) {
             drawTooltip(rowTooltip, mouseX, mouseY);
         }
@@ -510,10 +591,13 @@ public class GuiBarCustomize extends GuiScreen {
         if (row.number != null) {
             numberButton.drawButton(mc, mouseX, mouseY);
             numberStyleButton.drawButton(mc, mouseX, mouseY);
+            decimalsButton.drawButton(mc, mouseX, mouseY);
             if (numberButton.func_146115_a()) {
                 rowTooltip = Collections.singletonList(StatCollector.translateToLocal("dashboard.customize.number"));
             } else if (numberStyleButton.func_146115_a()) {
                 rowTooltip = getStyleTooltip(HudLayout.getNumberStyle(row.number));
+            } else if (decimalsButton.func_146115_a()) {
+                rowTooltip = getDecimalsTooltip(BarNumbers.getDecimals(row.number));
             }
         }
         int x = left + getPreviewX();
@@ -568,6 +652,10 @@ public class GuiBarCustomize extends GuiScreen {
             numberStyleButton.yPosition = rowY;
             numberStyleButton.displayString = getStyleSample(HudLayout.getNumberStyle(row.number));
             numberStyleButton.enabled = on;
+            decimalsButton.xPosition = left + getDecimalsX();
+            decimalsButton.yPosition = rowY;
+            decimalsButton.displayString = getDecimalsLabel(BarNumbers.getDecimals(row.number));
+            decimalsButton.enabled = on;
         }
     }
 
@@ -589,6 +677,9 @@ public class GuiBarCustomize extends GuiScreen {
         } else if (row.number != null && numberStyleButton.mousePressed(mc, mouseX, mouseY)) {
             numberStyleButton.func_146113_a(mc.getSoundHandler());
             HudLayout.setNumberStyle(row.number, stepNumberStyle(HudLayout.getNumberStyle(row.number)));
+        } else if (row.number != null && decimalsButton.mousePressed(mc, mouseX, mouseY)) {
+            decimalsButton.func_146113_a(mc.getSoundHandler());
+            stepDecimals(row.number, BarNumbers.getDecimals(row.number));
         }
         updateAllBarsRow();
     }
@@ -619,6 +710,7 @@ public class GuiBarCustomize extends GuiScreen {
             }
             case BUTTON_ALL_NUMBERS -> toggleAllNumbers();
             case BUTTON_ALL_NUMBER_STYLES -> stepAllNumberStyles();
+            case BUTTON_ALL_NUMBER_DECIMALS -> stepAllDecimals();
             case BUTTON_CROSSHAIR_STYLE -> changeCrosshairStyle();
             case BUTTON_CROSSHAIR_SIZE -> changeCrosshairSize();
             case BUTTON_RESET -> {
@@ -629,6 +721,7 @@ public class GuiBarCustomize extends GuiScreen {
                 for (HudElement number : numbers) {
                     HudLayout.setNumberOn(number, false);
                     HudLayout.setNumberStyle(number, NumberStyle.SLASH);
+                    HudLayout.setNumberDecimals(number, null);
                 }
             }
             default -> {}

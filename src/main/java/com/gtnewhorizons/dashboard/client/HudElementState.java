@@ -26,8 +26,14 @@ public class HudElementState {
     public boolean flipped;
     public boolean numberOn;
     public NumberStyle numberStyle;
+    public Integer numberDecimals;
 
     boolean isDefault() {
-        return visible && !moved && theme == null && !flipped && !numberOn && numberStyle == null;
+        return visible && !moved
+            && theme == null
+            && !flipped
+            && !numberOn
+            && numberStyle == null
+            && numberDecimals == null;
     }
 }

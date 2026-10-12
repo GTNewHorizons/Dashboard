@@ -91,6 +91,18 @@ public final class HudLayout {
         changed = true;
     }
 
+    /** Null for the number's own default. */
+    public static Integer getNumberDecimals(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null ? null : state.numberDecimals;
+    }
+
+    public static void setNumberDecimals(HudElement element, Integer decimals) {
+        getOrCreateState(element).numberDecimals = decimals;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {
         return getBounds(element, element.getDefaultBounds(screenWidth, screenHeight), screenWidth, screenHeight);
     }

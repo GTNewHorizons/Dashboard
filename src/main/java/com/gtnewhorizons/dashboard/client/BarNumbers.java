@@ -1,7 +1,6 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.lang.ref.WeakReference;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -15,6 +14,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeHooks;
@@ -38,10 +38,10 @@ public final class BarNumbers {
 
     private static final int GAP = 2;
     private static final int HEIGHT = 9;
-    private static final FormatOptions WHOLE = new FormatOptions().setDecimalPlaces(0)
-        .setRoundingMode(RoundingMode.CEILING);
-    private static final FormatOptions ONE_DECIMAL = new FormatOptions().setDecimalPlaces(1);
-    private static final FormatOptions PERCENT = new FormatOptions().setDecimalPlaces(0);
+    static final int MAX_DECIMALS = 2;
+    private static final FormatOptions[] DECIMALS = { new FormatOptions().setDecimalPlaces(0),
+        new FormatOptions().setDecimalPlaces(1), new FormatOptions().setDecimalPlaces(2) };
+    private static final FormatOptions PERCENT = DECIMALS[0];
 
     private static final List<BarNumber> NUMBERS = new ArrayList<>();
     private static final Set<ElementType> DRAWN_BARS = EnumSet.noneOf(ElementType.class);
@@ -57,7 +57,7 @@ public final class BarNumbers {
             "health_number",
             true,
             null,
-            WHOLE,
+            0,
             player -> new float[] { player.getHealth(), player.getMaxHealth() },
             previewFill(20),
             20);
@@ -66,48 +66,48 @@ public final class BarNumbers {
             "armor_number",
             true,
             null,
-            WHOLE,
+            0,
             player -> new float[] { ForgeHooks.getTotalArmorValue(player), 20 },
-            previewFill(20),
+            previewPoints(20),
             20);
         BarNumber food = add(
             ElementType.FOOD,
             "food_number",
             false,
             null,
-            WHOLE,
+            0,
             player -> new float[] { player.getFoodStats()
                 .getFoodLevel(), 20 },
-            previewFill(20),
+            previewPoints(20),
             20);
         saturationNumber = add(
             ElementType.FOOD,
             "saturation_number",
             false,
             food,
-            ONE_DECIMAL,
+            1,
             player -> new float[] { player.getFoodStats()
                 .getSaturationLevel(),
                 player.getFoodStats()
                     .getFoodLevel() },
             4.6f,
-            previewFill(20)).element;
+            previewPoints(20)).element;
         add(
             ElementType.AIR,
             "air_number",
             false,
             null,
-            WHOLE,
+            0,
             player -> new float[] { (float) Math.ceil(Math.max(0, player.getAir()) * 10 / 300.0), 10 },
-            previewFill(10),
+            previewPoints(10),
             10);
-        add(ElementType.HEALTHMOUNT, "mount_health_number", false, null, WHOLE, player -> {
+        add(ElementType.HEALTHMOUNT, "mount_health_number", false, null, 0, player -> {
             if (player.ridingEntity instanceof EntityLivingBase mount) {
                 return new float[] { mount.getHealth(), mount.getMaxHealth() };
             }
             return null;
         }, previewFill(20), 20);
-        add(ElementType.BOSSHEALTH, "boss_health_number", false, null, WHOLE, player -> {
+        add(ElementType.BOSSHEALTH, "boss_health_number", false, null, 0, player -> {
             IBossDisplayData current = boss.get();
             if (current != null) {
                 return new float[] { current.getHealth(), current.getMaxHealth() };
@@ -118,7 +118,12 @@ public final class BarNumbers {
 
     /** As full as the bar previews. */
     private static float previewFill(float max) {
-        return Math.round(BarThemes.PREVIEW_FILL * max);
+        return BarThemes.PREVIEW_FILL * max;
+    }
+
+    /** For values that are always whole, like armor points. */
+    private static float previewPoints(float max) {
+        return Math.round(previewFill(max));
     }
 
     /** Vanilla only keeps the boss health as a fraction. */
@@ -129,12 +134,12 @@ public final class BarNumbers {
     }
 
     private static BarNumber add(ElementType type, String name, boolean leftSide, BarNumber besideNumber,
-        FormatOptions format, Values values, float sampleCurrent, float sampleMax) {
+        int defaultDecimals, Values values, float sampleCurrent, float sampleMax) {
         BarNumber number = new BarNumber(
             type,
             leftSide,
             besideNumber,
-            format,
+            defaultDecimals,
             values,
             new float[] { sampleCurrent, sampleMax });
         HudElement element = new HudElement("minecraft:" + name, "dashboard.element.minecraft." + name, number);
@@ -160,12 +165,25 @@ public final class BarNumbers {
 
     /** Like the editor preview, in the number's style. */
     static String getSampleText(HudElement element) {
+        return find(element).getSampleText();
+    }
+
+    static int getDecimals(HudElement element) {
+        return find(element).getDecimals();
+    }
+
+    /** The number's own default is saved as nothing. */
+    static void setDecimals(HudElement element, int decimals) {
+        HudLayout.setNumberDecimals(element, decimals == find(element).defaultDecimals ? null : decimals);
+    }
+
+    private static BarNumber find(HudElement element) {
         for (BarNumber number : NUMBERS) {
             if (number.element == element) {
-                return number.getSampleText();
+                return number;
             }
         }
-        return "";
+        throw new IllegalArgumentException("Not a bar number: " + element.getId());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -203,17 +221,17 @@ public final class BarNumbers {
         private final ElementType type;
         private final boolean leftSide;
         private final BarNumber besideNumber;
-        private final FormatOptions format;
+        private final int defaultDecimals;
         private final Values values;
         private final float[] sample;
         private HudElement element;
 
-        private BarNumber(ElementType type, boolean leftSide, BarNumber besideNumber, FormatOptions format,
+        private BarNumber(ElementType type, boolean leftSide, BarNumber besideNumber, int defaultDecimals,
             Values values, float[] sample) {
             this.type = type;
             this.leftSide = leftSide;
             this.besideNumber = besideNumber;
-            this.format = format;
+            this.defaultDecimals = defaultDecimals;
             this.values = values;
             this.sample = sample;
         }
@@ -247,7 +265,13 @@ public final class BarNumbers {
             return format(sample);
         }
 
+        private int getDecimals() {
+            Integer saved = HudLayout.getNumberDecimals(element);
+            return saved != null ? MathHelper.clamp_int(saved, 0, MAX_DECIMALS) : defaultDecimals;
+        }
+
         private String format(float[] currentAndMax) {
+            FormatOptions format = DECIMALS[getDecimals()];
             float current = currentAndMax[0];
             float max = currentAndMax[1];
             float percent = max > 0 ? current / max * 100 : 0;
