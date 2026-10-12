@@ -311,11 +311,11 @@ public class GuiBarCustomize extends GuiScreen {
         drawCrosshairPreview();
         super.drawScreen(mouseX, mouseY, partialTicks);
 
-        if (isMouseOver(resetFlipsButton, mouseX, mouseY)) {
+        if (resetFlipsButton.func_146115_a()) {
             drawTooltip(StatCollector.translateToLocal("dashboard.customize.reset_flips"), mouseX, mouseY);
-        } else if (isMouseOver(crosshairSizeButton, mouseX, mouseY)) {
+        } else if (crosshairSizeButton.func_146115_a()) {
             drawTooltip(StatCollector.translateToLocal("dashboard.customize.crosshair_size"), mouseX, mouseY);
-        } else if (isMouseOver(allButton, mouseX, mouseY) && !allButton.displayString.equals(allBarsLabel)) {
+        } else if (allButton.func_146115_a() && !allButton.displayString.equals(allBarsLabel)) {
             drawTooltip(allBarsLabel, mouseX, mouseY);
         } else if (rowTooltip != null) {
             drawTooltip(rowTooltip, mouseX, mouseY);
@@ -347,12 +347,6 @@ public class GuiBarCustomize extends GuiScreen {
         }
     }
 
-    private static boolean isMouseOver(GuiButton button, int mouseX, int mouseY) {
-        return mouseX >= button.xPosition && mouseY >= button.yPosition
-            && mouseX < button.xPosition + button.width
-            && mouseY < button.yPosition + button.height;
-    }
-
     private void drawRowName(String name, int rowY, int color) {
         int y = rowY + (BUTTON_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
         int right = getContentLeft() + nameWidth;
@@ -370,9 +364,9 @@ public class GuiBarCustomize extends GuiScreen {
             themeButton.drawButton(mc, mouseX, mouseY);
             flipButton.drawButton(mc, mouseX, mouseY);
             String themeName = getThemeName(theme);
-            if (isMouseOver(themeButton, mouseX, mouseY) && !themeButton.displayString.equals(themeName)) {
+            if (themeButton.func_146115_a() && !themeButton.displayString.equals(themeName)) {
                 rowTooltip = themeName;
-            } else if (isMouseOver(flipButton, mouseX, mouseY)) {
+            } else if (flipButton.func_146115_a()) {
                 rowTooltip = StatCollector.translateToLocal("dashboard.customize.fill_direction");
             }
         }
