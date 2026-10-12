@@ -11,13 +11,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -186,11 +183,6 @@ public final class BarThemes {
     }
 
     private static void bindTexture(String theme) {
-        Minecraft.getMinecraft()
-            .getTextureManager()
-            .bindTexture(getTexture(theme));
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1, 1, 1, 1);
+        PreviewDrawing.bindTexture(getTexture(theme));
     }
 }

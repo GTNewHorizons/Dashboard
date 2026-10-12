@@ -33,8 +33,6 @@ public final class Crosshairs {
         Dashboard.MODID,
         "textures/gui/crosshairs/crosshairs.png");
 
-    private static final Gui GUI = new Gui();
-
     private Crosshairs() {}
 
     @SubscribeEvent
@@ -50,9 +48,7 @@ public final class Crosshairs {
 
     /** Inverting what is behind it, like vanilla. */
     public static void draw(int style, int size, int centerX, int centerY) {
-        Minecraft.getMinecraft()
-            .getTextureManager()
-            .bindTexture(style == VANILLA ? Gui.icons : TEXTURE);
+        PreviewDrawing.bindTexture(style == VANILLA ? Gui.icons : TEXTURE);
         int cell = style - 1;
         int u = style == VANILLA ? 0 : cell % 16 * CELL_SIZE;
         int v = style == VANILLA ? 0 : cell / 16 * CELL_SIZE;
@@ -60,9 +56,8 @@ public final class Crosshairs {
         GL11.glPushMatrix();
         GL11.glTranslatef(centerX, centerY, 0);
         GL11.glScalef(size, size, 1);
-        GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ONE_MINUS_SRC_COLOR, 1, 0);
-        GUI.drawTexturedModalRect(-CENTER, -CENTER, u, v, CELL_SIZE, CELL_SIZE);
+        PreviewDrawing.drawTexture(-CENTER, -CENTER, u, v, CELL_SIZE, CELL_SIZE);
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glPopMatrix();
