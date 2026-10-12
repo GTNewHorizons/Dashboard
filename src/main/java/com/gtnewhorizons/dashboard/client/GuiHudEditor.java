@@ -31,7 +31,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class GuiHudEditor extends GuiScreen {
 
     private static final int BUTTON_DONE = 0;
-    private static final int BUTTON_RESET_ALL = 1;
+    private static final int BUTTON_RESET = 1;
     private static final int BUTTON_GRID = 2;
     private static final int BUTTON_LABELS = 3;
     private static final int BUTTON_POSITIONS = 4;
@@ -92,8 +92,7 @@ public class GuiHudEditor extends GuiScreen {
 
         List<GuiButton> actionButtons = new ArrayList<>();
         actionButtons.add(createButton(BUTTON_DONE, StatCollector.translateToLocal("dashboard.editor.button.done")));
-        actionButtons
-            .add(createButton(BUTTON_RESET_ALL, StatCollector.translateToLocal("dashboard.editor.button.reset_all")));
+        actionButtons.add(createButton(BUTTON_RESET, StatCollector.translateToLocal("dashboard.editor.button.reset")));
         actionButtons
             .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
         buttonRows.add(actionButtons);
@@ -622,7 +621,7 @@ public class GuiHudEditor extends GuiScreen {
     protected void actionPerformed(GuiButton button) {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
-            case BUTTON_RESET_ALL -> HudLayout.resetAll();
+            case BUTTON_RESET -> HudLayout.resetAll();
             case BUTTON_CUSTOMIZE -> mc.displayGuiScreen(new GuiBarCustomize(this));
             case BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}

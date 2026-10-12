@@ -267,7 +267,7 @@ public class GuiBarCustomize extends GuiScreen {
             BarThemes.drawSample(theme, row.slot, x, y, fromRight);
         }
         if (row.slot == BarSlot.EXPERIENCE) {
-            HudBounds bounds = new HudBounds(x, y, row.slot.width, row.slot.height);
+            HudBounds bounds = new HudBounds(x, y - 6, row.slot.width, row.slot.height);
             VanillaHudElements.drawLevelNumber(bounds, VanillaHudElements.SAMPLE_LEVEL);
         }
     }

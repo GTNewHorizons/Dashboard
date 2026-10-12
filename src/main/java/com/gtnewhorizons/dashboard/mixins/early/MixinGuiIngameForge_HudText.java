@@ -40,6 +40,18 @@ public class MixinGuiIngameForge_HudText {
         return dashboard$drawShifted(VanillaHudElements.ACTION_BAR, font, text, x, y, color, original);
     }
 
+    // XP level number
+    @WrapOperation(
+        method = "renderExperience",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/FontRenderer;drawString(Ljava/lang/String;III)I",
+            remap = true))
+    private int dashboard$skipLevelNumber(FontRenderer font, String text, int x, int y, int color,
+        Operation<Integer> original) {
+        return 0;
+    }
+
     @Unique
     private static int dashboard$drawShifted(HudElement element, FontRenderer font, String text, int x, int y,
         int color, Operation<Integer> original) {

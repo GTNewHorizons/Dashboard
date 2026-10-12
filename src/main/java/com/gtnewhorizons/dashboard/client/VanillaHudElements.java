@@ -14,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
@@ -63,6 +64,7 @@ public final class VanillaHudElements {
 
     private static final int ITEM_NAME_WIDTH = 150;
     private static final int ACTION_BAR_WIDTH = 200;
+    private static final int LEVEL_WIDTH = 30;
 
     public static final HudElement ITEM_NAME = new HudElement(
         "minecraft:item_name",
@@ -73,6 +75,11 @@ public final class VanillaHudElements {
         "minecraft:action_bar",
         "dashboard.element.minecraft.action_bar",
         (w, h) -> new HudBounds(w / 2 - ACTION_BAR_WIDTH / 2, h - 52, ACTION_BAR_WIDTH, ICON_SIZE));
+
+    private static final HudElement EXPERIENCE_LEVEL = new HudElement(
+        "minecraft:experience_level",
+        "dashboard.element.minecraft.experience_level",
+        (w, h) -> new HudBounds(w / 2 - LEVEL_WIDTH / 2, h - 35, LEVEL_WIDTH, 8));
 
     private VanillaHudElements() {}
 
@@ -86,7 +93,11 @@ public final class VanillaHudElements {
             ElementType.EXPERIENCE,
             "experience",
             (w, h) -> new HudBounds(w / 2 - 91, h - 29, BAR_WIDTH, 5));
-        PreviewDrawing.setImitationInBounds(experience, VanillaHudElements::drawExperiencePreview);
+        PreviewDrawing.setImitationInBounds(
+            experience,
+            bounds -> drawBarSample(experience, BarSlot.EXPERIENCE, bounds.x, bounds.y));
+        HudEditor.register(EXPERIENCE_LEVEL);
+        PreviewDrawing.setImitationInBounds(EXPERIENCE_LEVEL, bounds -> drawLevelNumber(bounds, SAMPLE_LEVEL));
         HudElement jumpBar = add(
             ElementType.JUMPBAR,
             "jump_bar",
@@ -235,12 +246,6 @@ public final class VanillaHudElements {
         font.drawStringWithShadow(name, nameX, bounds.y, 0xFFFFFF);
     }
 
-    /** Experience bar, with the number (vanilla colors). */
-    private static void drawExperiencePreview(HudBounds bounds) {
-        drawBarSample(ELEMENTS.get(ElementType.EXPERIENCE), BarSlot.EXPERIENCE, bounds.x, bounds.y);
-        drawLevelNumber(bounds, SAMPLE_LEVEL);
-    }
-
     /** Themed or vanilla editor sample. */
     private static void drawBarSample(HudElement element, BarSlot slot, int x, int y) {
         String theme = HudLayout.getTheme(element);
@@ -251,11 +256,12 @@ public final class VanillaHudElements {
         }
     }
 
-    static void drawLevelNumber(HudBounds bar, int level) {
+    /** Experience level number */
+    static void drawLevelNumber(HudBounds box, int level) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
         String text = String.valueOf(level);
-        int x = bar.x + BAR_WIDTH / 2 - font.getStringWidth(text) / 2;
-        int y = bar.y - 6;
+        int x = box.x + box.width / 2 - font.getStringWidth(text) / 2;
+        int y = box.y;
         font.drawString(text, x + 1, y, 0x000000);
         font.drawString(text, x - 1, y, 0x000000);
         font.drawString(text, x, y + 1, 0x000000);
@@ -291,6 +297,7 @@ public final class VanillaHudElements {
         BarSlot themedSlot = THEMED_BARS.get(element);
         String theme = themedSlot != null ? HudLayout.getTheme(element) : null;
         if (theme != null && drawThemed(event, element, themedSlot, theme)) {
+            drawExperienceLevel(event);
             return;
         }
         if (HudEditor.isHidingContent() && HudLayout.isVisible(element)) {
@@ -306,6 +313,28 @@ public final class VanillaHudElements {
             SHIFTED.add(event.type);
         } else {
             cancel(event);
+            drawExperienceLevel(event);
+        }
+    }
+
+    /** Instead of vanilla's, which the mixin skips. After the XP bar, so it stays on top. */
+    private static void drawExperienceLevel(RenderGameOverlayEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        int level = mc.thePlayer.experienceLevel;
+        ScaledResolution resolution = event.resolution;
+        if (event.type != ElementType.EXPERIENCE || level <= 0
+            || !willDraw(ElementType.EXPERIENCE)
+            || !HudEditor.beginRender(EXPERIENCE_LEVEL, resolution)) {
+            return;
+        }
+        try {
+            HudBounds bounds = EXPERIENCE_LEVEL
+                .getDefaultBounds(resolution.getScaledWidth(), resolution.getScaledHeight());
+            drawLevelNumber(bounds, level);
+        } finally {
+            HudEditor.endRender();
+            mc.getTextureManager()
+                .bindTexture(Gui.icons);
         }
     }
 
@@ -369,9 +398,7 @@ public final class VanillaHudElements {
                     BarThemes.drawAirPop(theme, bounds.x, barY, fill, fromRight);
                 }
             }
-            if (event.type == ElementType.EXPERIENCE && mc.thePlayer.experienceLevel > 0) {
-                drawLevelNumber(bounds, mc.thePlayer.experienceLevel);
-            } else if (event.type == ElementType.BOSSHEALTH) {
+            if (event.type == ElementType.BOSSHEALTH) {
                 drawBossName(bounds, BossStatus.bossName);
             }
         } finally {
@@ -488,6 +515,7 @@ public final class VanillaHudElements {
             endAllShifts();
         } else if (!STACKED_ROWS.containsKey(event.type)) {
             endShift(event.type);
+            drawExperienceLevel(event);
         }
     }
 
