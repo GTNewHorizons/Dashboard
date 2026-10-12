@@ -30,6 +30,8 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_STATES = 3;
     private static final int SCROLL_UP = 4;
     private static final int SCROLL_DOWN = 5;
+    private static final int BUTTON_RESET = 6;
+    private static final int BOTTOM_BUTTON_GAP = 4;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
@@ -54,6 +56,7 @@ public class GuiBarCustomize extends GuiScreen {
     private BarList list;
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
+    private GuiButton resetButton;
     private int nameWidth;
     private int contentWidth;
 
@@ -117,18 +120,19 @@ public class GuiBarCustomize extends GuiScreen {
             "R");
         buttonList.add(resetFlipsButton);
 
+        // Show States, Reset and Done, centered
         int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
-        buttonList.add(
-            new GuiButton(
-                BUTTON_STATES,
-                width / 2 - BOTTOM_BUTTON_WIDTH - 2,
-                bottomY,
-                BOTTOM_BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                StatCollector.translateToLocal(
-                    showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states")));
+        int step = BOTTOM_BUTTON_WIDTH + BOTTOM_BUTTON_GAP;
+        int bottomX = width / 2 - (3 * BOTTOM_BUTTON_WIDTH + 2 * BOTTOM_BUTTON_GAP) / 2;
+        String states = StatCollector
+            .translateToLocal(showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states");
+        buttonList.add(new GuiButton(BUTTON_STATES, bottomX, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, states));
+        String reset = StatCollector.translateToLocal("dashboard.customize.reset");
+        resetButton = new GuiButton(BUTTON_RESET, bottomX + step, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, reset);
+        buttonList.add(resetButton);
         String done = StatCollector.translateToLocal("dashboard.editor.button.done");
-        buttonList.add(new GuiButton(BUTTON_DONE, width / 2 + 2, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, done));
+        buttonList
+            .add(new GuiButton(BUTTON_DONE, bottomX + 2 * step, bottomY, BOTTOM_BUTTON_WIDTH, BUTTON_HEIGHT, done));
         updateAllBarsRow();
     }
 
@@ -137,6 +141,16 @@ public class GuiBarCustomize extends GuiScreen {
         allButton.displayString = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0)))
             : StatCollector.translateToLocal("dashboard.customize.mixed");
         resetFlipsButton.enabled = anyBarFlipped();
+        resetButton.enabled = resetFlipsButton.enabled || anyBarThemed();
+    }
+
+    private boolean anyBarThemed() {
+        for (HudElement bar : bars) {
+            if (HudLayout.getTheme(bar) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int getContentLeft() {
@@ -316,6 +330,12 @@ public class GuiBarCustomize extends GuiScreen {
             }
             case BUTTON_RESET_FLIPS -> {
                 for (HudElement bar : bars) {
+                    HudLayout.setFlipped(bar, false);
+                }
+            }
+            case BUTTON_RESET -> {
+                for (HudElement bar : bars) {
+                    HudLayout.setTheme(bar, null);
                     HudLayout.setFlipped(bar, false);
                 }
             }
