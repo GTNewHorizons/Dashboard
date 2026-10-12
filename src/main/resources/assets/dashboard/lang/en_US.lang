@@ -106,7 +106,6 @@ dashboard.customize.status_effects=Status Effects
 dashboard.customize.screen_overlays=Screen Overlays
 
 # Screen overlays screen
-dashboard.screen_overlays.title=Screen Overlays
 dashboard.screen_overlays.pumpkin_opacity=Pumpkin Opacity
 dashboard.screen_overlays.portal_opacity=Portal Opacity
 dashboard.screen_overlays.fire_opacity=Fire Opacity

@@ -9,7 +9,6 @@ import java.util.Map;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
@@ -113,6 +112,7 @@ public class GuiBarCustomize extends GuiScreen {
     private boolean rebuildNeeded;
     private String allBarsLabel;
     private List<String> rowTooltip;
+    private String title;
 
     public GuiBarCustomize(GuiScreen parent) {
         this.parent = parent;
@@ -126,6 +126,7 @@ public class GuiBarCustomize extends GuiScreen {
             screenOverlays.save();
         }
         buttonList.clear();
+        title = StatCollector.translateToLocal("dashboard.customize.title");
         bars.clear();
         slots.clear();
         rows.clear();
@@ -602,20 +603,17 @@ public class GuiBarCustomize extends GuiScreen {
         }
         rowTooltip = null;
         // Checked every frame, since the Forge list can swallow the mouse release event
-        if (!Mouse.isButtonDown(0)) {
-            statusEffects.releaseSliders(mouseX, mouseY);
-            screenOverlays.releaseSliders(mouseX, mouseY);
-        } else if (statusEffects.isDragging() || screenOverlays.isDragging()) {
-            LIST_DRAG_START.setValue(list, NOT_DRAGGING);
+        if (statusEffects.isDragging() || screenOverlays.isDragging()) {
+            if (!Mouse.isButtonDown(0)) {
+                statusEffects.releaseSliders(mouseX, mouseY);
+                screenOverlays.releaseSliders(mouseX, mouseY);
+            } else {
+                LIST_DRAG_START.setValue(list, NOT_DRAGGING);
+            }
         }
         list.drawScreen(mouseX, mouseY, partialTicks);
 
-        drawCenteredString(
-            fontRendererObj,
-            StatCollector.translateToLocal("dashboard.customize.title"),
-            width / 2,
-            TITLE_Y,
-            ColorUtils.text.getColor());
+        drawCenteredString(fontRendererObj, title, width / 2, TITLE_Y, ColorUtils.text.getColor());
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (rowTooltip != null) {
@@ -951,7 +949,7 @@ public class GuiBarCustomize extends GuiScreen {
 
         @Override
         protected void draw(int y, int mouseX, int mouseY) {
-            int scale = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaleFactor();
+            int scale = HudLayout.getGameGuiScale();
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
             GL11.glScissor(0, mc.displayHeight - (y + LINE_HEIGHT) * scale, mc.displayWidth, LINE_HEIGHT * scale);
             int areaTop = y - index * LINE_HEIGHT;

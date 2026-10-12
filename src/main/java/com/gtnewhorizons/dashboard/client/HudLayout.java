@@ -35,6 +35,11 @@ public final class HudLayout {
 
     private static Map<String, HudElementState> states;
     private static boolean changed;
+    private static int scaleDisplayWidth = -1;
+    private static int scaleDisplayHeight;
+    private static int scaleSetting;
+    private static boolean scaleUnicode;
+    private static int gameGuiScale;
 
     private HudLayout() {}
 
@@ -132,15 +137,28 @@ public final class HudLayout {
 
     /** The factor HudEditor resizes this element's drawing by, on top of the game's own GUI scale. */
     public static float getScale(HudElement element) {
-        if (getSizeStep(element) == 0) {
+        int step = getSizeStep(element);
+        if (step == 0) {
             return 1;
         }
-        return getElementGuiScale(element) / (float) getGameGuiScale();
+        int gameScale = getGameGuiScale();
+        return Math.max(1, gameScale + step) / (float) gameScale;
     }
 
-    private static int getGameGuiScale() {
+    /** Measured again only when something it depends on changes, since the HUD asks for it every frame. */
+    static int getGameGuiScale() {
         Minecraft mc = Minecraft.getMinecraft();
-        return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaleFactor();
+        boolean unicode = mc.func_152349_b();
+        if (mc.displayWidth != scaleDisplayWidth || mc.displayHeight != scaleDisplayHeight
+            || mc.gameSettings.guiScale != scaleSetting
+            || unicode != scaleUnicode) {
+            scaleDisplayWidth = mc.displayWidth;
+            scaleDisplayHeight = mc.displayHeight;
+            scaleSetting = mc.gameSettings.guiScale;
+            scaleUnicode = unicode;
+            gameGuiScale = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaleFactor();
+        }
+        return gameGuiScale;
     }
 
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {
