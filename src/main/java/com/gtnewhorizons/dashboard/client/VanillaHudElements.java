@@ -18,6 +18,7 @@ import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -94,7 +95,9 @@ public final class VanillaHudElements {
             (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
         PreviewDrawing.setImitationInBounds(bossHealth, VanillaHudElements::drawBossHealthPreview);
         HudElement health = addStacked(ElementType.HEALTH, "health", false);
-        PreviewDrawing.setImitationInBounds(health, rowSample(BarSlot.HEALTH));
+        PreviewDrawing.setImitationInBounds(
+            health,
+            bounds -> drawBarSample(health, BarSlot.HEALTH, bounds.x, bounds.getBottom() - ICON_SIZE));
         HudElement armor = addStacked(ElementType.ARMOR, "armor", false);
         PreviewDrawing.setImitationInBounds(armor, rowSample(BarSlot.ARMOR));
         HudElement food = addStacked(ElementType.FOOD, "food", true);
@@ -304,22 +307,38 @@ public final class VanillaHudElements {
             case EXPERIENCE -> mc.thePlayer.experience;
             case JUMPBAR -> mc.thePlayer.getHorseJumpPower();
             case BOSSHEALTH -> BossStatus.healthScale;
+            case HEALTH -> mc.thePlayer.getHealth() / mc.thePlayer.getMaxHealth();
             default -> -1;
         };
         if (fill < 0) {
             return false;
         }
         cancel(event);
+
+        // Absorption above health / TODO: posibble re-do (smaller bar, bar as overlay)
+        float absorption = event.type == ElementType.HEALTH ? mc.thePlayer.getAbsorptionAmount() : 0;
+        int rows = absorption > 0 ? 2 : 1;
+        StackedIconRow row = STACKED_ROWS.get(event.type);
+        if (row != null && HudLayout.isVisible(element)) {
+            row.addToStack(ROW_HEIGHT * rows);
+            row.growth = ROW_HEIGHT * rows;
+        }
         if (!HudEditor.beginRender(element, event.resolution)) {
             return true;
         }
         BarSlot slot = THEMED_BARS.get(element);
+        boolean fromRight = BarThemes.fillsFromRight(element, slot);
         HudBounds bounds = element
             .getDefaultBounds(event.resolution.getScaledWidth(), event.resolution.getScaledHeight());
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
         try {
             int barY = bounds.getBottom() - slot.height;
-            BarThemes.drawBar(theme, slot, bounds.x, barY, fill, BarThemes.fillsFromRight(element, slot));
+            BarThemes.drawBar(theme, getStateSlot(slot, mc.thePlayer), bounds.x, barY, fill, fromRight);
+            if (absorption > 0) {
+                float absorptionFill = Math.min(1, absorption / mc.thePlayer.getMaxHealth());
+                BarThemes
+                    .drawBar(theme, BarSlot.HEALTH_ABSORPTION, bounds.x, barY - ROW_HEIGHT, absorptionFill, fromRight);
+            }
             if (event.type == ElementType.EXPERIENCE && mc.thePlayer.experienceLevel > 0) {
                 drawLevelNumber(bounds, mc.thePlayer.experienceLevel);
             } else if (event.type == ElementType.BOSSHEALTH) {
@@ -332,6 +351,16 @@ public final class VanillaHudElements {
                 .bindTexture(Gui.icons);
         }
         return true;
+    }
+
+    private static BarSlot getStateSlot(BarSlot slot, EntityPlayer player) {
+        if (slot == BarSlot.HEALTH && player.isPotionActive(Potion.poison)) {
+            return BarSlot.HEALTH_POISONED;
+        }
+        if (slot == BarSlot.HEALTH && player.isPotionActive(Potion.wither)) {
+            return BarSlot.HEALTH_WITHERED;
+        }
+        return slot;
     }
 
     /** These events fire even when nothing is drawn: no boss nearby, in creative, no armor, or not underwater. */
@@ -416,6 +445,14 @@ public final class VanillaHudElements {
 
         private int currentStackHeight() {
             return rightSide ? GuiIngameForge.right_height : GuiIngameForge.left_height;
+        }
+
+        private void addToStack(int height) {
+            if (rightSide) {
+                GuiIngameForge.right_height += height;
+            } else {
+                GuiIngameForge.left_height += height;
+            }
         }
 
         @Override
