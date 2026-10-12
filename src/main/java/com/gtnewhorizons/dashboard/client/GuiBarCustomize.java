@@ -250,7 +250,12 @@ public class GuiBarCustomize extends GuiScreen {
             VanillaHudElements.drawVanillaSample(row.slot, x, y);
         } else {
             boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
-            BarThemes.drawBar(theme, row.slot, x, y, BarThemes.PREVIEW_FILL, fromRight);
+            if (row.slot == BarSlot.HEALTH_REGEN) {
+                BarThemes.drawBar(theme, BarSlot.HEALTH, x, y, BarThemes.PREVIEW_FILL, fromRight);
+                BarThemes.drawRegenShine(theme, x, y, VanillaHudElements.getSampleRegenStep(), fromRight);
+            } else {
+                BarThemes.drawBar(theme, row.slot, x, y, BarThemes.PREVIEW_FILL, fromRight);
+            }
         }
         if (row.slot == BarSlot.EXPERIENCE) {
             HudBounds bounds = new HudBounds(x, y, row.slot.width, row.slot.height);

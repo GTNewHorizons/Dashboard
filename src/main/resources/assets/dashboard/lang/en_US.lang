@@ -57,6 +57,11 @@ dashboard.customize.hide_states=Hide States
 dashboard.customize.state.health_poisoned=Poisoned
 dashboard.customize.state.health_withered=Withered
 dashboard.customize.state.health_absorption=Absorption
+dashboard.customize.state.health_flash_empty=Flash (Empty)
+dashboard.customize.state.health_flash=Flash
+dashboard.customize.state.health_flash_poisoned=Flash (Poisoned)
+dashboard.customize.state.health_flash_withered=Flash (Withered)
+dashboard.customize.state.health_regen=Regeneration
 dashboard.customize.state.food_hunger=Hunger Effect
 
 # Bar themes

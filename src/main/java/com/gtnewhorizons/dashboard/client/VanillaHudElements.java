@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -57,6 +58,7 @@ public final class VanillaHudElements {
     private static final Set<ElementType> SHIFTED = EnumSet.noneOf(ElementType.class);
     private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
     private static final Map<HudElement, BarSlot> THEMED_BARS = new LinkedHashMap<>();
+    private static final Random SHAKE = new Random();
 
     private static final int ITEM_NAME_WIDTH = 150;
     private static final int ACTION_BAR_WIDTH = 200;
@@ -162,6 +164,11 @@ public final class VanillaHudElements {
             case HEALTH_WITHERED -> drawIconRowPreview(x, y, false, 16, 124, 133, 0);
             case HEALTH_ABSORPTION -> drawIconRowPreview(x, y, false, 16, 160, 169, 0);
             case FOOD_HUNGER -> drawIconRowPreview(x, y, true, 133, 88, 97, 27);
+            case HEALTH_FLASH_EMPTY -> drawIconRowPreview(x, y, false, 25, 52, 61, 0);
+            case HEALTH_FLASH -> drawIconRowPreview(x, y, false, 25, 70, 79, 0);
+            case HEALTH_FLASH_POISONED -> drawIconRowPreview(x, y, false, 25, 106, 115, 0);
+            case HEALTH_FLASH_WITHERED -> drawIconRowPreview(x, y, false, 25, 142, 151, 0);
+            case HEALTH_REGEN -> drawIconRowPreview(x, y, false, 16, 52, 61, 0, getSampleRegenStep());
             default -> {}
         }
     }
@@ -182,19 +189,30 @@ public final class VanillaHudElements {
      */
     private static void drawIconRowPreview(int left, int y, boolean fromRight, int emptyU, int fullU, int halfU,
         int v) {
+        drawIconRowPreview(left, y, fromRight, emptyU, fullU, halfU, v, -1);
+    }
+
+    private static void drawIconRowPreview(int left, int y, boolean fromRight, int emptyU, int fullU, int halfU, int v,
+        int liftIndex) {
         PreviewDrawing.bindTexture(Gui.icons);
         int points = Math.round(BarThemes.PREVIEW_FILL * 20);
         for (int i = 0; i < 10; i++) {
             int x = fromRight ? left + ICON_ROW_WIDTH - ICON_SIZE - i * ICON_STEP : left + i * ICON_STEP;
+            int iconY = i == liftIndex ? y - 2 : y;
             if (emptyU >= 0) {
-                PreviewDrawing.drawTexture(x, y, emptyU, v, ICON_SIZE, ICON_SIZE);
+                PreviewDrawing.drawTexture(x, iconY, emptyU, v, ICON_SIZE, ICON_SIZE);
             }
             if (i * 2 + 2 <= points) {
-                PreviewDrawing.drawTexture(x, y, fullU, v, ICON_SIZE, ICON_SIZE);
+                PreviewDrawing.drawTexture(x, iconY, fullU, v, ICON_SIZE, ICON_SIZE);
             } else if (i * 2 + 1 == points && halfU >= 0) {
-                PreviewDrawing.drawTexture(x, y, halfU, v, ICON_SIZE, ICON_SIZE);
+                PreviewDrawing.drawTexture(x, iconY, halfU, v, ICON_SIZE, ICON_SIZE);
             }
         }
+    }
+
+    /** The regeneration step for samples, from the clock since samples have no game ticks. */
+    static int getSampleRegenStep() {
+        return BarThemes.getRegenStep((int) (System.currentTimeMillis() / 50 % 100_000));
     }
 
     /** Action bar - music disc message. */
@@ -219,7 +237,7 @@ public final class VanillaHudElements {
         font.drawStringWithShadow(name, nameX, bounds.y, 0xFFFFFF);
     }
 
-    /** Experience bar, with the number (vanilla colors) */
+    /** Experience bar, with the number (vanilla colors). */
     private static void drawExperiencePreview(HudBounds bounds) {
         drawBarSample(ELEMENTS.get(ElementType.EXPERIENCE), BarSlot.EXPERIENCE, bounds.x, bounds.y);
         drawLevelNumber(bounds, SAMPLE_LEVEL);
@@ -322,7 +340,8 @@ public final class VanillaHudElements {
         }
         cancel(event);
 
-        // Absorption above health / TODO: posibble re-do (smaller bar, bar as overlay)
+        // Absorption above health
+        // TODO: posibble re-do (smaller bar, bar as overlay)
         float absorption = event.type == ElementType.HEALTH ? mc.thePlayer.getAbsorptionAmount() : 0;
         int rows = absorption > 0 ? 2 : 1;
         StackedIconRow row = STACKED_ROWS.get(event.type);
@@ -340,7 +359,22 @@ public final class VanillaHudElements {
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
         try {
             int barY = bounds.getBottom() - slot.height;
-            BarThemes.drawBar(theme, getStateSlot(slot, mc.thePlayer), bounds.x, barY, fill, fromRight);
+            if (event.type == ElementType.HEALTH && mc.thePlayer.getHealth() <= 4) {
+                barY += getLowHealthShake(mc);
+            }
+            BarSlot stateSlot = getStateSlot(slot, mc.thePlayer);
+            if (event.type == ElementType.HEALTH && isHealthFlashing(mc.thePlayer)) {
+                float lastFill = mc.thePlayer.prevHealth / mc.thePlayer.getMaxHealth();
+                BarThemes.drawEmpty(theme, BarSlot.HEALTH_FLASH_EMPTY, bounds.x, barY);
+                BarThemes.drawFillRange(theme, getFlashSlot(stateSlot), bounds.x, barY, fill, lastFill, fromRight);
+                BarThemes.drawFillRange(theme, stateSlot, bounds.x, barY, 0, fill, fromRight);
+            } else {
+                BarThemes.drawBar(theme, stateSlot, bounds.x, barY, fill, fromRight);
+            }
+            if (event.type == ElementType.HEALTH && mc.thePlayer.isPotionActive(Potion.regeneration)) {
+                int step = BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter());
+                BarThemes.drawRegenShine(theme, bounds.x, barY, step, fromRight);
+            }
             if (absorption > 0) {
                 float absorptionFill = Math.min(1, absorption / mc.thePlayer.getMaxHealth());
                 BarThemes
@@ -371,6 +405,25 @@ public final class VanillaHudElements {
             return BarSlot.FOOD_HUNGER;
         }
         return slot;
+    }
+
+    /** Blinks every 3 ticks during the first half of the hurt cooldown. */
+    private static boolean isHealthFlashing(EntityPlayer player) {
+        return player.hurtResistantTime >= 10 && player.hurtResistantTime / 3 % 2 == 1;
+    }
+
+    /** 0 or 1 px, changing every tick, with the seed vanilla uses for its hearts. */
+    private static int getLowHealthShake(Minecraft mc) {
+        SHAKE.setSeed(mc.ingameGUI.getUpdateCounter() * 312871L);
+        return SHAKE.nextInt(2);
+    }
+
+    private static BarSlot getFlashSlot(BarSlot healthSlot) {
+        return switch (healthSlot) {
+            case HEALTH_POISONED -> BarSlot.HEALTH_FLASH_POISONED;
+            case HEALTH_WITHERED -> BarSlot.HEALTH_FLASH_WITHERED;
+            default -> BarSlot.HEALTH_FLASH;
+        };
     }
 
     /** These events fire even when nothing is drawn: no boss nearby, in creative, no armor, or not underwater. */

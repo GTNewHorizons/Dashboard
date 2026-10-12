@@ -41,6 +41,11 @@ public final class BarThemes {
     }
 
     public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
+        drawEmpty(theme, slot, x, y);
+        drawFill(slot, x, y, 0, fraction, fromRight);
+    }
+
+    public static void drawEmpty(String theme, BarSlot slot, int x, int y) {
         bindTexture(theme);
         drawFromSheet(
             x - PADDING,
@@ -49,21 +54,43 @@ public final class BarThemes {
             slot.emptyV,
             slot.width + PADDING * 2,
             slot.height + PADDING * 2);
-        drawFill(slot, x, y, fraction, fromRight);
     }
 
-    public static void drawFillOnly(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
-        bindTexture(theme);
-        drawFill(slot, x, y, fraction, fromRight);
+    /** Vanilla's regen heart wave. */
+    public static int getRegenStep(int ticks) {
+        int step = ticks % 25;
+        return step < 10 ? step : -1;
     }
 
-    private static void drawFill(BarSlot slot, int x, int y, float fraction, boolean fromRight) {
-        int fillWidth = Math.round(Math.max(0, Math.min(1, fraction)) * slot.width);
-        if (fillWidth <= 0) {
+    /** Over the health bar at barX, barY. */
+    public static void drawRegenShine(String theme, int barX, int barY, int step, boolean fromRight) {
+        if (step < 0) {
             return;
         }
-        int offset = fromRight ? slot.width - fillWidth : 0;
-        drawFromSheet(x + offset, y, slot.fullU + PADDING + offset, slot.fullV + PADDING, fillWidth, slot.height);
+        int offset = step * 8;
+        int x = fromRight ? barX + BarSlot.HEALTH.width - BarSlot.HEALTH_REGEN.width - offset : barX + offset;
+        drawEmpty(theme, BarSlot.HEALTH_REGEN, x, barY);
+    }
+
+    /** Only the stretch between two fractions. */
+    public static void drawFillRange(String theme, BarSlot slot, int x, int y, float from, float to,
+        boolean fromRight) {
+        bindTexture(theme);
+        drawFill(slot, x, y, from, to, fromRight);
+    }
+
+    private static void drawFill(BarSlot slot, int x, int y, float from, float to, boolean fromRight) {
+        int start = Math.round(clamp(from) * slot.width);
+        int end = Math.round(clamp(to) * slot.width);
+        if (end <= start) {
+            return;
+        }
+        int offset = fromRight ? slot.width - end : start;
+        drawFromSheet(x + offset, y, slot.fullU + PADDING + offset, slot.fullV + PADDING, end - start, slot.height);
+    }
+
+    private static float clamp(float fraction) {
+        return Math.max(0, Math.min(1, fraction));
     }
 
     private static void drawFromSheet(int x, int y, int u, int v, int width, int height) {

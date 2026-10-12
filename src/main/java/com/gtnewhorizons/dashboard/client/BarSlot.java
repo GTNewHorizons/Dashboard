@@ -17,7 +17,12 @@ public enum BarSlot {
     FOOD(0, 88, 97, 88, 81, 9, true),
     FOOD_HUNGER(0, 88, 291, 138, 81, 9, true),
     AIR(194, 88, 291, 88, 81, 9, true),
-    MOUNT_HEALTH(0, 113, 97, 113, 81, 9, true);
+    MOUNT_HEALTH(0, 113, 97, 113, 81, 9, true),
+    HEALTH_FLASH_EMPTY(0, 163, 97, 63, 81, 9, false),
+    HEALTH_FLASH(0, 163, 97, 163, 81, 9, false),
+    HEALTH_FLASH_POISONED(0, 163, 194, 163, 81, 9, false),
+    HEALTH_FLASH_WITHERED(0, 163, 291, 163, 81, 9, false),
+    HEALTH_REGEN(0, 188, 0, 188, 9, 9, false);
 
     public final int emptyU;
     public final int emptyV;
@@ -39,7 +44,8 @@ public enum BarSlot {
 
     public BarSlot[] getStates() {
         return switch (this) {
-            case HEALTH -> new BarSlot[] { HEALTH_POISONED, HEALTH_WITHERED, HEALTH_ABSORPTION };
+            case HEALTH -> new BarSlot[] { HEALTH_POISONED, HEALTH_WITHERED, HEALTH_ABSORPTION, HEALTH_FLASH_EMPTY,
+                HEALTH_FLASH, HEALTH_FLASH_POISONED, HEALTH_FLASH_WITHERED, HEALTH_REGEN };
             case FOOD -> new BarSlot[] { FOOD_HUNGER };
             default -> new BarSlot[0];
         };
