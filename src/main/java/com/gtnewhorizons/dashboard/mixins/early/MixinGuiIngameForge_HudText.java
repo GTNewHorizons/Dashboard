@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.mixins.early;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraftforge.client.GuiIngameForge;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,6 +51,26 @@ public class MixinGuiIngameForge_HudText {
     private int dashboard$skipLevelNumber(FontRenderer font, String text, int x, int y, int color,
         Operation<Integer> original) {
         return 0;
+    }
+
+    // Scoreboard sidebar
+    @WrapOperation(
+        method = { "renderGameOverlay", "func_73830_a" },
+        remap = false,
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraftforge/client/GuiIngameForge;func_96136_a(Lnet/minecraft/scoreboard/ScoreObjective;IILnet/minecraft/client/gui/FontRenderer;)V",
+            remap = false))
+    private void dashboard$moveScoreboard(GuiIngameForge gui, ScoreObjective objective, int height, int width,
+        FontRenderer font, Operation<Void> original) {
+        if (!HudEditor.beginRender(VanillaHudElements.SCOREBOARD)) {
+            return;
+        }
+        try {
+            original.call(gui, objective, height, width, font);
+        } finally {
+            HudEditor.endRender();
+        }
     }
 
     @Unique

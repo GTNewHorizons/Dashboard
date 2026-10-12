@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -22,6 +23,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.scoreboard.Score;
+import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
@@ -81,6 +87,14 @@ public final class VanillaHudElements {
         "dashboard.element.minecraft.experience_level",
         (w, h) -> new HudBounds(w / 2 - LEVEL_WIDTH / 2, h - 35, LEVEL_WIDTH, 8));
 
+    public static final HudElement SCOREBOARD = new HudElement(
+        "minecraft:scoreboard",
+        "dashboard.element.minecraft.scoreboard",
+        VanillaHudElements::getScoreboardBounds);
+
+    private static final String[] SAMPLE_SCORES = { "Steve: " + EnumChatFormatting.RED + 12,
+        "Alex: " + EnumChatFormatting.RED + 7, "Notch: " + EnumChatFormatting.RED + 3 };
+
     private VanillaHudElements() {}
 
     public static void register() {
@@ -88,6 +102,8 @@ public final class VanillaHudElements {
         PreviewDrawing.setImitationInBounds(ITEM_NAME, VanillaHudElements::drawItemNamePreview);
         HudEditor.register(ACTION_BAR);
         PreviewDrawing.setImitationInBounds(ACTION_BAR, VanillaHudElements::drawActionBarPreview);
+        HudEditor.register(SCOREBOARD);
+        PreviewDrawing.setImitationInBounds(SCOREBOARD, VanillaHudElements::drawScoreboardPreview);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
             ElementType.EXPERIENCE,
@@ -147,6 +163,47 @@ public final class VanillaHudElements {
         StackedIconRow row = new StackedIconRow(rightSide);
         STACKED_ROWS.put(type, row);
         return add(type, name, row);
+    }
+
+        /** Scoreboard sidebar bounds */
+        private static HudBounds getScoreboardBounds(int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getMinecraft();
+        FontRenderer font = mc.fontRenderer;
+        ScoreObjective objective = mc.theWorld == null ? null
+            : mc.theWorld.getScoreboard()
+                .func_96539_a(1);
+        Collection<?> scores = objective == null ? null
+            : objective.getScoreboard()
+                .func_96534_i(objective);
+
+        int lines;
+        int textWidth;
+        if (scores != null && scores.size() <= 15) {
+            lines = scores.size();
+            textWidth = font.getStringWidth(objective.getDisplayName());
+            Scoreboard scoreboard = objective.getScoreboard();
+            for (Object entry : scores) {
+                Score score = (Score) entry;
+                String name = ScorePlayerTeam
+                    .formatPlayerName(scoreboard.getPlayersTeam(score.getPlayerName()), score.getPlayerName());
+                textWidth = Math
+                    .max(textWidth, font.getStringWidth(name + ": " + EnumChatFormatting.RED + score.getScorePoints()));
+            }
+        } else {
+            lines = SAMPLE_SCORES.length;
+            textWidth = getSampleScoreboardWidth(font);
+        }
+        int bottom = screenHeight / 2 + lines * font.FONT_HEIGHT / 3;
+        int height = (lines + 1) * font.FONT_HEIGHT + 1;
+        return new HudBounds(screenWidth - textWidth - 5, bottom - height, textWidth + 4, height);
+    }
+
+    private static int getSampleScoreboardWidth(FontRenderer font) {
+        int width = font.getStringWidth(StatCollector.translateToLocal("dashboard.preview.scoreboard"));
+        for (String line : SAMPLE_SCORES) {
+            width = Math.max(width, font.getStringWidth(line));
+        }
+        return width;
     }
 
     /** 59px above the bottom screen border, or 14px lower without hearts and food (creative). */
@@ -267,6 +324,30 @@ public final class VanillaHudElements {
         font.drawString(text, x, y + 1, 0x000000);
         font.drawString(text, x, y - 1, 0x000000);
         font.drawString(text, x, y, 0x80FF20);
+    }
+
+    /** Scoreboard sidebar */
+    private static void drawScoreboardPreview(HudBounds bounds) {
+        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        int lineHeight = font.FONT_HEIGHT;
+        int textLeft = bounds.x + 2;
+        int right = bounds.getRight();
+        String title = StatCollector.translateToLocal("dashboard.preview.scoreboard");
+        Gui.drawRect(bounds.x, bounds.y, right, bounds.y + lineHeight, 0x60000000);
+        Gui.drawRect(bounds.x, bounds.y + lineHeight, right, bounds.y + lineHeight + 1, 0x50000000);
+        int titleX = textLeft + (bounds.width - 4) / 2 - font.getStringWidth(title) / 2;
+        font.drawString(title, titleX, bounds.y + 1, 0xFFFFFF);
+
+        int y = bounds.y + lineHeight + 1;
+        for (String line : SAMPLE_SCORES) {
+            int split = line.indexOf(':');
+            String name = line.substring(0, split);
+            String score = line.substring(split + 2);
+            Gui.drawRect(bounds.x, y, right, y + lineHeight, 0x50000000);
+            font.drawString(name, textLeft, y, 0xFFFFFF);
+            font.drawString(score, right - font.getStringWidth(score), y, 0xFFFFFF);
+            y += lineHeight;
+        }
     }
 
     /** Held item name preview. */

@@ -47,6 +47,8 @@ dashboard.element.minecraft.air=Air
 dashboard.element.minecraft.mount_health=Mount Health
 dashboard.element.minecraft.item_name=Held Item Name
 dashboard.element.minecraft.action_bar=Action Bar
+dashboard.element.minecraft.scoreboard=Scoreboard
+dashboard.preview.scoreboard=Scores
 
 # Customize screen
 dashboard.customize.title=Customize Bars
