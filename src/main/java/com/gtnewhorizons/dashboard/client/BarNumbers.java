@@ -22,6 +22,7 @@ import net.minecraftforge.common.ForgeHooks;
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil;
 import com.gtnewhorizon.gtnhlib.util.numberformatting.options.FormatOptions;
+import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
@@ -143,7 +144,8 @@ public final class BarNumbers {
             values,
             new float[] { sampleCurrent, sampleMax });
         HudElement element = new HudElement("minecraft:" + name, "dashboard.element.minecraft." + name, number);
-        element.setActiveCheck(() -> HudLayout.isNumberOn(element));
+        element.setActiveCheck(() -> HudLayout.isNumberOn(element))
+            .setModId(Dashboard.MODID);
         number.element = element;
         HudEditor.register(element);
         PreviewDrawing.setImitationInBounds(element, bounds -> number.drawText(number.getSampleText(), bounds));
