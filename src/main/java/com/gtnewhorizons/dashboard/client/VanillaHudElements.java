@@ -50,6 +50,7 @@ public final class VanillaHudElements {
     private static final int ICON_SIZE = 9;
     private static final int ICON_STEP = 8;
     private static final int ROW_HEIGHT = 10;
+    static final int SAMPLE_LEVEL = 16;
 
     private static final Map<ElementType, HudElement> ELEMENTS = new EnumMap<>(ElementType.class);
     private static final Map<ElementType, StackedIconRow> STACKED_ROWS = new EnumMap<>(ElementType.class);
@@ -221,7 +222,7 @@ public final class VanillaHudElements {
     /** Experience bar, with the number (vanilla colors) */
     private static void drawExperiencePreview(HudBounds bounds) {
         drawBarSample(ELEMENTS.get(ElementType.EXPERIENCE), BarSlot.EXPERIENCE, bounds.x, bounds.y);
-        drawLevelNumber(bounds, 16);
+        drawLevelNumber(bounds, SAMPLE_LEVEL);
     }
 
     /** Themed or vanilla editor sample. */
@@ -234,7 +235,7 @@ public final class VanillaHudElements {
         }
     }
 
-    private static void drawLevelNumber(HudBounds bar, int level) {
+    static void drawLevelNumber(HudBounds bar, int level) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
         String text = String.valueOf(level);
         int x = bar.x + BAR_WIDTH / 2 - font.getStringWidth(text) / 2;

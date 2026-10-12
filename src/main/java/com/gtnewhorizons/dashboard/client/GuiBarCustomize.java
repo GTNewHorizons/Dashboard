@@ -13,6 +13,7 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Mouse;
 
+import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 
 import cpw.mods.fml.client.GuiScrollingList;
@@ -250,6 +251,10 @@ public class GuiBarCustomize extends GuiScreen {
         } else {
             boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
             BarThemes.drawBar(theme, row.slot, x, y, BarThemes.PREVIEW_FILL, fromRight);
+        }
+        if (row.slot == BarSlot.EXPERIENCE) {
+            HudBounds bounds = new HudBounds(x, y, row.slot.width, row.slot.height);
+            VanillaHudElements.drawLevelNumber(bounds, VanillaHudElements.SAMPLE_LEVEL);
         }
     }
 
