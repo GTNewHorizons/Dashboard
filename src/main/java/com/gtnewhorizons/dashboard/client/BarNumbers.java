@@ -224,6 +224,8 @@ public final class BarNumbers {
         private final int defaultDecimals;
         private final Values values;
         private final float[] sample;
+        private final CachedText realText = new CachedText();
+        private final CachedText sampleText = new CachedText();
         private HudElement element;
 
         private BarNumber(ElementType type, boolean leftSide, BarNumber besideNumber, int defaultDecimals,
@@ -258,11 +260,11 @@ public final class BarNumbers {
         private String getText() {
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             float[] current = player == null ? null : values.get(player);
-            return current == null ? null : format(current);
+            return current == null ? null : realText.get(current);
         }
 
         private String getSampleText() {
-            return format(sample);
+            return sampleText.get(sample);
         }
 
         private int getDecimals() {
@@ -270,16 +272,38 @@ public final class BarNumbers {
             return saved != null ? MathHelper.clamp_int(saved, 0, MAX_DECIMALS) : defaultDecimals;
         }
 
-        private String format(float[] currentAndMax) {
-            FormatOptions format = DECIMALS[getDecimals()];
-            float current = currentAndMax[0];
-            float max = currentAndMax[1];
-            float percent = max > 0 ? current / max * 100 : 0;
-            return HudLayout.getNumberStyle(element)
-                .format(
+        /** Formats again only when something changed. */
+        private final class CachedText {
+
+            private float current = Float.NaN;
+            private float max;
+            private NumberStyle style;
+            private int decimals = -1;
+            private String text;
+
+            private String get(float[] currentAndMax) {
+                NumberStyle newStyle = HudLayout.getNumberStyle(element);
+                int newDecimals = getDecimals();
+                if (currentAndMax[0] != current || currentAndMax[1] != max
+                    || newStyle != style
+                    || newDecimals != decimals) {
+                    current = currentAndMax[0];
+                    max = currentAndMax[1];
+                    style = newStyle;
+                    decimals = newDecimals;
+                    text = format();
+                }
+                return text;
+            }
+
+            private String format() {
+                FormatOptions format = DECIMALS[decimals];
+                float percent = max > 0 ? current / max * 100 : 0;
+                return style.format(
                     NumberFormatUtil.formatNumber(current, format),
                     NumberFormatUtil.formatNumber(max, format),
                     NumberFormatUtil.formatNumber(percent, PERCENT));
+            }
         }
 
         /** Next to the default spot of the bar (or the number it sits beside). */

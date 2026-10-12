@@ -299,14 +299,11 @@ public class GuiBarCustomize extends GuiScreen {
         };
     }
 
-    /** Null decimals means mixed. */
     private static List<String> getDecimalsTooltip(Integer decimals) {
         String name = decimals != null
             ? StatCollector.translateToLocal("dashboard.customize.number_decimals." + decimals)
-            : StatCollector.translateToLocal("dashboard.customize.mixed");
-        return Arrays.asList(
-            StatCollector.translateToLocal("dashboard.customize.number_decimals"),
-            EnumChatFormatting.GRAY + name);
+            : null;
+        return getValueTooltip("dashboard.customize.number_decimals", name);
     }
 
     private int countNumbersOn() {
@@ -546,12 +543,13 @@ public class GuiBarCustomize extends GuiScreen {
         drawHoveringText(lines, mouseX, mouseY, fontRendererObj);
     }
 
-    /** Null style means mixed. */
     private static List<String> getStyleTooltip(NumberStyle style) {
-        String name = style != null ? style.getDisplayName()
-            : StatCollector.translateToLocal("dashboard.customize.mixed");
-        return Arrays
-            .asList(StatCollector.translateToLocal("dashboard.customize.number_style"), EnumChatFormatting.GRAY + name);
+        return getValueTooltip("dashboard.customize.number_style", style != null ? style.getDisplayName() : null);
+    }
+
+    private static List<String> getValueTooltip(String titleKey, String value) {
+        String shown = value != null ? value : StatCollector.translateToLocal("dashboard.customize.mixed");
+        return Arrays.asList(StatCollector.translateToLocal(titleKey), EnumChatFormatting.GRAY + shown);
     }
 
     private String fitToButton(String text, GuiButton button) {
