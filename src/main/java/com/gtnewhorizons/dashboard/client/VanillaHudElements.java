@@ -95,11 +95,9 @@ public final class VanillaHudElements {
             (w, h) -> new HudBounds(w / 2 - 91, 2, BAR_WIDTH, 15));
         PreviewDrawing.setImitationInBounds(bossHealth, VanillaHudElements::drawBossHealthPreview);
         HudElement health = addStacked(ElementType.HEALTH, "health", false);
-        PreviewDrawing.setImitationInBounds(
-            health,
-            bounds -> drawBarSample(health, BarSlot.HEALTH, bounds.x, bounds.getBottom() - ICON_SIZE));
+        PreviewDrawing.setImitationInBounds(health, rowSample(health, BarSlot.HEALTH));
         HudElement armor = addStacked(ElementType.ARMOR, "armor", false);
-        PreviewDrawing.setImitationInBounds(armor, rowSample(BarSlot.ARMOR));
+        PreviewDrawing.setImitationInBounds(armor, rowSample(armor, BarSlot.ARMOR));
         HudElement food = addStacked(ElementType.FOOD, "food", true);
         PreviewDrawing.setImitationInBounds(food, rowSample(BarSlot.FOOD));
         HudElement air = addStacked(ElementType.AIR, "air", true);
@@ -169,6 +167,11 @@ public final class VanillaHudElements {
     /** A stacked row sample. */
     private static Consumer<HudBounds> rowSample(BarSlot slot) {
         return bounds -> drawVanillaSample(slot, bounds.x, bounds.getBottom() - ICON_SIZE);
+    }
+
+    /** Follows the row's theme. */
+    private static Consumer<HudBounds> rowSample(HudElement element, BarSlot slot) {
+        return bounds -> drawBarSample(element, slot, bounds.x, bounds.getBottom() - ICON_SIZE);
     }
 
     private static void drawBarPreview(int x, int y, int v) {
@@ -308,6 +311,7 @@ public final class VanillaHudElements {
             case JUMPBAR -> mc.thePlayer.getHorseJumpPower();
             case BOSSHEALTH -> BossStatus.healthScale;
             case HEALTH -> mc.thePlayer.getHealth() / mc.thePlayer.getMaxHealth();
+            case ARMOR -> ForgeHooks.getTotalArmorValue(mc.thePlayer) / 20f;
             default -> -1;
         };
         if (fill < 0) {
