@@ -27,6 +27,7 @@ public class HudElementState {
     public boolean numberOn;
     public NumberStyle numberStyle;
     public Integer numberDecimals;
+    public int sizeStep;
 
     boolean isDefault() {
         return visible && !moved
@@ -34,6 +35,7 @@ public class HudElementState {
             && !flipped
             && !numberOn
             && numberStyle == null
-            && numberDecimals == null;
+            && numberDecimals == null
+            && sizeStep == 0;
     }
 }

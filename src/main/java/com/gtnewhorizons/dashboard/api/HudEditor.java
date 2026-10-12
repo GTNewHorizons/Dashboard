@@ -140,13 +140,20 @@ public final class HudEditor {
     }
 
     /**
-     * Shifts everything drawn afterwards from the element's default position to where the player put it. Does not push
-     * the matrix, so only use it where the drawing code restores the matrix itself.
+     * Shifts and resizes everything drawn afterwards from the element's default position and size to the player's.
+     * Does not push the matrix, so only use it where the drawing code restores the matrix itself.
      */
     public static void translateToPosition(HudElement element, int screenWidth, int screenHeight) {
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
         HudBounds bounds = HudLayout.getBounds(element, defaultBounds, screenWidth, screenHeight);
-        GL11.glTranslatef(bounds.x - defaultBounds.x, bounds.y - defaultBounds.y, 0);
+        float scale = HudLayout.getScale(element);
+        if (scale == 1) {
+            GL11.glTranslatef(bounds.x - defaultBounds.x, bounds.y - defaultBounds.y, 0);
+            return;
+        }
+        GL11.glTranslatef(bounds.x, bounds.y, 0);
+        GL11.glScalef(scale, scale, 1);
+        GL11.glTranslatef(-defaultBounds.x, -defaultBounds.y, 0);
     }
 
     public static void translateToPosition(HudElement element) {

@@ -12,6 +12,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -45,7 +46,8 @@ public class GuiHudEditor extends GuiScreen {
     private static final int CENTER_MARK_LENGTH = 3;
     private static final float POSITION_TEXT_SCALE = 0.75f;
     private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
-        "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset" };
+        "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset",
+        "dashboard.editor.help_tooltip.resize", "dashboard.editor.help_tooltip.reset_size" };
     private static final int HELP_ICON_SIZE = 12;
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
@@ -465,6 +467,7 @@ public class GuiHudEditor extends GuiScreen {
     private List<String> getTooltip(HudElement element) {
         List<String> lines = new ArrayList<>();
         lines.add(element.getDisplayName());
+        lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (!HudLayout.isVisible(element)) {
             lines.add(
                 EnumChatFormatting.RED + StatCollector.translateToLocal("dashboard.editor.element_tooltip.hidden"));
@@ -476,6 +479,19 @@ public class GuiHudEditor extends GuiScreen {
         }
         lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getModName());
         return lines;
+    }
+
+    private static String getSizeText(HudElement element) {
+        int step = HudLayout.getSizeStep(element);
+        int guiScale = HudLayout.getElementGuiScale(element);
+        String key = "dashboard.editor.element_tooltip.size";
+        if (guiScale == 1) {
+            key += "_smallest";
+        } else if (step == HudLayout.MAX_SIZE_STEP) {
+            key += "_largest";
+        }
+        String stepText = step > 0 ? "+" + step : String.valueOf(step);
+        return StatCollector.translateToLocalFormatted(key, stepText, guiScale);
     }
 
     private void updateBoxes() {
@@ -545,7 +561,10 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         HudElement element = box.element;
-        if (mouseButton == 0 && isCtrlKeyDown()) {
+        if (mouseButton == 0 && isAltKeyDown()) {
+            HudLayout.setSizeStep(element, 0);
+            playClickSound();
+        } else if (mouseButton == 0 && isCtrlKeyDown()) {
             HudLayout.resetPosition(element);
             playClickSound();
         } else if (mouseButton == 0) {
@@ -594,6 +613,36 @@ public class GuiHudEditor extends GuiScreen {
     private static int nearestGridLine(int position, int screenSize) {
         int center = screenSize / 2;
         return center + Math.round((position - center) / (float) GRID_SIZE) * GRID_SIZE;
+    }
+
+    @Override
+    public void handleMouseInput() {
+        super.handleMouseInput();
+        int wheel = Mouse.getEventDWheel();
+        if (wheel == 0 || !isAltKeyDown()) {
+            return;
+        }
+        int mouseX = Mouse.getEventX() * width / mc.displayWidth;
+        int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+        if (getMenuBounds().contains(mouseX, mouseY)) {
+            return;
+        }
+        ElementBox box = findBoxAt(mouseX, mouseY);
+        if (box != null) {
+            resize(box.element, wheel > 0 ? 1 : -1);
+        }
+    }
+
+    /** Stops shrinking at GUI scale 1, since nothing smaller can be drawn. */
+    private static void resize(HudElement element, int change) {
+        if (change < 0 && HudLayout.getElementGuiScale(element) <= 1) {
+            return;
+        }
+        HudLayout.setSizeStep(element, HudLayout.getSizeStep(element) + change);
+    }
+
+    private static boolean isAltKeyDown() {
+        return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
     }
 
     @Override

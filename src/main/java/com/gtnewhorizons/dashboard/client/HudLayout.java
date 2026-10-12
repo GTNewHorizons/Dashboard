@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.MathHelper;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,6 +26,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 /** Where the player moved each HUD element and which ones they hid, saved to config/dashboard/hud_layout.json. */
 @SideOnly(Side.CLIENT)
 public final class HudLayout {
+
+    public static final int MAX_SIZE_STEP = 5;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
         .create();
@@ -103,38 +107,93 @@ public final class HudLayout {
         changed = true;
     }
 
+    /**
+     * How much bigger or smaller the player made this element, counted in GUI scale steps. -1 draws it one GUI scale
+     * smaller than the rest of the HUD, 0 the same size.
+     */
+    public static int getSizeStep(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null ? 0 : MathHelper.clamp_int(state.sizeStep, -MAX_SIZE_STEP, MAX_SIZE_STEP);
+    }
+
+    public static void setSizeStep(HudElement element, int step) {
+        getOrCreateState(element).sizeStep = MathHelper.clamp_int(step, -MAX_SIZE_STEP, MAX_SIZE_STEP);
+        removeIfDefault(element);
+        changed = true;
+    }
+
+    /**
+     * The GUI scale this element is drawn at. Whole GUI scales keep every texture pixel the same number of screen
+     * pixels, so a resized element stays as sharp as the rest of the HUD.
+     */
+    public static int getElementGuiScale(HudElement element) {
+        return Math.max(1, getGameGuiScale() + getSizeStep(element));
+    }
+
+    /** The factor HudEditor resizes this element's drawing by, on top of the game's own GUI scale. */
+    public static float getScale(HudElement element) {
+        if (getSizeStep(element) == 0) {
+            return 1;
+        }
+        return getElementGuiScale(element) / (float) getGameGuiScale();
+    }
+
+    private static int getGameGuiScale() {
+        Minecraft mc = Minecraft.getMinecraft();
+        return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaleFactor();
+    }
+
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {
         return getBounds(element, element.getDefaultBounds(screenWidth, screenHeight), screenWidth, screenHeight);
     }
 
-    /** Where the element should be drawn, kept fully on screen. */
+    /** Where the element should be drawn and how big, kept fully on screen. */
     public static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight) {
         HudElementState state = getStates().get(element.getId());
-        if (state == null || !state.moved) {
+        float scale = getScale(element);
+        boolean moved = state != null && state.moved;
+        if (!moved && scale == 1) {
             return defaultBounds;
         }
+        int width = Math.round(defaultBounds.width * scale);
+        int height = Math.round(defaultBounds.height * scale);
 
-        int x = anchorPosition(state.anchorX, defaultBounds.width, screenWidth) + state.offsetX;
-        int y = anchorPosition(state.anchorY, defaultBounds.height, screenHeight) + state.offsetY;
+        int x;
+        int y;
+        if (moved) {
+            x = anchorPosition(state.anchorX, width, screenWidth) + state.offsetX;
+            y = anchorPosition(state.anchorY, height, screenHeight) + state.offsetY;
+        } else {
+            // Resized around the default spot's anchor, so the hotbar stays at the bottom center
+            float anchorX = closestAnchor(defaultBounds.x + defaultBounds.width / 2, screenWidth);
+            float anchorY = closestAnchor(defaultBounds.y + defaultBounds.height / 2, screenHeight);
+            x = anchorPosition(anchorX, width, screenWidth) + defaultBounds.x
+                - anchorPosition(anchorX, defaultBounds.width, screenWidth);
+            y = anchorPosition(anchorY, height, screenHeight) + defaultBounds.y
+                - anchorPosition(anchorY, defaultBounds.height, screenHeight);
+        }
         return new HudBounds(
-            clampToScreen(x, defaultBounds.width, screenWidth),
-            clampToScreen(y, defaultBounds.height, screenHeight),
-            defaultBounds.width,
-            defaultBounds.height);
+            clampToScreen(x, width, screenWidth),
+            clampToScreen(y, height, screenHeight),
+            width,
+            height);
     }
 
     /** Moves the element's top left corner to the given position, anchored to the closest edge or the center. */
     public static void moveTo(HudElement element, int x, int y, int screenWidth, int screenHeight) {
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
-        x = clampToScreen(x, defaultBounds.width, screenWidth);
-        y = clampToScreen(y, defaultBounds.height, screenHeight);
+        float scale = getScale(element);
+        int width = Math.round(defaultBounds.width * scale);
+        int height = Math.round(defaultBounds.height * scale);
+        x = clampToScreen(x, width, screenWidth);
+        y = clampToScreen(y, height, screenHeight);
 
         HudElementState state = getOrCreateState(element);
         state.moved = true;
-        state.anchorX = closestAnchor(x + defaultBounds.width / 2, screenWidth);
-        state.anchorY = closestAnchor(y + defaultBounds.height / 2, screenHeight);
-        state.offsetX = x - anchorPosition(state.anchorX, defaultBounds.width, screenWidth);
-        state.offsetY = y - anchorPosition(state.anchorY, defaultBounds.height, screenHeight);
+        state.anchorX = closestAnchor(x + width / 2, screenWidth);
+        state.anchorY = closestAnchor(y + height / 2, screenHeight);
+        state.offsetX = x - anchorPosition(state.anchorX, width, screenWidth);
+        state.offsetY = y - anchorPosition(state.anchorY, height, screenHeight);
         changed = true;
     }
 
@@ -148,11 +207,12 @@ public final class HudLayout {
         }
     }
 
-    /** Positions and visibility. */
+    /** Positions, sizes and visibility. */
     public static void resetAll() {
         for (HudElementState state : getStates().values()) {
             state.visible = true;
             state.moved = false;
+            state.sizeStep = 0;
         }
         getStates().values()
             .removeIf(HudElementState::isDefault);

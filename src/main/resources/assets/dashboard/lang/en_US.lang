@@ -28,10 +28,15 @@ dashboard.editor.button.positions.off=Position: OFF
 dashboard.editor.help_tooltip.move=§6Drag§r to move (hold §6Shift§r to stop snapping)
 dashboard.editor.help_tooltip.toggle=§6Right-click§r to toggle visibility of the element
 dashboard.editor.help_tooltip.reset=§6Ctrl+click§r to reset position of the element
+dashboard.editor.help_tooltip.resize=§6Alt+scroll§r to resize the element
+dashboard.editor.help_tooltip.reset_size=§6Alt+click§r to reset size of the element
 
 ## Element tooltip
 dashboard.editor.element_tooltip.hidden=Hidden
 dashboard.editor.element_tooltip.not_showing=Not showing right now
+dashboard.editor.element_tooltip.size=Size: %s (drawn at %s)
+dashboard.editor.element_tooltip.size_smallest=Size: %s (drawn at %s, smallest)
+dashboard.editor.element_tooltip.size_largest=Size: %s (drawn at %s, largest)
 
 # Elements
 ## Minecraft
