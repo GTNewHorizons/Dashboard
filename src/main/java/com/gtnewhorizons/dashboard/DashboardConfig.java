@@ -2,6 +2,7 @@ package com.gtnewhorizons.dashboard;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
 import com.gtnewhorizons.dashboard.client.Crosshairs;
+import com.gtnewhorizons.dashboard.client.ScreenOverlays;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 
 @Config(modid = Dashboard.MODID, category = "editor", configSubDirectory = "dashboard", filename = "editor")
@@ -91,4 +92,63 @@ public class DashboardConfig {
     @Config.LangKey("dashboard.config.editor.status_effect_permanent")
     @Config.DefaultBoolean(true)
     public static boolean statusEffectPermanent;
+
+    @Config.Comment("How visible the pumpkin blur is, in percent")
+    @Config.LangKey("dashboard.config.editor.pumpkin_opacity")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int pumpkinOpacity;
+
+    @Config.Comment("How visible the nether portal swirl is, in percent")
+    @Config.LangKey("dashboard.config.editor.portal_opacity")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int portalOpacity;
+
+    @Config.Comment("How visible the flames are while burning, in percent")
+    @Config.LangKey("dashboard.config.editor.fire_opacity")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int fireOpacity;
+
+    @Config.Comment("How high the flames reach while burning, in percent")
+    @Config.LangKey("dashboard.config.editor.fire_height")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int fireHeight;
+
+    @Config.Comment("How visible the underwater overlay is, in percent")
+    @Config.LangKey("dashboard.config.editor.water_opacity")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int waterOpacity;
+
+    @Config.Comment("How dark the corners of the screen get, in percent")
+    @Config.LangKey("dashboard.config.editor.vignette_strength")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int vignetteStrength;
+
+    @Config.Comment("How dark the screen gets while falling asleep, in percent")
+    @Config.LangKey("dashboard.config.editor.sleep_fade_strength")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int sleepFadeStrength;
+
+    @Config.Comment("How much the camera tilts when you get hurt, in percent")
+    @Config.LangKey("dashboard.config.editor.hurt_shake_strength")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int hurtShakeStrength;
+
+    @Config.Comment("How much the screen wobbles from nausea and portals, in percent")
+    @Config.LangKey("dashboard.config.editor.nausea_strength")
+    @Config.DefaultInt(ScreenOverlays.MAX_PERCENT)
+    @Config.RangeInt(min = 0, max = ScreenOverlays.MAX_PERCENT)
+    public static int nauseaStrength;
+
+    @Config.Comment("Flash the screen while night vision runs out")
+    @Config.LangKey("dashboard.config.editor.night_vision_flicker")
+    @Config.DefaultBoolean(true)
+    public static boolean nightVisionFlicker;
 }

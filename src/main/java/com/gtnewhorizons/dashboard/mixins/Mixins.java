@@ -13,6 +13,14 @@ public enum Mixins implements IMixins {
     ACHIEVEMENT(new MixinBuilder("Make the achievement popup movable").addClientMixins("MixinGuiAchievement")
         .setPhase(Phase.EARLY)),
     BOSS_HEALTH(new MixinBuilder("Remember the boss for its health number").addClientMixins("MixinBossStatus")
+        .setPhase(Phase.EARLY)),
+    SCREEN_OVERLAYS(new MixinBuilder("Change the screen overlays")
+        .addClientMixins(
+            "MixinGuiIngame_Overlays",
+            "MixinItemRenderer_Fire",
+            "MixinItemRenderer_Water",
+            "MixinGuiIngameForge_SleepFade",
+            "MixinEntityRenderer_Camera")
         .setPhase(Phase.EARLY));
 
     private final MixinBuilder builder;

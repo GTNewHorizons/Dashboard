@@ -42,6 +42,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_ALL_NUMBER_STYLES = 10;
     private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
     private static final int BUTTON_STATUS_EFFECTS = 12;
+    private static final int BUTTON_SCREEN_OVERLAYS = 13;
     private static final int SWATCH_SIZE = 20;
     private static final int BOTTOM_BUTTON_GAP = 4;
     private static final int BUTTON_HEIGHT = 20;
@@ -51,7 +52,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int NUMBER_BUTTON_WIDTH = 40;
     private static final int NUMBER_STYLE_BUTTON_WIDTH = 52;
     private static final int DECIMALS_BUTTON_WIDTH = 40;
-    private static final int STATUS_EFFECTS_BUTTON_WIDTH = 90;
+    private static final int PAGE_BUTTON_WIDTH = 100;
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 8;
@@ -176,9 +177,9 @@ public class GuiBarCustomize extends GuiScreen {
         buttonList.add(
             new GuiButton(
                 BUTTON_STATUS_EFFECTS,
-                left + contentWidth - STATUS_EFFECTS_BUTTON_WIDTH,
+                left + contentWidth - PAGE_BUTTON_WIDTH,
                 CROSSHAIR_ROW_Y,
-                STATUS_EFFECTS_BUTTON_WIDTH,
+                PAGE_BUTTON_WIDTH,
                 BUTTON_HEIGHT,
                 StatCollector.translateToLocal("dashboard.customize.status_effects")));
 
@@ -217,6 +218,14 @@ public class GuiBarCustomize extends GuiScreen {
             BUTTON_HEIGHT,
             "");
         buttonList.add(allDecimalsButton);
+        buttonList.add(
+            new GuiButton(
+                BUTTON_SCREEN_OVERLAYS,
+                left + contentWidth - PAGE_BUTTON_WIDTH,
+                ALL_ROW_Y,
+                PAGE_BUTTON_WIDTH,
+                BUTTON_HEIGHT,
+                StatCollector.translateToLocal("dashboard.customize.screen_overlays")));
 
         // Show States, Reset and Done, centered
         int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
@@ -737,6 +746,7 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_CROSSHAIR_STYLE -> changeCrosshairStyle();
             case BUTTON_CROSSHAIR_SIZE -> changeCrosshairSize();
             case BUTTON_STATUS_EFFECTS -> mc.displayGuiScreen(new GuiStatusEffects(this));
+            case BUTTON_SCREEN_OVERLAYS -> mc.displayGuiScreen(new GuiScreenOverlays(this));
             case BUTTON_RESET -> {
                 for (HudElement bar : bars) {
                     HudLayout.setTheme(bar, null);
