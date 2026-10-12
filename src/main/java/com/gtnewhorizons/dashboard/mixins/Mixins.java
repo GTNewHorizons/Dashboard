@@ -9,7 +9,9 @@ public enum Mixins implements IMixins {
 
     HOTBAR_TEXT(
         new MixinBuilder("Make the text above the hotbar movable").addClientMixins("MixinGuiIngameForge_HudText")
-            .setPhase(Phase.EARLY));
+            .setPhase(Phase.EARLY)),
+    ACHIEVEMENT(new MixinBuilder("Make the achievement popup movable").addClientMixins("MixinGuiAchievement")
+        .setPhase(Phase.EARLY));
 
     private final MixinBuilder builder;
 

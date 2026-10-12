@@ -17,6 +17,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,8 +29,11 @@ import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.stats.Achievement;
+import net.minecraft.stats.AchievementList;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.FoodStats;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -36,6 +41,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeHooks;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.api.HudBounds;
@@ -71,6 +77,8 @@ public final class VanillaHudElements {
     private static final int ITEM_NAME_WIDTH = 150;
     private static final int ACTION_BAR_WIDTH = 200;
     private static final int LEVEL_WIDTH = 30;
+    private static final int ACHIEVEMENT_WIDTH = 160;
+    private static final int ACHIEVEMENT_HEIGHT = 32;
 
     public static final HudElement ITEM_NAME = new HudElement(
         "minecraft:item_name",
@@ -92,6 +100,15 @@ public final class VanillaHudElements {
         "dashboard.element.minecraft.scoreboard",
         VanillaHudElements::getScoreboardBounds);
 
+    public static final HudElement ACHIEVEMENT = new HudElement(
+        "minecraft:achievement",
+        "dashboard.element.minecraft.achievement",
+        (w, h) -> new HudBounds(w - ACHIEVEMENT_WIDTH, 0, ACHIEVEMENT_WIDTH, ACHIEVEMENT_HEIGHT));
+
+    private static final ResourceLocation ACHIEVEMENT_BACKGROUND = new ResourceLocation(
+        "textures/gui/achievement/achievement_background.png");
+    private static final RenderItem ITEM_RENDERER = new RenderItem();
+
     private static final String[] SAMPLE_SCORES = { "Steve: " + EnumChatFormatting.RED + 12,
         "Alex: " + EnumChatFormatting.RED + 7, "Notch: " + EnumChatFormatting.RED + 3 };
 
@@ -104,6 +121,8 @@ public final class VanillaHudElements {
         PreviewDrawing.setImitationInBounds(ACTION_BAR, VanillaHudElements::drawActionBarPreview);
         HudEditor.register(SCOREBOARD);
         PreviewDrawing.setImitationInBounds(SCOREBOARD, VanillaHudElements::drawScoreboardPreview);
+        HudEditor.register(ACHIEVEMENT);
+        PreviewDrawing.setImitationInBounds(ACHIEVEMENT, VanillaHudElements::drawAchievementPreview);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
             ElementType.EXPERIENCE,
@@ -348,6 +367,28 @@ public final class VanillaHudElements {
             font.drawString(score, right - font.getStringWidth(score), y, 0xFFFFFF);
             y += lineHeight;
         }
+    }
+
+    /** Achievement popup - Taking Inventory. */
+    private static void drawAchievementPreview(HudBounds bounds) {
+        Minecraft mc = Minecraft.getMinecraft();
+        Achievement achievement = AchievementList.openInventory;
+        PreviewDrawing.bindTexture(ACHIEVEMENT_BACKGROUND);
+        PreviewDrawing.drawTexture(bounds.x, bounds.y, 96, 202, ACHIEVEMENT_WIDTH, ACHIEVEMENT_HEIGHT);
+        String title = StatCollector.translateToLocal("achievement.get");
+        String name = achievement.func_150951_e()
+            .getUnformattedText();
+        mc.fontRenderer.drawString(title, bounds.x + 30, bounds.y + 7, 0xFFFF00);
+        mc.fontRenderer.drawString(name, bounds.x + 30, bounds.y + 18, 0xFFFFFF);
+        RenderHelper.enableGUIStandardItemLighting();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        ITEM_RENDERER.renderItemAndEffectIntoGUI(
+            mc.fontRenderer,
+            mc.getTextureManager(),
+            achievement.theItemStack,
+            bounds.x + 8,
+            bounds.y + 8);
+        RenderHelper.disableStandardItemLighting();
     }
 
     /** Held item name preview. */

@@ -49,6 +49,7 @@ dashboard.element.minecraft.item_name=Held Item Name
 dashboard.element.minecraft.action_bar=Action Bar
 dashboard.element.minecraft.scoreboard=Scoreboard
 dashboard.preview.scoreboard=Scores
+dashboard.element.minecraft.achievement=Achievement Popup
 
 # Customize screen
 dashboard.customize.title=Customize Bars
