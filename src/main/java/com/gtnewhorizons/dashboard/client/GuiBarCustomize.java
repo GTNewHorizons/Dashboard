@@ -58,6 +58,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int LIST_TOP = 72;
     private static final int LIST_BOTTOM_MARGIN = 30;
     private static final int LABEL_MARGIN = 8;
+    private static final int SCREEN_MARGIN = 10;
     private static final String ELLIPSIS = "...";
 
     private static boolean showStates;
@@ -85,6 +86,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton crosshairSizeButton;
     private int nameWidth;
     private int contentWidth;
+    private boolean twoLines;
     private String allBarsLabel;
     private List<String> rowTooltip;
 
@@ -136,13 +138,8 @@ public class GuiBarCustomize extends GuiScreen {
             int rowWidth = row.number != null && !row.numberOnly ? row.slot.width + numberSampleWidth : row.slot.width;
             previewWidth = Math.max(previewWidth, rowWidth);
         }
-        contentWidth = nameWidth + COLUMN_GAP
-            + THEME_BUTTON_WIDTH
-            + COLUMN_GAP
-            + FLIP_BUTTON_WIDTH
-            + COLUMN_GAP
-            + NUMBER_BUTTON_WIDTH
-            + COLUMN_GAP
+        int themeWidth = THEME_BUTTON_WIDTH + COLUMN_GAP + FLIP_BUTTON_WIDTH;
+        int numbersWidth = NUMBER_BUTTON_WIDTH + COLUMN_GAP
             + NUMBER_STYLE_BUTTON_WIDTH
             + COLUMN_GAP
             + DECIMALS_BUTTON_WIDTH
@@ -150,6 +147,9 @@ public class GuiBarCustomize extends GuiScreen {
             + BarThemes.PADDING
             + previewWidth
             + BarThemes.PADDING;
+        int oneLineWidth = nameWidth + COLUMN_GAP + themeWidth + COLUMN_GAP + numbersWidth;
+        twoLines = oneLineWidth > width - SCREEN_MARGIN * 2;
+        contentWidth = twoLines ? nameWidth + COLUMN_GAP + Math.max(themeWidth, numbersWidth) : oneLineWidth;
         list = new BarList();
         list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
 
@@ -182,10 +182,11 @@ public class GuiBarCustomize extends GuiScreen {
             BUTTON_HEIGHT,
             "R");
         buttonList.add(resetFlipsButton);
+        int allNumbersY = ALL_ROW_Y + getSecondLineOffset();
         allNumbersButton = new GuiButton(
             BUTTON_ALL_NUMBERS,
             left + getNumberX(),
-            ALL_ROW_Y,
+            allNumbersY,
             NUMBER_BUTTON_WIDTH,
             BUTTON_HEIGHT,
             "");
@@ -193,7 +194,7 @@ public class GuiBarCustomize extends GuiScreen {
         allNumberStylesButton = new GuiButton(
             BUTTON_ALL_NUMBER_STYLES,
             left + getNumberStyleX(),
-            ALL_ROW_Y,
+            allNumbersY,
             NUMBER_STYLE_BUTTON_WIDTH,
             BUTTON_HEIGHT,
             "");
@@ -201,7 +202,7 @@ public class GuiBarCustomize extends GuiScreen {
         allDecimalsButton = new GuiButton(
             BUTTON_ALL_NUMBER_DECIMALS,
             left + getDecimalsX(),
-            ALL_ROW_Y,
+            allNumbersY,
             DECIMALS_BUTTON_WIDTH,
             BUTTON_HEIGHT,
             "");
@@ -421,7 +422,19 @@ public class GuiBarCustomize extends GuiScreen {
     }
 
     private int getNumberX() {
-        return getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+        return twoLines ? getButtonX() : getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+    }
+
+    private int getSecondLineOffset() {
+        return twoLines ? ROW_HEIGHT : 0;
+    }
+
+    private int getRowHeight() {
+        return ROW_HEIGHT + getSecondLineOffset();
+    }
+
+    private int getListTop() {
+        return LIST_TOP + getSecondLineOffset();
     }
 
     private int getNumberStyleX() {
@@ -601,15 +614,16 @@ public class GuiBarCustomize extends GuiScreen {
             }
         }
         int x = left + getPreviewX();
+        int lineY = rowY + getSecondLineOffset();
         if (row.numberOnly) {
-            drawNumberSample(row.number, x, rowY);
+            drawNumberSample(row.number, x, lineY);
             return;
         }
         if (row.number != null) {
-            drawNumberSample(row.number, x + row.slot.width + BarThemes.PADDING, rowY);
+            drawNumberSample(row.number, x + row.slot.width + BarThemes.PADDING, lineY);
         }
 
-        int y = rowY + (BUTTON_HEIGHT - row.slot.height) / 2;
+        int y = lineY + (BUTTON_HEIGHT - row.slot.height) / 2;
         if (theme == null) {
             VanillaHudElements.drawVanillaSample(row.slot, x, y);
         } else {
@@ -645,15 +659,16 @@ public class GuiBarCustomize extends GuiScreen {
 
         if (row.number != null) {
             boolean on = HudLayout.isNumberOn(row.number);
+            int lineY = rowY + getSecondLineOffset();
             numberButton.xPosition = left + getNumberX();
-            numberButton.yPosition = rowY;
+            numberButton.yPosition = lineY;
             numberButton.displayString = getNumberToggleName(on);
             numberStyleButton.xPosition = left + getNumberStyleX();
-            numberStyleButton.yPosition = rowY;
+            numberStyleButton.yPosition = lineY;
             numberStyleButton.displayString = getStyleSample(HudLayout.getNumberStyle(row.number));
             numberStyleButton.enabled = on;
             decimalsButton.xPosition = left + getDecimalsX();
-            decimalsButton.yPosition = rowY;
+            decimalsButton.yPosition = lineY;
             decimalsButton.displayString = getDecimalsLabel(BarNumbers.getDecimals(row.number));
             decimalsButton.enabled = on;
         }
@@ -748,10 +763,10 @@ public class GuiBarCustomize extends GuiScreen {
                 GuiBarCustomize.this.mc,
                 GuiBarCustomize.this.width,
                 GuiBarCustomize.this.height,
-                LIST_TOP,
+                GuiBarCustomize.this.getListTop(),
                 GuiBarCustomize.this.height - LIST_BOTTOM_MARGIN,
                 0,
-                ROW_HEIGHT);
+                GuiBarCustomize.this.getRowHeight());
         }
 
         @Override
