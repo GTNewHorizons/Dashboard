@@ -101,7 +101,7 @@ public final class VanillaHudElements {
         HudElement food = addStacked(ElementType.FOOD, "food", true);
         PreviewDrawing.setImitationInBounds(food, rowSample(food, BarSlot.FOOD));
         HudElement air = addStacked(ElementType.AIR, "air", true);
-        PreviewDrawing.setImitationInBounds(air, rowSample(BarSlot.AIR));
+        PreviewDrawing.setImitationInBounds(air, rowSample(air, BarSlot.AIR));
         HudElement mountHealth = addStacked(ElementType.HEALTHMOUNT, "mount_health", true);
         PreviewDrawing.setImitationInBounds(mountHealth, rowSample(BarSlot.MOUNT_HEALTH));
 
@@ -314,6 +314,7 @@ public final class VanillaHudElements {
             case ARMOR -> ForgeHooks.getTotalArmorValue(mc.thePlayer) / 20f;
             case FOOD -> mc.thePlayer.getFoodStats()
                 .getFoodLevel() / 20f;
+            case AIR -> Math.max(0, mc.thePlayer.getAir()) / 300f;
             default -> -1;
         };
         if (fill < 0) {
