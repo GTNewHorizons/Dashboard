@@ -62,6 +62,9 @@ public final class StatusEffects {
         new PotionEffect(Potion.moveSpeed.id, 3600),
         new PotionEffect(Potion.poison.id, 300),
         new PotionEffect(Potion.regeneration.id, 900, 1));
+    private static final Comparator<PotionEffect> BY_GROUP = Comparator.comparing(StatusEffects::isBad);
+    private static final Comparator<PotionEffect> BY_TIME = Comparator.comparingInt(StatusEffects::getTicksLeft);
+    private static final Comparator<PotionEffect> BY_GROUP_THEN_TIME = BY_GROUP.thenComparing(BY_TIME);
 
     public static final HudElement ELEMENT = new HudElement(
         "minecraft:status_effects",
@@ -140,17 +143,23 @@ public final class StatusEffects {
     }
 
     /** Good effects first with the group setting, then by time left with the sort setting. */
-    private static List<PotionEffect> order(Collection<PotionEffect> effects) {
+    private static Collection<PotionEffect> order(Collection<PotionEffect> effects) {
+        Comparator<PotionEffect> comparator = getOrder();
+        if (comparator == null) {
+            return effects;
+        }
+        // A copy, so the player's own list is not reordered
         List<PotionEffect> ordered = new ArrayList<>(effects);
-        Comparator<PotionEffect> comparator = (first, second) -> 0;
-        if (DashboardConfig.statusEffectGroup) {
-            comparator = comparator.thenComparing(StatusEffects::isBad);
-        }
-        if (DashboardConfig.statusEffectSortByTime) {
-            comparator = comparator.thenComparingInt(StatusEffects::getTicksLeft);
-        }
         ordered.sort(comparator);
         return ordered;
+    }
+
+    /** Null when the effects stay in the order they were added. */
+    private static Comparator<PotionEffect> getOrder() {
+        if (DashboardConfig.statusEffectGroup) {
+            return DashboardConfig.statusEffectSortByTime ? BY_GROUP_THEN_TIME : BY_GROUP;
+        }
+        return DashboardConfig.statusEffectSortByTime ? BY_TIME : null;
     }
 
     private static boolean isBad(PotionEffect effect) {
@@ -254,8 +263,11 @@ public final class StatusEffects {
 
     @SubscribeEvent
     public static void onPostRender(RenderGameOverlayEvent.Post event) {
+        if (event.type != ElementType.ALL) {
+            return;
+        }
         Collection<PotionEffect> effects = getEffects();
-        if (event.type != ElementType.ALL || effects.isEmpty()) {
+        if (effects.isEmpty()) {
             return;
         }
         int screenWidth = event.resolution.getScaledWidth();
