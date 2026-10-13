@@ -48,8 +48,8 @@ Coordinates are the top left corner of the slot, in pixels (u across, v down).
 | **138** | Health poisoned (full) | Health withered (full) | Absorption (full) | Hunger effect (full) |
 | **163** | Health flash (empty) | Health flash (full) | Health flash poisoned (full) | Health flash withered (full) |
 | **188** | Health regen shine *(u 0, 25 x 25)*, Air pop *(u 25, 25 x 25)* | Health hardcore overlay | | |
-
-Everything else from v 188 down is free for future slots.
+| **213** | *(kept free for vanilla)* | | | |
+| **238** | AppleCore saturation (full) | AppleCore exhaustion (full) | | |
 
 ## How the slots are used
 
@@ -65,4 +65,7 @@ Everything else from v 188 down is free for future slots.
   whatever state the bar is in. Leave it transparent where the bar should show through.
 - **Air pop** is a 9 x 9 piece (25 x 25 with its 8 px space), drawn whole just past the end of the air fill for a
   moment whenever a bubble runs out, like vanilla's popping bubble.
+- **AppleCore saturation** and **AppleCore exhaustion** are only used when AppleCore is installed. Both are full bars
+  cut to how full they are and drawn over the food fill, exhaustion first, then saturation. Make them see-through,
+  so the food fill shows under them.
 - Food, air and mount health fill from the right by default, the others from the left. Players can flip any bar.

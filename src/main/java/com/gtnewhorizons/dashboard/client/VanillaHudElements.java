@@ -31,6 +31,7 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.FoodStats;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.GuiIngameForge;
@@ -44,6 +45,8 @@ import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.compat.AppleCoreCompat;
+import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -70,6 +73,9 @@ public final class VanillaHudElements {
     private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
     private static final Map<HudElement, BarSlot> THEMED_BARS = new LinkedHashMap<>();
     private static final Random SHAKE = new Random();
+    private static final ResourceLocation APPLECORE_ICONS = new ResourceLocation(
+        Mods.APPLECORE.getResourceLocation(),
+        "textures/icons.png");
 
     private static final int ITEM_NAME_WIDTH = 150;
     private static final int ACTION_BAR_WIDTH = 200;
@@ -257,7 +263,29 @@ public final class VanillaHudElements {
             case HEALTH_FLASH_WITHERED -> drawIconRowPreview(x, y, false, 25, 142, 151, 0);
             case HEALTH_REGEN -> drawIconRowPreview(x, y, false, 16, 52, 61, 0, BarThemes.getSampleRegenStep());
             case HEALTH_HARDCORE -> drawIconRowPreview(x, y, false, 16, 52, 61, 45);
+            case FOOD_SATURATION -> drawSaturationPreview(x, y);
+            case FOOD_EXHAUSTION -> drawExhaustionPreview(x, y);
             default -> {}
+        }
+    }
+
+    /** AppleCore's see-through strip behind the food sample, like its exhaustion underlay. */
+    private static void drawExhaustionPreview(int left, int y) {
+        PreviewDrawing.bindTexture(APPLECORE_ICONS);
+        GL11.glColor4f(1, 1, 1, 0.75f);
+        int width = ICON_ROW_WIDTH / 2;
+        PreviewDrawing.drawTexture(left + ICON_ROW_WIDTH - width, y, ICON_ROW_WIDTH - width, 18, width, ICON_SIZE);
+        drawVanillaSample(BarSlot.FOOD, left, y);
+    }
+
+    /** AppleCore's gold outlines over the food sample, half as full as the food. */
+    private static void drawSaturationPreview(int left, int y) {
+        drawVanillaSample(BarSlot.FOOD, left, y);
+        PreviewDrawing.bindTexture(APPLECORE_ICONS);
+        int icons = Math.round(BarThemes.PREVIEW_FILL * 10 / 2);
+        for (int i = 0; i < icons; i++) {
+            PreviewDrawing
+                .drawTexture(left + ICON_ROW_WIDTH - ICON_SIZE - i * ICON_STEP, y, 27, 0, ICON_SIZE, ICON_SIZE);
         }
     }
 
@@ -499,6 +527,9 @@ public final class VanillaHudElements {
                     barY += getHungerShake(mc);
                 }
                 BarThemes.drawBar(theme, getStateSlot(slot, mc.thePlayer), bounds.x, barY, fill, fromRight);
+                if (event.type == ElementType.FOOD) {
+                    drawAppleCoreLayers(mc.thePlayer, theme, bounds.x, barY, fromRight);
+                }
                 if (event.type == ElementType.AIR && isBubblePopping(mc.thePlayer.getAir())) {
                     BarThemes.drawAirPop(theme, bounds.x, barY, fill, fromRight);
                 }
@@ -543,6 +574,54 @@ public final class VanillaHudElements {
             float absorptionFill = Math.min(1, absorption / player.getMaxHealth());
             BarThemes.drawBar(theme, BarSlot.HEALTH_ABSORPTION, x, barY - ROW_HEIGHT, absorptionFill, fromRight);
         }
+    }
+
+    /** Over the fill, unlike AppleCore's exhaustion, since a themed fill would hide anything behind it. */
+    private static void drawAppleCoreLayers(EntityPlayer player, String theme, int x, int barY, boolean fromRight) {
+        if (AppleCoreCompat.showsExhaustion()) {
+            float exhaustion = AppleCoreCompat.getExhaustionFill(player);
+            BarThemes.drawFillRange(theme, BarSlot.FOOD_EXHAUSTION, x, barY, 0, exhaustion, fromRight);
+        }
+        if (AppleCoreCompat.showsSaturation()) {
+            float saturation = player.getFoodStats()
+                .getSaturationLevel() / 20f;
+            BarThemes.drawFillRange(theme, BarSlot.FOOD_SATURATION, x, barY, 0, saturation, fromRight);
+        }
+        if (AppleCoreCompat.showsHeldFood()) {
+            drawHeldFood(player, theme, x, barY, fromRight);
+        }
+    }
+
+    /** What the held food would add, blinking like AppleCore's. Saturation can not go past the new food level. */
+    private static void drawHeldFood(EntityPlayer player, String theme, int x, int barY, boolean fromRight) {
+        AppleCoreCompat.HeldFood heldFood = AppleCoreCompat.getHeldFood(player);
+        if (heldFood == null) {
+            return;
+        }
+        FoodStats stats = player.getFoodStats();
+        int food = stats.getFoodLevel();
+        float saturation = stats.getSaturationLevel();
+        int newFood = Math.min(20, food + heldFood.hunger);
+        float newSaturation = Math.min(newFood, saturation + heldFood.saturation);
+        float alpha = getHeldFoodAlpha(Minecraft.getMinecraft().ingameGUI.getUpdateCounter());
+        BarSlot foodSlot = getStateSlot(BarSlot.FOOD, player);
+        BarThemes.drawFillRange(theme, foodSlot, x, barY, food / 20f, newFood / 20f, fromRight, alpha);
+        BarThemes.drawFillRange(
+            theme,
+            BarSlot.FOOD_SATURATION,
+            x,
+            barY,
+            saturation / 20f,
+            newSaturation / 20f,
+            fromRight,
+            alpha);
+    }
+
+    /** AppleCore's fade: in over 12 ticks, out over 12, briefly past fully clear and fully solid. */
+    private static float getHeldFoodAlpha(int tick) {
+        int step = tick % 24;
+        float alpha = step < 12 ? step * 0.125f : 1 - (step - 12) * 0.125f;
+        return MathHelper.clamp_float(alpha, 0, 1);
     }
 
     private static BarSlot getStateSlot(BarSlot slot, EntityPlayer player) {

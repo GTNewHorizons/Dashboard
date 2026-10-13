@@ -17,6 +17,8 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
+import org.lwjgl.opengl.GL11;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.gtnewhorizon.gtnhlib.util.ResourceUtil;
@@ -134,6 +136,10 @@ public final class BarThemes {
                 drawBar(theme, BarSlot.AIR, x, y, PREVIEW_FILL, fromRight);
                 drawAirPop(theme, x, y, PREVIEW_FILL, fromRight);
             }
+            case FOOD_SATURATION, FOOD_EXHAUSTION -> {
+                drawBar(theme, BarSlot.FOOD, x, y, PREVIEW_FILL, fromRight);
+                drawFillRange(theme, slot, x, y, 0, PREVIEW_FILL / 2, fromRight);
+            }
             default -> drawBar(theme, slot, x, y, PREVIEW_FILL, fromRight);
         }
     }
@@ -169,8 +175,16 @@ public final class BarThemes {
     /** Only part of the fill, like the health lost in a damage flash. */
     public static void drawFillRange(String theme, BarSlot slot, int x, int y, float from, float to,
         boolean fromRight) {
+        drawFillRange(theme, slot, x, y, from, to, fromRight, 1);
+    }
+
+    /** See-through, like the blinking held food preview. */
+    public static void drawFillRange(String theme, BarSlot slot, int x, int y, float from, float to, boolean fromRight,
+        float alpha) {
         bindTexture(theme);
+        GL11.glColor4f(1, 1, 1, alpha);
         drawFill(slot, x, y, from, to, fromRight);
+        GL11.glColor4f(1, 1, 1, 1);
     }
 
     private static void drawFill(BarSlot slot, int x, int y, float from, float to, boolean fromRight) {
