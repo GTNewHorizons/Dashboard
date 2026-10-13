@@ -39,7 +39,7 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
     private static final int BUTTON_HURT_SHAKE_STRENGTH = 209;
     private static final int BUTTON_NAUSEA_STRENGTH = 210;
     private static final int BUTTON_NIGHT_VISION_FLICKER = 211;
-    private static final int PREVIEW_OFFSET = 100;
+    private static final int PREVIEW_OFFSET = 10;
     private static final int MAX_SLIDER_WIDTH = 200;
     private static final int PREVIEW_BUTTON_WIDTH = 20;
     private static final int PREVIEW_GAP = 4;
