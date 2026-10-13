@@ -37,7 +37,6 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_PREVIEW = 5;
     private static final int BUTTON_CUSTOMIZE = 6;
     private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS };
-    private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
     private static final int SNAP_DISTANCE = 4;
@@ -107,11 +106,11 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     private GuiButton createButton(int id, String text) {
-        return new GuiButton(id, 0, 0, getButtonWidth(text), BUTTON_HEIGHT, text);
+        return new GuiButton(id, 0, 0, getButtonWidth(text), GuiHelpers.BUTTON_HEIGHT, text);
     }
 
     private int getButtonWidth(String text) {
-        return Math.max(BUTTON_HEIGHT, fontRendererObj.getStringWidth(text) + BUTTON_TEXT_PADDING);
+        return Math.max(GuiHelpers.BUTTON_HEIGHT, fontRendererObj.getStringWidth(text) + BUTTON_TEXT_PADDING);
     }
 
     private static String getToggleName(int buttonId) {
@@ -160,7 +159,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final class ToggleButton extends GuiButton {
 
         private ToggleButton(int id, int width, String text) {
-            super(id, 0, 0, width, BUTTON_HEIGHT, text);
+            super(id, 0, 0, width, GuiHelpers.BUTTON_HEIGHT, text);
         }
 
         private void setOn(boolean on) {
@@ -170,10 +169,7 @@ public class GuiHudEditor extends GuiScreen {
         /** Vanilla ignores clicks on disabled buttons. */
         @Override
         public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-            return visible && mouseX >= xPosition
-                && mouseY >= yPosition
-                && mouseX < xPosition + width
-                && mouseY < yPosition + height;
+            return GuiHelpers.isMouseOver(this, mouseX, mouseY);
         }
     }
 
@@ -188,7 +184,7 @@ public class GuiHudEditor extends GuiScreen {
                 button.yPosition = y;
                 x += button.width + BUTTON_GAP;
             }
-            y += BUTTON_HEIGHT + BUTTON_GAP;
+            y += GuiHelpers.BUTTON_HEIGHT + BUTTON_GAP;
         }
     }
 
@@ -216,7 +212,7 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     private int calculateMenuHeight() {
-        int rowsHeight = buttonRows.size() * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
+        int rowsHeight = buttonRows.size() * (GuiHelpers.BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
         return MENU_PADDING * 2 + TITLE_ROW_HEIGHT + TITLE_ROW_GAP + rowsHeight;
     }
 

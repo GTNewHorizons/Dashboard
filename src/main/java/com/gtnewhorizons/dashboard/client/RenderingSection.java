@@ -2,7 +2,6 @@ package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
@@ -11,7 +10,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -20,20 +18,20 @@ import org.lwjgl.input.Keyboard;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizon.gtnhlib.util.data.ItemId;
 import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.api.HudBounds;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /** The hidden held items list in the Customize screen. */
 @SideOnly(Side.CLIENT)
-final class RenderingSection {
+final class RenderingSection extends CustomizeSection {
 
     private static final int BUTTON_RESET = 401;
     private static final int BUTTON_ADD = 402;
     private static final int BUTTON_HELD = 403;
     /** Remove buttons count up from here, one per entry. */
     private static final int BUTTON_REMOVE = 410;
-    private static final int BUTTON_HEIGHT = 20;
     private static final int ADD_WIDTH = 40;
     private static final int HELD_WIDTH = 20;
     private static final int REMOVE_WIDTH = 20;
@@ -41,17 +39,21 @@ final class RenderingSection {
     private static final int MAX_INPUT_WIDTH = 220;
     private static final int MAX_ID_LENGTH = 128;
     private static final int HINT_PADDING = 4;
+    private static final String ENTRY_SEPARATOR = "  ";
 
     private final FontRenderer font;
     private final GuiTextField input;
     private final GuiButton addButton;
     private final GuiButton heldButton;
-    private final GuiButton resetButton;
     private final GuiButton[] removeButtons;
-    private final String[] entryTexts;
+    private final String[] entryIds;
+    private final String[] entryNames;
     private final boolean[] entryKnown;
+    /** Uncut, so a cut entry can still be read in its tooltip. */
+    private final String[] entryFullTexts;
     private final int inputX;
     private final int inputWidth;
+    private final int entryWidth;
     /** Shows both forms: every meta, and one meta. */
     private final String hint;
     private boolean inputDrawn;
@@ -59,14 +61,16 @@ final class RenderingSection {
 
     /** Text and focus are carried over from the previous section, since adding an id rebuilds the screen. */
     RenderingSection(FontRenderer font, int centerX, int maxWidth, int resetWidth, String text, boolean focused) {
+        super(BUTTON_RESET, resetWidth);
         this.font = font;
         int buttonsWidth = GAP + HELD_WIDTH + GAP + ADD_WIDTH;
         inputWidth = Math.min(MAX_INPUT_WIDTH, maxWidth - buttonsWidth);
         inputX = centerX - (inputWidth + buttonsWidth) / 2;
         int heldX = inputX + inputWidth + GAP;
         int buttonX = heldX + HELD_WIDTH + GAP;
+        entryWidth = buttonX - GAP - inputX;
 
-        input = new GuiTextField(font, inputX, 0, inputWidth, BUTTON_HEIGHT);
+        input = new GuiTextField(font, inputX, 0, inputWidth, GuiHelpers.BUTTON_HEIGHT);
         input.setMaxStringLength(MAX_ID_LENGTH);
         input.setText(text);
         input.setFocused(focused);
@@ -79,29 +83,31 @@ final class RenderingSection {
             buttonX,
             0,
             ADD_WIDTH,
-            BUTTON_HEIGHT,
+            GuiHelpers.BUTTON_HEIGHT,
             StatCollector.translateToLocal("dashboard.rendering.add"));
-        heldButton = new IconButton(BUTTON_HELD, heldX, 0, HELD_WIDTH, BUTTON_HEIGHT, Icons.HELD);
+        heldButton = new IconButton(BUTTON_HELD, heldX, 0, HELD_WIDTH, GuiHelpers.BUTTON_HEIGHT, Icons.HELD);
         heldButton.enabled = getHeldItem() != null;
-        resetButton = new GuiButton(
-            BUTTON_RESET,
-            0,
-            0,
-            resetWidth,
-            BUTTON_HEIGHT,
-            StatCollector.translateToLocal("dashboard.customize.reset"));
 
         String[] entries = DashboardConfig.hiddenHeldItems;
         removeButtons = new GuiButton[entries.length];
-        entryTexts = new String[entries.length];
+        entryIds = new String[entries.length];
+        entryNames = new String[entries.length];
+        entryFullTexts = new String[entries.length];
         entryKnown = new boolean[entries.length];
         for (int i = 0; i < entries.length; i++) {
-            removeButtons[i] = new IconButton(BUTTON_REMOVE + i, buttonX, 0, REMOVE_WIDTH, BUTTON_HEIGHT, Icons.REMOVE);
+            removeButtons[i] = new IconButton(
+                BUTTON_REMOVE + i,
+                buttonX,
+                0,
+                REMOVE_WIDTH,
+                GuiHelpers.BUTTON_HEIGHT,
+                Icons.REMOVE);
             ItemId id = HiddenHeldItems.parse(entries[i]);
             entryKnown[i] = id != null;
-            String detail = id != null ? getItemName(id)
-                : StatCollector.translateToLocal("dashboard.rendering.unknown");
-            entryTexts[i] = font.trimStringToWidth(entries[i] + EnumChatFormatting.GRAY + "  " + detail, inputWidth);
+            String name = id != null ? getItemName(id) : StatCollector.translateToLocal("dashboard.rendering.unknown");
+            entryIds[i] = GuiHelpers.fitToWidth(font, entries[i], entryWidth);
+            entryNames[i] = GuiHelpers.fitToWidth(font, name, entryWidth);
+            entryFullTexts[i] = entries[i] + ENTRY_SEPARATOR + name;
         }
         resetButton.enabled = entries.length > 0;
     }
@@ -114,10 +120,6 @@ final class RenderingSection {
         } catch (RuntimeException e) {
             return "";
         }
-    }
-
-    GuiButton getResetButton() {
-        return resetButton;
     }
 
     GuiButton getHeldButton() {
@@ -137,15 +139,15 @@ final class RenderingSection {
         return removeButtons;
     }
 
-    /** Null if the button is not one of this section's held or remove buttons. */
+    @Override
     List<String> getTooltip(GuiButton button) {
         if (button.id == BUTTON_HELD) {
-            return Collections.singletonList(StatCollector.translateToLocal("dashboard.rendering.held.tooltip"));
+            return GuiHelpers.getTooltip("dashboard.rendering.held.tooltip");
         }
         if (button.id < BUTTON_REMOVE || button.id >= BUTTON_REMOVE + removeButtons.length) {
             return null;
         }
-        return Collections.singletonList(StatCollector.translateToLocal("dashboard.rendering.remove"));
+        return GuiHelpers.getTooltip("dashboard.rendering.remove");
     }
 
     String getText() {
@@ -173,16 +175,28 @@ final class RenderingSection {
         input.drawTextBox();
         if (input.getText()
             .isEmpty() && !input.isFocused()) {
-            int textY = y + (BUTTON_HEIGHT - font.FONT_HEIGHT) / 2 + 1;
+            int textY = GuiHelpers.getTextY(font, y);
             font.drawString(hint, inputX + HINT_PADDING, textY, ColorUtils.textHint.getColor());
         }
         inputDrawn = true;
     }
 
+    /** The id above the item name, both inside the remove button's height. */
     void drawEntry(int index, int y) {
-        int textY = y + (BUTTON_HEIGHT - font.FONT_HEIGHT) / 2 + 1;
-        int color = entryKnown[index] ? ColorUtils.textInput.getColor() : ColorUtils.textUnknown.getColor();
-        font.drawStringWithShadow(entryTexts[index], inputX, textY, color);
+        boolean known = entryKnown[index];
+        int idColor = known ? ColorUtils.textInput.getColor() : ColorUtils.textUnknown.getColor();
+        int nameColor = known ? ColorUtils.textState.getColor() : ColorUtils.textUnknown.getColor();
+        font.drawStringWithShadow(entryIds[index], inputX, y + 1, idColor);
+        font.drawStringWithShadow(entryNames[index], inputX, y + 1 + font.FONT_HEIGHT + 1, nameColor);
+    }
+
+    /** Null unless the entry was cut and the mouse is over its text. */
+    List<String> getEntryTooltip(int index, int y, int mouseX, int mouseY) {
+        if (!new HudBounds(inputX, y, entryWidth, GuiHelpers.BUTTON_HEIGHT).contains(mouseX, mouseY)) {
+            return null;
+        }
+        String shown = entryIds[index] + ENTRY_SEPARATOR + entryNames[index];
+        return GuiHelpers.getCutTooltip(shown, entryFullTexts[index]);
     }
 
     void mouseClicked(int mouseX, int mouseY, int mouseButton) {
@@ -217,7 +231,7 @@ final class RenderingSection {
         input.setTextColor(unknown ? ColorUtils.textUnknown.getColor() : ColorUtils.textInput.getColor());
     }
 
-    /** False if the button is not one of this section's. */
+    @Override
     boolean actionPerformed(GuiButton button) {
         if (button.id == BUTTON_ADD) {
             add();

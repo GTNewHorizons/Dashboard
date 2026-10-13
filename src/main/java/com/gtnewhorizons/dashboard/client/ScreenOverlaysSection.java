@@ -1,12 +1,10 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -17,7 +15,6 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
-import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 
 import cpw.mods.fml.client.config.GuiSlider;
@@ -26,7 +23,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /** The screen overlay and camera settings in the Customize screen. */
 @SideOnly(Side.CLIENT)
-final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
+final class ScreenOverlaysSection extends CustomizeSection implements GuiSlider.ISlider {
 
     private static final int BUTTON_RESET = 201;
     private static final int BUTTON_PUMPKIN_OPACITY = 202;
@@ -44,7 +41,6 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
     private static final int PREVIEW_BUTTON_WIDTH = 20;
     private static final int PREVIEW_GAP = 4;
     private static final int COLUMN_GAP = 8;
-    private static final int BUTTON_HEIGHT = 20;
     private static final ResourceLocation PUMPKIN_BLUR = new ResourceLocation("textures/misc/pumpkinblur.png");
     private static final ResourceLocation UNDERWATER = new ResourceLocation("textures/misc/underwater.png");
     private static final ResourceLocation VIGNETTE = new ResourceLocation("textures/misc/vignette.png");
@@ -54,18 +50,16 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
     private static final int SLEEP_FADE_COLOR = 220 << 24 | 0x101020;
 
     private final GuiButton[][] rows;
-    private final List<GuiSlider> sliders = new ArrayList<>();
     private final List<PreviewButton> previewButtons = new ArrayList<>();
-    private final GuiButton resetButton;
     private final GuiButton nightVisionButton;
     private final int overlaysCenterX;
     private final int cameraCenterX;
-    private boolean changed;
     /** The slider whose overlay is previewed, or 0. */
     private int previewedSlider;
 
     /** Two columns centered on centerX, narrower sliders if maxWidth is small. */
     ScreenOverlaysSection(int centerX, int maxWidth, int resetWidth) {
+        super(BUTTON_RESET, resetWidth);
         int sliderWidth = Math.min(MAX_SLIDER_WIDTH, (maxWidth - PREVIEW_GAP - PREVIEW_BUTTON_WIDTH - COLUMN_GAP) / 2);
         int overlaysWidth = sliderWidth + PREVIEW_GAP + PREVIEW_BUTTON_WIDTH;
         int overlaysX = centerX - (overlaysWidth + COLUMN_GAP + sliderWidth) / 2;
@@ -73,14 +67,13 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
         overlaysCenterX = overlaysX + overlaysWidth / 2;
         cameraCenterX = cameraX + sliderWidth / 2;
 
-        resetButton = new GuiButton(
-            BUTTON_RESET,
+        nightVisionButton = new GuiButton(
+            BUTTON_NIGHT_VISION_FLICKER,
+            cameraX,
             0,
-            0,
-            resetWidth,
-            BUTTON_HEIGHT,
-            StatCollector.translateToLocal("dashboard.customize.reset"));
-        nightVisionButton = new GuiButton(BUTTON_NIGHT_VISION_FLICKER, cameraX, 0, sliderWidth, BUTTON_HEIGHT, "");
+            sliderWidth,
+            GuiHelpers.BUTTON_HEIGHT,
+            "");
         List<GuiButton> camera = new ArrayList<>();
         camera.add(createSlider(BUTTON_HURT_SHAKE_STRENGTH, cameraX, sliderWidth));
         camera.add(createSlider(BUTTON_NAUSEA_STRENGTH, cameraX, sliderWidth));
@@ -104,26 +97,21 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
     }
 
     private GuiSlider createSlider(int id, int x, int width) {
-        GuiSlider slider = new GuiSlider(
-            id,
-            x,
-            0,
-            width,
-            BUTTON_HEIGHT,
-            getName(id) + ": ",
-            "%",
-            0,
-            ScreenOverlays.MAX_PERCENT,
-            getValue(id),
-            false,
-            true,
-            this);
-        sliders.add(slider);
-        return slider;
-    }
-
-    GuiButton getResetButton() {
-        return resetButton;
+        return addSlider(
+            new GuiSlider(
+                id,
+                x,
+                0,
+                width,
+                GuiHelpers.BUTTON_HEIGHT,
+                getName(id) + ": ",
+                "%",
+                0,
+                ScreenOverlays.MAX_PERCENT,
+                getValue(id),
+                false,
+                true,
+                this));
     }
 
     /** Each row holds an overlay slider and its preview button, the first rows also a camera setting. */
@@ -147,41 +135,14 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
             color);
     }
 
-    boolean isDragging() {
-        for (GuiSlider slider : sliders) {
-            if (slider.dragging) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void releaseSliders(int mouseX, int mouseY) {
-        for (GuiSlider slider : sliders) {
-            slider.mouseReleased(mouseX, mouseY);
-        }
-    }
-
-    /** Sliders are saved here, since dragging changes them every step. */
-    void save() {
-        if (changed) {
-            ConfigurationManager.save(DashboardConfig.class);
-            changed = false;
-        }
-    }
-
-    /** Null if the button is not one of this section's preview buttons. */
+    @Override
     List<String> getTooltip(GuiButton button) {
-        if (!(button instanceof PreviewButton)) {
-            return null;
-        }
-        return Collections.singletonList(StatCollector.translateToLocal("dashboard.screen_overlays.preview"));
+        return button instanceof PreviewButton ? GuiHelpers.getTooltip("dashboard.screen_overlays.preview") : null;
     }
 
     private void updateNightVisionButton() {
-        String state = StatCollector.translateToLocal(
-            DashboardConfig.nightVisionFlicker ? "dashboard.customize.number.on" : "dashboard.customize.number.off");
-        nightVisionButton.displayString = getName(BUTTON_NIGHT_VISION_FLICKER) + ": " + state;
+        nightVisionButton.displayString = getName(BUTTON_NIGHT_VISION_FLICKER) + ": "
+            + GuiHelpers.getOnOff(DashboardConfig.nightVisionFlicker);
     }
 
     private void updatePreviewButtons() {
@@ -251,7 +212,7 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
         resetButton.enabled = !isDefault();
     }
 
-    /** False if the button is not one of this section's. */
+    @Override
     boolean actionPerformed(GuiButton button) {
         if (button.id == BUTTON_NIGHT_VISION_FLICKER) {
             DashboardConfig.nightVisionFlicker = !DashboardConfig.nightVisionFlicker;
@@ -344,15 +305,12 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
     private static final class PreviewButton extends IconButton {
 
         private PreviewButton(int id, int x) {
-            super(id, x, 0, PREVIEW_BUTTON_WIDTH, BUTTON_HEIGHT, Icons.PREVIEW);
+            super(id, x, 0, PREVIEW_BUTTON_WIDTH, GuiHelpers.BUTTON_HEIGHT, Icons.PREVIEW);
         }
 
         @Override
         public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-            return visible && mouseX >= xPosition
-                && mouseY >= yPosition
-                && mouseX < xPosition + width
-                && mouseY < yPosition + height;
+            return GuiHelpers.isMouseOver(this, mouseX, mouseY);
         }
     }
 }
