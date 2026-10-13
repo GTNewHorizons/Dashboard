@@ -71,6 +71,13 @@ dashboard.element.gravisuite.status=GraviSuite Status
 dashboard.preview.gravisuite.mode=Gravitation Engine: ON
 dashboard.preview.gravisuite.energy=Energy Level: 100%
 
+## Galacticraft
+dashboard.element.galacticraft.oxygen=Oxygen & Temperature
+dashboard.element.galacticraft.oxygen_warning=Oxygen Warning
+dashboard.element.galacticraft.launch_countdown=Launch Countdown
+dashboard.element.galacticraft.lander=Lander Warning & Speed
+dashboard.element.galacticraft.rocket_altitude=Rocket Altitude
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

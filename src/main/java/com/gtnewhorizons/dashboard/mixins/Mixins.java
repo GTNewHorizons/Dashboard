@@ -32,6 +32,16 @@ public enum Mixins implements IMixins {
     GRAVISUITE_HUD(new MixinBuilder("Make the GraviSuite status text movable")
         .addClientMixins("gravisuite.MixinClientTickHandler_Hud")
         .addRequiredMod(Mods.GRAVISUITE)
+        .setPhase(Phase.LATE)),
+    GALACTICRAFT_HUD(new MixinBuilder("Make the Galacticraft overlays movable")
+        .addClientMixins(
+            "galacticraft.MixinOverlayOxygenTanks_Hud",
+            "galacticraft.MixinOverlayOxygenWarning_Hud",
+            "galacticraft.MixinOverlayLaunchCountdown_Hud",
+            "galacticraft.MixinOverlayLander_Hud",
+            "galacticraft.MixinOverlayRocket_Hud",
+            "galacticraft.MixinTickHandlerClient_Preview")
+        .addRequiredMod(Mods.GALACTICRAFT)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
