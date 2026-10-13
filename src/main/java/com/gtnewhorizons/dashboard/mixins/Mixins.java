@@ -13,6 +13,9 @@ public enum Mixins implements IMixins {
     HOTBAR_NUMBERS(new MixinBuilder("Draw the hotbar slot numbers under the items")
         .addClientMixins("MixinGuiIngameForge_HotbarNumbers")
         .setPhase(Phase.EARLY)),
+    HIDDEN_HELD_ITEMS(new MixinBuilder("Draw an empty hand for hidden items in first person")
+        .addClientMixins("MixinItemRenderer_HiddenItems")
+        .setPhase(Phase.EARLY)),
     ACHIEVEMENT(new MixinBuilder("Make the achievement popup movable").addClientMixins("MixinGuiAchievement")
         .setPhase(Phase.EARLY)),
     BOSS_HEALTH(new MixinBuilder("Remember the boss for its health number").addClientMixins("MixinBossStatus")

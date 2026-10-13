@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -71,6 +72,10 @@ public class GuiBarCustomize extends GuiScreen {
         .ofClass(GuiScrollingList.class)
         .getFloatField(Fields.LookupType.DECLARED, "initialMouseClickY");
     private static final float NOT_DRAGGING = -2;
+    /** Kept when the screen rebuilds, so adding or removing a line does not jump back to the top. */
+    private static final Fields.ClassFields<GuiScrollingList>.Field<Float> LIST_SCROLL = Fields
+        .ofClass(GuiScrollingList.class)
+        .getFloatField(Fields.LookupType.DECLARED, "scrollDistance");
 
     /** Light, dark, sky, grass and sand, to show how the crosshair inverts what is behind it. */
     private static final ColorResource[] CROSSHAIR_BACKGROUNDS = { ColorUtils.crosshairBackground1,
@@ -105,6 +110,7 @@ public class GuiBarCustomize extends GuiScreen {
     private StatusEffectsSection statusEffects;
     private ScreenOverlaysSection screenOverlays;
     private HotbarSection hotbar;
+    private RenderingSection rendering;
     private int nameWidth;
     private int contentWidth;
     private int crosshairLeft;
@@ -126,6 +132,10 @@ public class GuiBarCustomize extends GuiScreen {
             statusEffects.save();
             screenOverlays.save();
         }
+        float scroll = list != null ? LIST_SCROLL.getValue(list) : 0;
+        String renderingText = rendering != null ? rendering.getText() : "";
+        boolean renderingFocused = rendering != null && rendering.isFocused();
+        Keyboard.enableRepeatEvents(true);
         buttonList.clear();
         title = StatCollector.translateToLocal("dashboard.customize.title");
         bars.clear();
@@ -313,8 +323,27 @@ public class GuiBarCustomize extends GuiScreen {
         }
         lines.add(new CenteredLine(screenOverlays.getResetButton()));
         lines.add(new Line(null));
+
+        rendering = new RenderingSection(
+            fontRendererObj,
+            width / 2,
+            contentWidth,
+            SECTION_BUTTON_WIDTH,
+            renderingText,
+            renderingFocused);
+        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.rendering")));
+        lines.add(new Line(null));
+        lines.add(new TextLine(StatCollector.translateToLocal("dashboard.rendering.hidden_held_items")));
+        lines.add(new InputLine());
+        for (int i = 0; i < rendering.getRemoveButtons().length; i++) {
+            lines.add(new EntryLine(i));
+        }
+        lines.add(new CenteredLine(rendering.getResetButton()));
+        lines.add(new Line(null));
+
         list = new BarList();
         list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
+        LIST_SCROLL.setValue(list, scroll);
 
         int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - BUTTON_HEIGHT) / 2;
         String done = StatCollector.translateToLocal("dashboard.editor.button.done");
@@ -611,6 +640,7 @@ public class GuiBarCustomize extends GuiScreen {
             drawDefaultBackground();
         }
         rowTooltip = null;
+        rendering.startFrame();
         // Checked every frame, since the Forge list can swallow the mouse release event
         if (statusEffects.isDragging() || screenOverlays.isDragging()) {
             if (!Mouse.isButtonDown(0)) {
@@ -643,7 +673,10 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_ALL_NUMBER_DECIMALS -> getDecimalsTooltip(getCommonDecimals());
             case BUTTON_CROSSHAIR_SIZE -> Collections
                 .singletonList(StatCollector.translateToLocal("dashboard.customize.crosshair_size"));
-            default -> screenOverlays.getTooltip(button);
+            default -> {
+                List<String> overlayTooltip = screenOverlays.getTooltip(button);
+                yield overlayTooltip != null ? overlayTooltip : rendering.getTooltip(button);
+            }
         };
     }
 
@@ -764,23 +797,41 @@ public class GuiBarCustomize extends GuiScreen {
                 }
             }
             default -> {
-                if (!hotbar.actionPerformed(button) && !statusEffects.actionPerformed(button)) {
-                    screenOverlays.actionPerformed(button);
+                if (!hotbar.actionPerformed(button) && !statusEffects.actionPerformed(button)
+                    && !screenOverlays.actionPerformed(button)) {
+                    rendering.actionPerformed(button);
                 }
             }
+        }
+        if (rendering.takeListChanged()) {
+            rebuildNeeded = true;
         }
         updateAllBarsRow();
     }
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
-        if (keyCode == 1) {
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             mc.displayGuiScreen(parent);
+        } else if (rendering.keyTyped(typedChar, keyCode) && rendering.takeListChanged()) {
+            rebuildNeeded = true;
         }
     }
 
     @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        rendering.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    public void updateScreen() {
+        rendering.updateCursor();
+    }
+
+    @Override
     public void onGuiClosed() {
+        Keyboard.enableRepeatEvents(false);
         HudLayout.save();
         statusEffects.save();
         screenOverlays.save();
@@ -931,6 +982,51 @@ public class GuiBarCustomize extends GuiScreen {
         protected void drawName(String name, int y) {
             int textY = y + (BUTTON_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
             fontRendererObj.drawStringWithShadow(name, crosshairLeft, textY, ColorUtils.text.getColor());
+        }
+    }
+
+    private final class TextLine extends Line {
+
+        private final String text;
+
+        private TextLine(String text) {
+            super(null);
+            this.text = text;
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            int textY = y + (BUTTON_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
+            drawCenteredString(fontRendererObj, text, width / 2, textY, ColorUtils.textState.getColor());
+        }
+    }
+
+    private final class InputLine extends Line {
+
+        private InputLine() {
+            super(null, rendering.getHeldButton(), rendering.getAddButton());
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            rendering.drawInput(y);
+            super.draw(y, mouseX, mouseY);
+        }
+    }
+
+    private final class EntryLine extends Line {
+
+        private final int index;
+
+        private EntryLine(int index) {
+            super(null, rendering.getRemoveButtons()[index]);
+            this.index = index;
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            rendering.drawEntry(index, y);
+            super.draw(y, mouseX, mouseY);
         }
     }
 

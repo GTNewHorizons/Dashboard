@@ -75,6 +75,11 @@ public class DashboardConfig {
     @Config.RangeInt(min = 0, max = HotbarNumbers.COLOR_COUNT - 1)
     public static int hotbarNumberColor;
 
+    @Config.Comment("Items drawn as an empty hand in first person, as modid:name for every meta or modid:name:meta")
+    @Config.LangKey("dashboard.config.editor.hidden_held_items")
+    @Config.DefaultStringList({})
+    public static String[] hiddenHeldItems;
+
     @Config.Comment("Show the background behind each status effect")
     @Config.LangKey("dashboard.config.editor.status_effect_background")
     @Config.DefaultBoolean(true)

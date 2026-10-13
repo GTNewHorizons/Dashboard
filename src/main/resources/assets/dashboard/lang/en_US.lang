@@ -105,6 +105,16 @@ dashboard.customize.state.air_pop=Pop
 dashboard.customize.status_effects=Status Effects
 dashboard.customize.screen_overlays=Screen Overlays
 dashboard.customize.hotbar=Hotbar
+dashboard.customize.rendering=Rendering
+
+# Rendering section
+dashboard.rendering.hidden_held_items=Hidden Held Items
+dashboard.rendering.hint=minecraft:wool or minecraft:wool:14
+dashboard.rendering.add=Add
+dashboard.rendering.held=Held
+dashboard.rendering.held.tooltip=Fill in the item in your hand
+dashboard.rendering.remove=Remove
+dashboard.rendering.unknown=Unknown item
 
 # Hotbar section
 dashboard.hotbar.numbers=Slot Numbers
@@ -196,6 +206,8 @@ dashboard.config.editor.crosshair_style=Crosshair Style
 dashboard.config.editor.crosshair_style.tooltip=Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet
 dashboard.config.editor.crosshair_size=Crosshair Size
 dashboard.config.editor.crosshair_size.tooltip=Crosshair size, 1 to 5 times
+dashboard.config.editor.hidden_held_items=Hidden Held Items
+dashboard.config.editor.hidden_held_items.tooltip=Items drawn as an empty hand in first person, as modid:name for every meta or modid:name:meta
 dashboard.config.editor.hotbar_numbers=Hotbar Slot Numbers
 dashboard.config.editor.hotbar_numbers.tooltip=Show the bound key on each hotbar slot
 dashboard.config.editor.hotbar_number_bound_key=Hotbar Slot Bound Key
