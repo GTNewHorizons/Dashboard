@@ -522,8 +522,7 @@ public class GuiBarCustomize extends GuiScreen {
 
     private void updateCrosshairButtons() {
         int style = Crosshairs.getStyle();
-        crosshairStyleButton.displayString = style == Crosshairs.VANILLA
-            ? StatCollector.translateToLocal("dashboard.theme.vanilla")
+        crosshairStyleButton.displayString = style == Crosshairs.VANILLA ? getThemeName(null)
             : style + " / " + Crosshairs.getStyleCount();
         crosshairSizeButton.displayString = "x" + DashboardConfig.crosshairSize;
         resetCrosshairButton.enabled = style != Crosshairs.VANILLA || DashboardConfig.crosshairSize != 1;
@@ -746,6 +745,21 @@ public class GuiBarCustomize extends GuiScreen {
         fontRendererObj.drawStringWithShadow(BarNumbers.getSampleText(number), x, y, 0xFFFFFF);
     }
 
+    /** Theme and flip on a bar's first line, the number buttons on its last. States get none. */
+    private GuiButton[] getRowButtons(Row row, boolean first, boolean last) {
+        List<GuiButton> rowButtons = new ArrayList<>();
+        if (first && !row.state && !row.numberOnly) {
+            rowButtons.add(themeButton);
+            rowButtons.add(flipButton);
+        }
+        if (last && row.number != null) {
+            rowButtons.add(numberButton);
+            rowButtons.add(numberStyleButton);
+            rowButtons.add(decimalsButton);
+        }
+        return rowButtons.toArray(new GuiButton[0]);
+    }
+
     private void placeRowButtons(Row row, int y) {
         HudElement bar = bars.get(row.barIndex);
         String theme = HudLayout.getTheme(bar);
@@ -928,7 +942,7 @@ public class GuiBarCustomize extends GuiScreen {
                 button.yPosition = y;
                 button.drawButton(mc, mouseX, mouseY);
                 if (button.func_146115_a()) {
-                    rowTooltip = getButtonTooltip(button);
+                    rowTooltip = getTooltip(button);
                 }
             }
         }
@@ -937,15 +951,22 @@ public class GuiBarCustomize extends GuiScreen {
             drawRowName(name, y, ColorUtils.text.getColor());
         }
 
+        protected List<String> getTooltip(GuiButton button) {
+            return getButtonTooltip(button);
+        }
+
         protected void click(int y, int mouseX, int mouseY) {
             for (GuiButton button : buttons) {
                 button.yPosition = y;
-                if (button.mousePressed(mc, mouseX, mouseY)) {
-                    button.func_146113_a(mc.getSoundHandler());
-                    actionPerformed(button);
+                if (GuiHelpers.press(button, mouseX, mouseY)) {
+                    onPress(button);
                     return;
                 }
             }
+        }
+
+        protected void onPress(GuiButton button) {
+            actionPerformed(button);
         }
     }
 
@@ -1115,53 +1136,42 @@ public class GuiBarCustomize extends GuiScreen {
         private final boolean last;
 
         private BarLine(Row row, boolean first, boolean last) {
-            super(null);
+            super(null, getRowButtons(row, first, last));
             this.row = row;
             this.first = first;
             this.last = last;
         }
 
-        private boolean hasThemeButtons() {
-            return first && !row.state && !row.numberOnly;
-        }
-
-        private boolean hasNumberButtons() {
-            return last && row.number != null;
-        }
-
         @Override
         protected void draw(int y, int mouseX, int mouseY) {
-            HudElement bar = bars.get(row.barIndex);
-            String theme = HudLayout.getTheme(bar);
             if (first) {
                 drawRowName(row.name, y, row.state ? ColorUtils.textState.getColor() : ColorUtils.text.getColor());
             }
+            // The buttons are shared by every bar row, so they get this row's place and labels first
             placeRowButtons(row, y);
-            if (hasThemeButtons()) {
-                themeButton.drawButton(mc, mouseX, mouseY);
-                flipButton.drawButton(mc, mouseX, mouseY);
-                String themeName = getThemeName(theme);
-                if (themeButton.func_146115_a()) {
-                    rowTooltip = GuiHelpers.getCutTooltip(themeButton.displayString, themeName);
-                } else if (flipButton.func_146115_a()) {
-                    rowTooltip = GuiHelpers.getTooltip("dashboard.customize.fill_direction");
-                }
-            }
-            if (hasNumberButtons()) {
-                numberButton.drawButton(mc, mouseX, mouseY);
-                numberStyleButton.drawButton(mc, mouseX, mouseY);
-                decimalsButton.drawButton(mc, mouseX, mouseY);
-                if (numberButton.func_146115_a()) {
-                    rowTooltip = GuiHelpers.getTooltip("dashboard.customize.number");
-                } else if (numberStyleButton.func_146115_a()) {
-                    rowTooltip = getStyleTooltip(HudLayout.getNumberStyle(row.number));
-                } else if (decimalsButton.func_146115_a()) {
-                    rowTooltip = getDecimalsTooltip(BarNumbers.getDecimals(row.number));
-                }
-            }
+            super.draw(y, mouseX, mouseY);
             if (last) {
-                drawPreview(bar, theme, y);
+                HudElement bar = bars.get(row.barIndex);
+                drawPreview(bar, HudLayout.getTheme(bar), y);
             }
+        }
+
+        @Override
+        protected List<String> getTooltip(GuiButton button) {
+            if (button == themeButton) {
+                return GuiHelpers
+                    .getCutTooltip(themeButton.displayString, getThemeName(HudLayout.getTheme(bars.get(row.barIndex))));
+            }
+            if (button == flipButton) {
+                return GuiHelpers.getTooltip("dashboard.customize.fill_direction");
+            }
+            if (button == numberButton) {
+                return GuiHelpers.getTooltip("dashboard.customize.number");
+            }
+            if (button == numberStyleButton) {
+                return getStyleTooltip(HudLayout.getNumberStyle(row.number));
+            }
+            return getDecimalsTooltip(BarNumbers.getDecimals(row.number));
         }
 
         private void drawPreview(HudElement bar, String theme, int lineY) {
@@ -1189,25 +1199,22 @@ public class GuiBarCustomize extends GuiScreen {
 
         @Override
         protected void click(int y, int mouseX, int mouseY) {
-            if (row.state) {
-                return;
-            }
-            HudElement bar = bars.get(row.barIndex);
             placeRowButtons(row, y);
-            if (hasThemeButtons() && themeButton.mousePressed(mc, mouseX, mouseY)) {
-                themeButton.func_146113_a(mc.getSoundHandler());
+            super.click(y, mouseX, mouseY);
+        }
+
+        @Override
+        protected void onPress(GuiButton button) {
+            HudElement bar = bars.get(row.barIndex);
+            if (button == themeButton) {
                 HudLayout.setTheme(bar, stepTheme(HudLayout.getTheme(bar)));
-            } else if (hasThemeButtons() && flipButton.mousePressed(mc, mouseX, mouseY)) {
-                flipButton.func_146113_a(mc.getSoundHandler());
+            } else if (button == flipButton) {
                 HudLayout.setFlipped(bar, !isCtrlKeyDown() && !HudLayout.isFlipped(bar));
-            } else if (hasNumberButtons() && numberButton.mousePressed(mc, mouseX, mouseY)) {
-                numberButton.func_146113_a(mc.getSoundHandler());
+            } else if (button == numberButton) {
                 HudLayout.setNumberOn(row.number, !isCtrlKeyDown() && !HudLayout.isNumberOn(row.number));
-            } else if (hasNumberButtons() && numberStyleButton.mousePressed(mc, mouseX, mouseY)) {
-                numberStyleButton.func_146113_a(mc.getSoundHandler());
+            } else if (button == numberStyleButton) {
                 HudLayout.setNumberStyle(row.number, stepNumberStyle(HudLayout.getNumberStyle(row.number)));
-            } else if (hasNumberButtons() && decimalsButton.mousePressed(mc, mouseX, mouseY)) {
-                decimalsButton.func_146113_a(mc.getSoundHandler());
+            } else {
                 stepDecimals(row.number, BarNumbers.getDecimals(row.number));
             }
             updateAllBarsRow();

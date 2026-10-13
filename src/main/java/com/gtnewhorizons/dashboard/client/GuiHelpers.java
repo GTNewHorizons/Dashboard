@@ -3,9 +3,12 @@ package com.gtnewhorizons.dashboard.client;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
 import cpw.mods.fml.relauncher.Side;
@@ -17,6 +20,7 @@ final class GuiHelpers {
 
     static final int BUTTON_HEIGHT = 20;
     private static final String ELLIPSIS = "...";
+    private static final ResourceLocation CLICK_SOUND = new ResourceLocation("gui.button.press");
 
     private GuiHelpers() {}
 
@@ -54,6 +58,22 @@ final class GuiHelpers {
     /** The full text as a tooltip, for text that had to be cut to fit. Null when nothing was cut. */
     static List<String> getCutTooltip(String shown, String full) {
         return shown.equals(full) ? null : Collections.singletonList(full);
+    }
+
+    /** Vanilla's button click, for clicks that are not on a button. */
+    static void playClickSound() {
+        Minecraft.getMinecraft()
+            .getSoundHandler()
+            .playSound(PositionedSoundRecord.func_147674_a(CLICK_SOUND, 1.0F));
+    }
+
+    /** Plays the click sound when the button was hit, like vanilla. */
+    static boolean press(GuiButton button, int mouseX, int mouseY) {
+        if (!button.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
+            return false;
+        }
+        playClickSound();
+        return true;
     }
 
     /** For buttons that stay clickable while greyed out, since vanilla ignores clicks on disabled buttons. */

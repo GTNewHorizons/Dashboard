@@ -44,7 +44,23 @@ abstract class CustomizeSection extends Gui {
         return null;
     }
 
-    protected GuiSlider addSlider(GuiSlider slider) {
+    /** Whole numbers with the value shown, like every slider in Customize. */
+    protected GuiSlider addSlider(int id, int x, int width, String prefix, String suffix, double min, double max,
+        double value, GuiSlider.ISlider listener) {
+        GuiSlider slider = new GuiSlider(
+            id,
+            x,
+            0,
+            width,
+            GuiHelpers.BUTTON_HEIGHT,
+            prefix,
+            suffix,
+            min,
+            max,
+            value,
+            false,
+            true,
+            listener);
         sliders.add(slider);
         return slider;
     }

@@ -1,18 +1,12 @@
 package com.gtnewhorizons.dashboard.client;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.DashboardConfig;
@@ -36,7 +30,6 @@ final class HotbarSection extends CustomizeSection {
     private static final int HOTBAR_WIDTH = 182;
     private static final int HOTBAR_HEIGHT = 22;
     private static final ResourceLocation WIDGETS = new ResourceLocation("textures/gui/widgets.png");
-    private static final RenderItem ITEM_RENDERER = new RenderItem();
     private static final ItemStack[] SAMPLE_ITEMS = { new ItemStack(Items.diamond_sword),
         new ItemStack(Items.iron_pickaxe), new ItemStack(Items.bread, 16), new ItemStack(Blocks.torch, 64),
         new ItemStack(Blocks.cobblestone, 32) };
@@ -151,7 +144,6 @@ final class HotbarSection extends CustomizeSection {
 
     /** The keys are drawn by the same code as in game, so the preview always matches. */
     void drawPreview(int centerX, int y) {
-        Minecraft mc = Minecraft.getMinecraft();
         int x = centerX - HOTBAR_WIDTH / 2;
         PreviewDrawing.bindTexture(WIDGETS);
         PreviewDrawing.drawTexture(x, y, 0, 0, HOTBAR_WIDTH, HOTBAR_HEIGHT);
@@ -161,17 +153,9 @@ final class HotbarSection extends CustomizeSection {
             HotbarNumbers.draw(bounds);
         }
 
-        RenderHelper.enableGUIStandardItemLighting();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         for (int slot = 0; slot < SAMPLE_ITEMS.length; slot++) {
-            int itemX = x + 3 + slot * 20;
-            ITEM_RENDERER
-                .renderItemAndEffectIntoGUI(mc.fontRenderer, mc.getTextureManager(), SAMPLE_ITEMS[slot], itemX, y + 3);
-            ITEM_RENDERER
-                .renderItemOverlayIntoGUI(mc.fontRenderer, mc.getTextureManager(), SAMPLE_ITEMS[slot], itemX, y + 3);
+            PreviewDrawing.drawItem(SAMPLE_ITEMS[slot], x + 3 + slot * 20, y + 3);
         }
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        RenderHelper.disableStandardItemLighting();
 
         if (!DashboardConfig.hotbarNumberUnderItems) {
             HotbarNumbers.draw(bounds);

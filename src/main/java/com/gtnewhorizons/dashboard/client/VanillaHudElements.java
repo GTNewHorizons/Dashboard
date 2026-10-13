@@ -17,8 +17,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,7 +39,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeHooks;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.api.HudBounds;
@@ -107,7 +104,6 @@ public final class VanillaHudElements {
 
     private static final ResourceLocation ACHIEVEMENT_BACKGROUND = new ResourceLocation(
         "textures/gui/achievement/achievement_background.png");
-    private static final RenderItem ITEM_RENDERER = new RenderItem();
 
     private static final String[] SAMPLE_SCORES = { "Steve: " + EnumChatFormatting.RED + 12,
         "Alex: " + EnumChatFormatting.RED + 7, "Notch: " + EnumChatFormatting.RED + 3 };
@@ -376,15 +372,7 @@ public final class VanillaHudElements {
             .getUnformattedText();
         mc.fontRenderer.drawString(title, bounds.x + 30, bounds.y + 7, 0xFFFF00);
         mc.fontRenderer.drawString(name, bounds.x + 30, bounds.y + 18, 0xFFFFFF);
-        RenderHelper.enableGUIStandardItemLighting();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        ITEM_RENDERER.renderItemAndEffectIntoGUI(
-            mc.fontRenderer,
-            mc.getTextureManager(),
-            achievement.theItemStack,
-            bounds.x + 8,
-            bounds.y + 8);
-        RenderHelper.disableStandardItemLighting();
+        PreviewDrawing.drawItem(achievement.theItemStack, bounds.x + 8, bounds.y + 8);
     }
 
     private static void drawItemNamePreview(HudBounds bounds) {

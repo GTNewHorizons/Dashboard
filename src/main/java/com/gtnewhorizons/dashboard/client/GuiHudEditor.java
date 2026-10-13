@@ -5,11 +5,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
@@ -552,17 +550,17 @@ public class GuiHudEditor extends GuiScreen {
         HudElement element = box.element;
         if (mouseButton == 0 && isAltKeyDown()) {
             HudLayout.setSizeStep(element, 0);
-            playClickSound();
+            GuiHelpers.playClickSound();
         } else if (mouseButton == 0 && isCtrlKeyDown()) {
             HudLayout.resetPosition(element);
-            playClickSound();
+            GuiHelpers.playClickSound();
         } else if (mouseButton == 0) {
             draggedElement = element;
             grabOffsetX = mouseX - box.bounds.x;
             grabOffsetY = mouseY - box.bounds.y;
         } else if (mouseButton == 1) {
             HudLayout.setVisible(element, !HudLayout.isVisible(element));
-            playClickSound();
+            GuiHelpers.playClickSound();
         }
     }
 
@@ -670,8 +668,4 @@ public class GuiHudEditor extends GuiScreen {
         HudLayout.save();
     }
 
-    private void playClickSound() {
-        mc.getSoundHandler()
-            .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
-    }
 }

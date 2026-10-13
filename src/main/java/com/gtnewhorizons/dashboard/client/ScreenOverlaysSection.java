@@ -97,21 +97,7 @@ final class ScreenOverlaysSection extends CustomizeSection implements GuiSlider.
     }
 
     private GuiSlider createSlider(int id, int x, int width) {
-        return addSlider(
-            new GuiSlider(
-                id,
-                x,
-                0,
-                width,
-                GuiHelpers.BUTTON_HEIGHT,
-                getName(id) + ": ",
-                "%",
-                0,
-                ScreenOverlays.MAX_PERCENT,
-                getValue(id),
-                false,
-                true,
-                this));
+        return addSlider(id, x, width, getName(id) + ": ", "%", 0, ScreenOverlays.MAX_PERCENT, getValue(id), this);
     }
 
     /** Each row holds an overlay slider and its preview button, the first rows also a camera setting. */

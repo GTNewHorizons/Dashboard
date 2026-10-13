@@ -33,35 +33,25 @@ final class StatusEffectsSection extends CustomizeSection implements GuiSlider.I
     StatusEffectsSection(int leftX, int rightX, int buttonWidth, int resetWidth) {
         super(BUTTON_RESET, resetWidth);
         spacingSlider = addSlider(
-            new GuiSlider(
-                BUTTON_SPACING,
-                rightX,
-                0,
-                buttonWidth,
-                GuiHelpers.BUTTON_HEIGHT,
-                getName(BUTTON_SPACING) + ": ",
-                " px",
-                StatusEffects.MIN_SPACING,
-                StatusEffects.MAX_SPACING,
-                DashboardConfig.statusEffectSpacing,
-                false,
-                true,
-                this));
+            BUTTON_SPACING,
+            rightX,
+            buttonWidth,
+            getName(BUTTON_SPACING) + ": ",
+            " px",
+            StatusEffects.MIN_SPACING,
+            StatusEffects.MAX_SPACING,
+            DashboardConfig.statusEffectSpacing,
+            this);
         pulseSlider = addSlider(
-            new GuiSlider(
-                BUTTON_PULSE,
-                rightX,
-                0,
-                buttonWidth,
-                GuiHelpers.BUTTON_HEIGHT,
-                "",
-                "",
-                0,
-                StatusEffects.MAX_PULSE_SECONDS / StatusEffects.PULSE_STEP_SECONDS,
-                DashboardConfig.statusEffectPulseSeconds / StatusEffects.PULSE_STEP_SECONDS,
-                false,
-                true,
-                this));
+            BUTTON_PULSE,
+            rightX,
+            buttonWidth,
+            "",
+            "",
+            0,
+            StatusEffects.MAX_PULSE_SECONDS / StatusEffects.PULSE_STEP_SECONDS,
+            DashboardConfig.statusEffectPulseSeconds / StatusEffects.PULSE_STEP_SECONDS,
+            this);
         pulseSlider.displayString = getPulseLabel();
         int[] leftColumn = { BUTTON_BACKGROUND, BUTTON_ICON, BUTTON_NAME, BUTTON_TIME, BUTTON_PERMANENT };
         int[] rightColumn = { BUTTON_STACK, BUTTON_GROUP, BUTTON_SORT };
