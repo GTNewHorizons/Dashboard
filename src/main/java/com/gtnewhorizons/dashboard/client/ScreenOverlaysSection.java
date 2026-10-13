@@ -24,7 +24,7 @@ import cpw.mods.fml.client.config.GuiSlider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** The screen overlay and camera sliders of the Customize screen, each overlay with a preview button. */
+/** The screen overlay and camera settings in the Customize screen. */
 @SideOnly(Side.CLIENT)
 final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
 
@@ -281,7 +281,7 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
         return previewedSlider != 0;
     }
 
-    /** Over the world instead of the dark background, with the current slider values. */
+    /** Over the world instead of the dark background, so the slider's effect looks like in game. */
     void drawPreview(Minecraft mc, int width, int height) {
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);

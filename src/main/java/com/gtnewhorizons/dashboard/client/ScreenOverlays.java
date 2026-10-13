@@ -7,7 +7,7 @@ import com.gtnewhorizons.dashboard.DashboardConfig;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** The pumpkin, portal and fire overlay settings, as the mixins use them. */
+/** Turns the overlay percentages into what the mixins need, like an opacity from 0 to 1. */
 @SideOnly(Side.CLIENT)
 public final class ScreenOverlays {
 

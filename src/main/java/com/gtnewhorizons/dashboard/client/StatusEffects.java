@@ -158,7 +158,7 @@ public final class StatusEffects {
         return potion != null && potion.isBadEffect();
     }
 
-    /** Endless effects last. */
+    /** Endless effects count as the longest, so they sort last. */
     private static int getTicksLeft(PotionEffect effect) {
         return effect.getIsPotionDurationMax() ? Integer.MAX_VALUE : effect.getDuration();
     }

@@ -23,7 +23,7 @@ import com.gtnewhorizons.dashboard.api.HudElement;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Where the player moved each HUD element and which ones they hid, saved to config/dashboard/hud_layout.json. */
+/** What the player changed per HUD element (place, size, look), saved to config/dashboard/hud_layout.json. */
 @SideOnly(Side.CLIENT)
 public final class HudLayout {
 
@@ -54,7 +54,7 @@ public final class HudLayout {
         changed = true;
     }
 
-    /** The bar theme the player picked, or null for vanilla. */
+    /** Null for vanilla, also when the theme's resource pack is gone. */
     public static String getTheme(HudElement element) {
         HudElementState state = getStates().get(element.getId());
         return state == null || !BarThemes.isAvailable(state.theme) ? null : state.theme;
@@ -93,7 +93,7 @@ public final class HudLayout {
         return state == null || state.numberStyle == null ? NumberStyle.SLASH : state.numberStyle;
     }
 
-    /** SLASH is saved as no style. */
+    /** SLASH is saved as nothing, so untouched elements stay out of the file. */
     public static void setNumberStyle(HudElement element, NumberStyle style) {
         getOrCreateState(element).numberStyle = style == NumberStyle.SLASH ? null : style;
         removeIfDefault(element);
@@ -225,7 +225,7 @@ public final class HudLayout {
         }
     }
 
-    /** Positions, sizes and visibility. */
+    /** Positions, sizes and visibility. Looks are reset in the Customize screen. */
     public static void resetAll() {
         for (HudElementState state : getStates().values()) {
             state.visible = true;
@@ -237,7 +237,7 @@ public final class HudLayout {
         changed = true;
     }
 
-    /** Only write the file if something changed. */
+    /** Called whenever an editor screen closes, so it only writes when something changed. */
     public static void save() {
         if (!changed) {
             return;

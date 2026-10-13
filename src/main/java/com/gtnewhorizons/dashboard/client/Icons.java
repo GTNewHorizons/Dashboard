@@ -13,7 +13,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * Small icons for buttons, one 16 x 16 cell each in textures/gui/icons.png. Painted white with a vanilla text
- * shadow, then tinting them with the button text color.
+ * shadow, then tinted with the button text color.
  */
 @SideOnly(Side.CLIENT)
 public final class Icons {

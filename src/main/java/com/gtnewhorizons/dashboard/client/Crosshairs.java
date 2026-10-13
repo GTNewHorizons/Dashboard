@@ -68,7 +68,7 @@ public final class Crosshairs {
         draw(style, size, event.resolution.getScaledWidth() / 2, event.resolution.getScaledHeight() / 2);
     }
 
-    /** Inverting what is behind it, like vanilla. */
+    /** Inverts what is behind it like vanilla, so its more visible on any background. */
     public static void draw(int style, int size, int centerX, int centerY) {
         PreviewDrawing.bindTexture(style == VANILLA ? Gui.icons : TEXTURE);
         int cell = style - 1;

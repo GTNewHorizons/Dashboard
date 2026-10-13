@@ -77,7 +77,7 @@ public final class HotbarNumbers {
             .getDefaultBounds(screenWidth, screenHeight);
     }
 
-    /** On the item area of each slot, with the hotbar at its default bounds. */
+    /** Uses the hotbar's default bounds, since its move and resize are already applied. */
     static void draw(HudBounds hotbar) {
         if (!DashboardConfig.hotbarNumbers) {
             return;
@@ -107,8 +107,8 @@ public final class HotbarNumbers {
     }
 
     /**
-     * The slot number, or the key bound to the slot, with its color code in front. Made again only when the key or a
-     * setting changes, which also measures it into widths. NUMPAD1 becomes N1, and long names are cut to the slot.
+     * Made again only when the key or a setting changes, since it runs every frame. NUMPAD1 becomes N1, and long names
+     * are cut to fit the slot.
      */
     private static String getText(FontRenderer font, int slot, float scale) {
         int keyCode = DashboardConfig.hotbarNumberBoundKey

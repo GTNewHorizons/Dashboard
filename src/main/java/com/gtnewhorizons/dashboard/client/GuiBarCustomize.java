@@ -28,7 +28,7 @@ import cpw.mods.fml.client.GuiScrollingList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Lists the bars, with a button per bar that cycles through themes. */
+/** The Customize screen: one scrolling list with a section per HUD feature, so every setting is in one place. */
 @SideOnly(Side.CLIENT)
 public class GuiBarCustomize extends GuiScreen {
 
@@ -46,7 +46,6 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
     private static final int BUTTON_RESET_CROSSHAIR = 14;
     private static final int SWATCH_SIZE = 20;
-    private static final int BOTTOM_BUTTON_GAP = 4;
     private static final int BUTTON_HEIGHT = 20;
     private static final int LINE_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
@@ -172,7 +171,7 @@ public class GuiBarCustomize extends GuiScreen {
             }
         }
 
-        // Name, button and preview columns
+        // Measured over every row, so the columns line up
         nameWidth = Math.max(stateNameWidth, fontRendererObj.getStringWidth(getAllBarsName()));
         int previewWidth = 0;
         int numberSampleWidth = BarThemes.PADDING + fontRendererObj.getStringWidth("000 / 000");
@@ -523,7 +522,7 @@ public class GuiBarCustomize extends GuiScreen {
         return isShiftKeyDown() ? -1 : 1;
     }
 
-    /** Wraps around in both directions. */
+    /** Wraps around, also below zero, where Java's % would stay negative. */
     private static int wrap(int value, int count) {
         return (value % count + count) % count;
     }
@@ -882,7 +881,7 @@ public class GuiBarCustomize extends GuiScreen {
         }
     }
 
-    /** One line of the list, with an optional name and its own buttons. */
+    /** Forge's list only has rows of one height, so every section is built from these lines. */
     private class Line {
 
         private final String name;

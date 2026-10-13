@@ -52,7 +52,7 @@ public final class PreviewDrawing {
         GL11.glColor4f(1, 1, 1, 1);
     }
 
-    /** Draws part of the bound texture. */
+    /** Vanilla's version is not static, hence the shared Gui. */
     public static void drawTexture(int x, int y, int u, int v, int width, int height) {
         GUI.drawTexturedModalRect(x, y, u, v, width, height);
     }

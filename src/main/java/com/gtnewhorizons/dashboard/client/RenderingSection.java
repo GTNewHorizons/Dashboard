@@ -24,7 +24,7 @@ import com.gtnewhorizons.dashboard.DashboardConfig;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** The hidden held items list of the Customize screen: a text box to add item ids, and a line per id to remove it. */
+/** The hidden held items list in the Customize screen. */
 @SideOnly(Side.CLIENT)
 final class RenderingSection {
 

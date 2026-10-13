@@ -13,7 +13,7 @@ import com.gtnewhorizons.dashboard.client.BarNumbers;
 @Mixin(BossStatus.class)
 public class MixinBossStatus {
 
-    // Remember boss
+    // Remember the boss for its health number
     @Inject(method = "setBossStatus", at = @At("HEAD"))
     private static void dashboard$rememberBoss(IBossDisplayData boss, boolean hasColorModifier, CallbackInfo ci) {
         BarNumbers.setBoss(boss);

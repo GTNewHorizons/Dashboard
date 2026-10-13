@@ -25,9 +25,7 @@ import com.gtnewhorizons.dashboard.api.HudElement;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/**
- * Shows a box around every registered HUD element.
- */
+/** The HUD editor: a box per element, so players can see and grab elements even while they are not showing. */
 @SideOnly(Side.CLIENT)
 public class GuiHudEditor extends GuiScreen {
 
@@ -64,7 +62,6 @@ public class GuiHudEditor extends GuiScreen {
 
     /** Every element's box for the current frame, most important first. */
     private final List<ElementBox> boxes = new ArrayList<>();
-    /** The button rows of the panel, from top to bottom. */
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
     private String title;
@@ -289,9 +286,7 @@ public class GuiHudEditor extends GuiScreen {
         }
     }
 
-    /**
-     * Sample content for visible elements that are not showing.
-     */
+    /** Samples for elements that are not showing, so players see what they are moving. */
     private void drawPreviews() {
         List<HudBounds> taken = new ArrayList<>();
         for (ElementBox box : boxes) {
@@ -317,7 +312,7 @@ public class GuiHudEditor extends GuiScreen {
         return biggerArea > 0 && a.getOverlapArea(b) >= biggerArea * SAME_SPOT_OVERLAP_PERCENT / 100;
     }
 
-    /** Lines start from the screen center. */
+    /** Lines start from the screen center, so centered elements sit on a line. */
     private void drawGrid() {
         int centerX = width / 2;
         int centerY = height / 2;
@@ -430,7 +425,7 @@ public class GuiHudEditor extends GuiScreen {
      */
     private void drawElementName(String name, HudBounds bounds) {
         int maxWidth = bounds.width - 2;
-        // Hodge: MixinFontRenderer / Without this, j8 crashes
+        // Without this, Hodgepodge's MixinFontRenderer crashes on Java 8
         if (maxWidth < fontRendererObj.getCharWidth('W')) {
             return;
         }

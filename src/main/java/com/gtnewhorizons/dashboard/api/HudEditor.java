@@ -19,7 +19,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * Moves and hides registered HUD elements.
+ * Register a HUD element and wrap its drawing in {@link #beginRender}, so players can move, resize and hide
+ * it in the editor.
  */
 @SideOnly(Side.CLIENT)
 public final class HudEditor {
@@ -44,12 +45,11 @@ public final class HudEditor {
         return ELEMENTS_VIEW;
     }
 
-    /** True while the player is editing the HUD. */
     public static boolean isEditorOpen() {
         return Minecraft.getMinecraft().currentScreen instanceof GuiHudEditor;
     }
 
-    /** True while the editor is open and the preview is off (only the boxes are shown). */
+    /** With Preview turned off, the editor shows only the boxes, so elements skip drawing. */
     public static boolean isHidingContent() {
         return !drawingPreview && !DashboardConfig.showPreview && isEditorOpen();
     }
@@ -109,9 +109,7 @@ public final class HudEditor {
         return HudLayout.isVisible(element) && !isHidingContent();
     }
 
-    /**
-     * Draws the element's preview, if it has one.
-     */
+    /** A preview that' broken, is turned off, so one broken mod can not break the whole editor. */
     public static void drawPreview(HudElement element, int screenWidth, int screenHeight) {
         HudElement.PreviewRenderer preview = element.getPreview();
         if (preview == null) {

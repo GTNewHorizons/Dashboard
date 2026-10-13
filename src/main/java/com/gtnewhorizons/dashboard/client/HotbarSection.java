@@ -21,7 +21,7 @@ import com.gtnewhorizons.dashboard.api.HudBounds;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** The hotbar slot number buttons of the Customize screen, in two columns, with a hotbar preview. */
+/** The hotbar slot number settings in the Customize screen. */
 @SideOnly(Side.CLIENT)
 final class HotbarSection {
 
@@ -165,7 +165,7 @@ final class HotbarSection {
         return (value % count + count) % count;
     }
 
-    /** A vanilla hotbar with a few items and the first slot selected, the slot keys over or under the items. */
+    /** The keys are drawn by the same code as in game, so the preview always matches. */
     void drawPreview(int centerX, int y) {
         Minecraft mc = Minecraft.getMinecraft();
         int x = centerX - HOTBAR_WIDTH / 2;

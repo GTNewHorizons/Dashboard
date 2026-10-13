@@ -10,7 +10,7 @@ import cpw.mods.fml.client.config.GuiSlider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** The status effect buttons and sliders of the Customize screen, in two columns. */
+/** The status effect settings in the Customize screen. */
 @SideOnly(Side.CLIENT)
 final class StatusEffectsSection implements GuiSlider.ISlider {
 

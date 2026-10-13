@@ -15,7 +15,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * Rendering of the item that player hold, listed in the config as modid:name (every
+ * Rendering of the item the player holds, listed in the config as modid:name (every
  * meta) or modid:name:meta. They are drawn as an empty hand instead.
  */
 @SideOnly(Side.CLIENT)
@@ -26,7 +26,7 @@ public final class HiddenHeldItems {
 
     private HiddenHeldItems() {}
 
-    /** Called by the first person mixin. */
+    /** Called by the first person mixin every frame, so the list is only parsed when it changes. */
     public static boolean isHidden(ItemStack stack) {
         String[] list = DashboardConfig.hiddenHeldItems;
         if (stack == null || list.length == 0) {

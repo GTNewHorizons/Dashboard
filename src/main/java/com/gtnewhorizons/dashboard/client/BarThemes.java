@@ -26,6 +26,7 @@ import com.gtnewhorizons.dashboard.api.HudElement;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/** Bar looks from resource packs, drawn instead of vanilla's icons. Each theme is a sheet listed in themes.json. */
 @SideOnly(Side.CLIENT)
 public final class BarThemes {
 
@@ -97,7 +98,7 @@ public final class BarThemes {
         return TEXTURES.computeIfAbsent(theme, id -> new ResourceLocation(Dashboard.MODID, FOLDER + id + ".png"));
     }
 
-    /** The slot's vanilla side. */
+    /** Vanilla's side for the bar, unless the player flipped it. */
     public static boolean fillsFromRight(HudElement element, BarSlot slot) {
         return slot.fromRight != HudLayout.isFlipped(element);
     }
@@ -118,7 +119,7 @@ public final class BarThemes {
             slot.height + PADDING * 2);
     }
 
-    /** Two thirds full. Overlays like the regen shine are shown over a health bar. */
+    /** Overlays like the regen shine sit on a health bar, since on their own they would mean nothing. */
     public static void drawSample(String theme, BarSlot slot, int x, int y, boolean fromRight) {
         switch (slot) {
             case HEALTH_REGEN -> {
@@ -142,13 +143,12 @@ public final class BarThemes {
         return getRegenStep((int) (System.currentTimeMillis() / 50 % 100_000));
     }
 
-    /** Vanilla's regen heart wave. */
+    /** Same timing as vanilla's regen heart wave. */
     public static int getRegenStep(int ticks) {
         int step = ticks % 25;
         return step < 10 ? step : -1;
     }
 
-    /** Over the health bar at barX, barY. */
     public static void drawRegenShine(String theme, int barX, int barY, int step, boolean fromRight) {
         if (step < 0) {
             return;
@@ -166,7 +166,7 @@ public final class BarThemes {
         drawEmpty(theme, BarSlot.AIR_POP, x, barY);
     }
 
-    /** Only the stretch between two fractions. */
+    /** Only part of the fill, like the health lost in a damage flash. */
     public static void drawFillRange(String theme, BarSlot slot, int x, int y, float from, float to,
         boolean fromRight) {
         bindTexture(theme);

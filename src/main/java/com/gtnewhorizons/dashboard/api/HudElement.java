@@ -7,7 +7,7 @@ import net.minecraft.util.StatCollector;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 
-/** Something drawn on the HUD that the player can move or hide in the HUD editor. */
+/** Something drawn on the HUD that the player can move, resize or hide in the HUD editor. */
 public final class HudElement {
 
     private static final long SHOWING_TIMEOUT_MILLIS = 500;
@@ -23,8 +23,8 @@ public final class HudElement {
     public interface PreviewRenderer {
 
         /**
-         * Draws sample content the same way the real element is drawn, through {@link HudEditor#beginRender} or
-         * {@link HudEditor#render}.
+         * Draw through {@link HudEditor#beginRender} or {@link HudEditor#render}, so the sample moves and resizes like
+         * the real element.
          */
         void drawPreview(int screenWidth, int screenHeight);
     }
@@ -70,6 +70,7 @@ public final class HudElement {
         return previewRenderer;
     }
 
+    /** False hides the element from the editor completely, like for a mod feature that is turned off. */
     public HudElement setActiveCheck(BooleanSupplier activeCheck) {
         this.activeCheck = activeCheck;
         return this;

@@ -1,11 +1,12 @@
 package com.gtnewhorizons.dashboard.client;
 
 /**
- * Bar theme sheet (512 x 512). Each slot is the bar with 8px of space on every side.
+ * Where each bar sits on a theme sheet (512 x 512). Slots have 8 px of space around the bar for flair, like outlines or
+ * glow.
  */
 public enum BarSlot {
 
-    // empty slot / full slot / bar width, height / fills from the right like the vanilla right side rows
+    // empty u, v / full u, v / bar width, height / fills from the right, like vanilla's right side rows
     EXPERIENCE(0, 0, 198, 0, 182, 5, false),
     JUMP_BAR(0, 21, 198, 21, 182, 5, false),
     BOSS_HEALTH(0, 42, 198, 42, 182, 5, false),

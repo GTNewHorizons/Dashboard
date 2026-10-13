@@ -32,7 +32,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Numbers like 13/20 next to the bars, each its own element. Turned on in the Customize screen. */
+/** Numbers like 13/20 next to the bars. Each is its own element, so players can move it apart from its bar. */
 @SideOnly(Side.CLIENT)
 @EventBusSubscriber(side = Side.CLIENT)
 public final class BarNumbers {
@@ -122,7 +122,7 @@ public final class BarNumbers {
         return Math.round(previewFill(max));
     }
 
-    /** Vanilla only keeps the boss health as a fraction. */
+    /** Vanilla only keeps the boss health as a fraction, so the number reads it from the boss itself. */
     public static void setBoss(IBossDisplayData displayData) {
         if (boss.get() != displayData) {
             boss = new WeakReference<>(displayData);
@@ -160,7 +160,6 @@ public final class BarNumbers {
         return saturationNumber;
     }
 
-    /** Like the editor preview, in the number's style. */
     static String getSampleText(HudElement element) {
         return find(element).getSampleText();
     }
@@ -169,7 +168,7 @@ public final class BarNumbers {
         return find(element).getDecimals();
     }
 
-    /** The number's own default is saved as nothing. */
+    /** The number's own default is saved as nothing, so it follows if the default changes. */
     static void setDecimals(HudElement element, int decimals) {
         HudLayout.setNumberDecimals(element, decimals == find(element).defaultDecimals ? null : decimals);
     }
@@ -183,6 +182,7 @@ public final class BarNumbers {
         throw new IllegalArgumentException("Not a bar number: " + element.getId());
     }
 
+    /** Canceled bars count too, since themed bars cancel vanilla and draw themselves. */
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onPreRender(RenderGameOverlayEvent.Pre event) {
         if (VanillaHudElements.willDraw(event.type)) {
@@ -190,7 +190,7 @@ public final class BarNumbers {
         }
     }
 
-    /** After every bar, so no bar is still moved. */
+    /** At the end of the HUD, so no bar's move or resize is still applied. */
     @SubscribeEvent
     public static void onPostRender(RenderGameOverlayEvent.Post event) {
         if (event.type != ElementType.ALL) {
@@ -269,7 +269,7 @@ public final class BarNumbers {
             return saved != null ? MathHelper.clamp_int(saved, 0, MAX_DECIMALS) : defaultDecimals;
         }
 
-        /** Formats again only when something changed. */
+        /** Formats again only when something changed, since it runs every frame. */
         private final class CachedText {
 
             private float current = Float.NaN;

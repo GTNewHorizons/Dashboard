@@ -54,7 +54,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * Vanilla HUD elements.
+ * Makes vanilla's HUD movable through Forge's overlay events, and draws themed bars instead of vanilla's.
  */
 @SideOnly(Side.CLIENT)
 @EventBusSubscriber(side = Side.CLIENT)
@@ -166,7 +166,6 @@ public final class VanillaHudElements {
         THEMED_BARS.put(bossHealth, BarSlot.BOSS_HEALTH);
     }
 
-    /** Can use a bar theme. */
     public static Map<HudElement, BarSlot> getThemedBars() {
         return Collections.unmodifiableMap(THEMED_BARS);
     }
@@ -188,7 +187,7 @@ public final class VanillaHudElements {
         return add(type, name, row);
     }
 
-    /** Scoreboard sidebar bounds */
+    /** The size vanilla would draw, or three sample lines without a scoreboard. */
     private static HudBounds getScoreboardBounds(int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getMinecraft();
         FontRenderer font = mc.fontRenderer;
@@ -239,14 +238,13 @@ public final class VanillaHudElements {
         return new HudBounds(screenWidth / 2 - ITEM_NAME_WIDTH / 2, y, ITEM_NAME_WIDTH, ICON_SIZE);
     }
 
-    /** The vanilla look of a bar, as full as the themed previews. Used in the editor and the Customize screen. */
+    /** As full as the themed previews, so they look alike side by side. */
     public static void drawVanillaSample(BarSlot slot, int x, int y) {
         switch (slot) {
             // Texture positions from GuiIngameForge
             case EXPERIENCE -> drawBarPreview(x, y, 64);
             case JUMP_BAR -> drawBarPreview(x, y, 84);
             case BOSS_HEALTH -> drawBarPreview(x, y, 74);
-            // empty u, full u, half u, v
             case HEALTH -> drawIconRowPreview(x, y, false, 16, 52, 61, 0);
             case ARMOR -> drawIconRowPreview(x, y, false, 16, 34, 25, 9);
             case FOOD -> drawIconRowPreview(x, y, true, 16, 52, 61, 27);
@@ -267,7 +265,6 @@ public final class VanillaHudElements {
         }
     }
 
-    /** A stacked row sample, following the row's theme. */
     private static Consumer<HudBounds> rowSample(HudElement element, BarSlot slot) {
         return bounds -> drawBarSample(element, slot, bounds.x, bounds.getBottom() - ICON_SIZE);
     }
@@ -278,9 +275,7 @@ public final class VanillaHudElements {
         PreviewDrawing.drawTexture(x, y, 0, v + 5, Math.round(BAR_WIDTH * BarThemes.PREVIEW_FILL), 5);
     }
 
-    /**
-     * Ten icons worth two points each.
-     */
+    /** Ten icons worth two points each. */
     private static void drawIconRowPreview(int left, int y, boolean fromRight, int emptyU, int fullU, int halfU,
         int v) {
         drawIconRowPreview(left, y, fromRight, emptyU, fullU, halfU, v, -1);
@@ -326,7 +321,6 @@ public final class VanillaHudElements {
         font.drawStringWithShadow(name, nameX, bounds.y, 0xFFFFFF);
     }
 
-    /** Themed or vanilla editor sample. */
     private static void drawBarSample(HudElement element, BarSlot slot, int x, int y) {
         String theme = HudLayout.getTheme(element);
         if (theme == null) {
@@ -336,7 +330,6 @@ public final class VanillaHudElements {
         }
     }
 
-    /** Experience level number */
     static void drawLevelNumber(HudBounds box, int level) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
         String text = String.valueOf(level);
@@ -349,7 +342,6 @@ public final class VanillaHudElements {
         font.drawString(text, x, y, 0x80FF20);
     }
 
-    /** Scoreboard sidebar */
     private static void drawScoreboardPreview(HudBounds bounds) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
         int lineHeight = font.FONT_HEIGHT;
@@ -395,7 +387,6 @@ public final class VanillaHudElements {
         RenderHelper.disableStandardItemLighting();
     }
 
-    /** Held item name preview. */
     private static void drawItemNamePreview(HudBounds bounds) {
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
         String name = new ItemStack(Items.diamond_sword).getDisplayName();
@@ -495,7 +486,7 @@ public final class VanillaHudElements {
         }
         cancel(event);
 
-        // Absorption above health
+        // Absorption gets its own row above health, like vanilla's golden hearts
         // TODO: posibble re-do (smaller bar, bar as overlay)
         float absorption = event.type == ElementType.HEALTH ? mc.thePlayer.getAbsorptionAmount() : 0;
         int rows = absorption > 0 ? 2 : 1;
