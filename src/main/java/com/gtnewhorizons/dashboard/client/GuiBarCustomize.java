@@ -93,7 +93,7 @@ public class GuiBarCustomize extends GuiScreen {
     private final GuiButton scrollUp = new GuiButton(SCROLL_UP, 0, 0, "");
     private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
     private final GuiButton themeButton = new GuiButton(0, 0, 0, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
-    private final GuiButton flipButton = new GuiButton(0, 0, 0, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, "");
+    private final IconButton flipButton = new IconButton(0, 0, 0, FLIP_BUTTON_WIDTH, BUTTON_HEIGHT, Icons.ARROW_RIGHT);
     private final GuiButton numberButton = new GuiButton(0, 0, 0, NUMBER_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private final GuiButton numberStyleButton = new GuiButton(0, 0, 0, NUMBER_STYLE_BUTTON_WIDTH, BUTTON_HEIGHT, "");
     private final GuiButton decimalsButton = new GuiButton(0, 0, 0, DECIMALS_BUTTON_WIDTH, BUTTON_HEIGHT, "");
@@ -202,13 +202,13 @@ public class GuiBarCustomize extends GuiScreen {
         String reset = StatCollector.translateToLocal("dashboard.customize.reset");
         resetButton = new GuiButton(BUTTON_RESET, 0, 0, SECTION_BUTTON_WIDTH, BUTTON_HEIGHT, reset);
         allButton = new GuiButton(BUTTON_ALL, left + getButtonX(), 0, THEME_BUTTON_WIDTH, BUTTON_HEIGHT, "");
-        resetFlipsButton = new GuiButton(
+        resetFlipsButton = new IconButton(
             BUTTON_RESET_FLIPS,
             left + getFlipX(),
             0,
             FLIP_BUTTON_WIDTH,
             BUTTON_HEIGHT,
-            "R");
+            Icons.RESET);
         allNumbersButton = new GuiButton(
             BUTTON_ALL_NUMBERS,
             left + getNumberX(),
@@ -731,7 +731,7 @@ public class GuiBarCustomize extends GuiScreen {
 
         flipButton.xPosition = left + getFlipX();
         flipButton.yPosition = y;
-        flipButton.displayString = BarThemes.fillsFromRight(bar, slots.get(row.barIndex)) ? "<" : ">";
+        flipButton.icon = BarThemes.fillsFromRight(bar, slots.get(row.barIndex)) ? Icons.ARROW_LEFT : Icons.ARROW_RIGHT;
         flipButton.enabled = theme != null;
 
         if (row.number != null) {

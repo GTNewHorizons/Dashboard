@@ -339,13 +339,11 @@ public class GuiHudEditor extends GuiScreen {
 
         HudBounds help = getHelpIconBounds(menu);
         boolean hovered = help.contains(mouseX, mouseY) && !draggingMenu;
-        drawRect(
-            help.x,
-            help.y,
-            help.getRight(),
-            help.getBottom(),
-            hovered ? ColorUtils.helpIconHovered.getColor() : ColorUtils.helpIcon.getColor());
-        drawCenteredString(fontRendererObj, "?", help.x + help.width / 2, help.y + 2, ColorUtils.text.getColor());
+        Icons.drawCentered(
+            Icons.HELP,
+            help.x + help.width / 2,
+            help.y + help.height / 2,
+            hovered ? ColorUtils.buttonTextHovered : ColorUtils.text);
     }
 
     private static HudBounds getHelpIconBounds(HudBounds menu) {

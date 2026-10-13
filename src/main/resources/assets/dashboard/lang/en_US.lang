@@ -111,7 +111,6 @@ dashboard.customize.rendering=Rendering
 dashboard.rendering.hidden_held_items=Hidden Held Items
 dashboard.rendering.hint=minecraft:wool or minecraft:wool:14
 dashboard.rendering.add=Add
-dashboard.rendering.held=Held
 dashboard.rendering.held.tooltip=Fill in the item in your hand
 dashboard.rendering.remove=Remove
 dashboard.rendering.unknown=Unknown item

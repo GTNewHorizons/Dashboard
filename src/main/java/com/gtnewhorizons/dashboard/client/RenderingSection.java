@@ -35,7 +35,7 @@ final class RenderingSection {
     private static final int BUTTON_REMOVE = 410;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ADD_WIDTH = 40;
-    private static final int HELD_WIDTH = 40;
+    private static final int HELD_WIDTH = 20;
     private static final int REMOVE_WIDTH = 20;
     private static final int GAP = 4;
     private static final int MAX_INPUT_WIDTH = 220;
@@ -81,13 +81,7 @@ final class RenderingSection {
             ADD_WIDTH,
             BUTTON_HEIGHT,
             StatCollector.translateToLocal("dashboard.rendering.add"));
-        heldButton = new GuiButton(
-            BUTTON_HELD,
-            heldX,
-            0,
-            HELD_WIDTH,
-            BUTTON_HEIGHT,
-            StatCollector.translateToLocal("dashboard.rendering.held"));
+        heldButton = new IconButton(BUTTON_HELD, heldX, 0, HELD_WIDTH, BUTTON_HEIGHT, Icons.HELD);
         heldButton.enabled = getHeldItem() != null;
         resetButton = new GuiButton(
             BUTTON_RESET,
@@ -102,7 +96,7 @@ final class RenderingSection {
         entryTexts = new String[entries.length];
         entryKnown = new boolean[entries.length];
         for (int i = 0; i < entries.length; i++) {
-            removeButtons[i] = new GuiButton(BUTTON_REMOVE + i, buttonX, 0, REMOVE_WIDTH, BUTTON_HEIGHT, "X");
+            removeButtons[i] = new IconButton(BUTTON_REMOVE + i, buttonX, 0, REMOVE_WIDTH, BUTTON_HEIGHT, Icons.REMOVE);
             ItemId id = HiddenHeldItems.parse(entries[i]);
             entryKnown[i] = id != null;
             String detail = id != null ? getItemName(id)

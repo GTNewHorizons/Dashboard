@@ -341,10 +341,10 @@ final class ScreenOverlaysSection extends Gui implements GuiSlider.ISlider {
     }
 
     /** Greyed out while its preview is off, but still clickable. */
-    private static final class PreviewButton extends GuiButton {
+    private static final class PreviewButton extends IconButton {
 
         private PreviewButton(int id, int x) {
-            super(id, x, 0, PREVIEW_BUTTON_WIDTH, BUTTON_HEIGHT, "P");
+            super(id, x, 0, PREVIEW_BUTTON_WIDTH, BUTTON_HEIGHT, Icons.PREVIEW);
         }
 
         @Override
