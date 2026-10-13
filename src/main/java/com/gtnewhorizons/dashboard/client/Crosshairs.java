@@ -13,7 +13,9 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.compat.TinkerCompat;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -54,14 +56,19 @@ public final class Crosshairs {
         return style > styleCount ? VANILLA : Math.max(VANILLA, style);
     }
 
-    @SubscribeEvent
+    /** Runs before Tinkers' own crosshair, so canceling here also hides that one when its setting is off. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onPreRender(RenderGameOverlayEvent.Pre event) {
         if (event.type != ElementType.CROSSHAIRS) {
             return;
         }
+        boolean holdingTinkersWeapon = TinkerCompat.isHoldingRangedWeapon();
+        if (holdingTinkersWeapon && DashboardConfig.tinkersCrosshair) {
+            return;
+        }
         int style = getStyle();
         int size = MathHelper.clamp_int(DashboardConfig.crosshairSize, 1, MAX_SIZE);
-        if (style == VANILLA && size == 1) {
+        if (style == VANILLA && size == 1 && !holdingTinkersWeapon) {
             return;
         }
         event.setCanceled(true);

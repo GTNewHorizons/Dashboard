@@ -42,6 +42,11 @@ public class DashboardConfig {
     @Config.RangeInt(min = 1, max = Crosshairs.MAX_SIZE)
     public static int crosshairSize;
 
+    @Config.Comment("Let Tinkers' Construct draw its own crosshair while holding its bows, crossbows and throwing weapons")
+    @Config.LangKey("dashboard.config.editor.tinkers_crosshair")
+    @Config.DefaultBoolean(true)
+    public static boolean tinkersCrosshair;
+
     @Config.Comment("Show the bound key on each hotbar slot")
     @Config.LangKey("dashboard.config.editor.hotbar_numbers")
     @Config.DefaultBoolean(false)

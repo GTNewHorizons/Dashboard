@@ -22,6 +22,7 @@ import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.client.GuiScrollingList;
 import cpw.mods.fml.relauncher.Side;
@@ -44,6 +45,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_ALL_NUMBER_STYLES = 10;
     private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
     private static final int BUTTON_RESET_CROSSHAIR = 14;
+    private static final int BUTTON_TINKERS_CROSSHAIR = 15;
     private static final int SWATCH_SIZE = 20;
     private static final int LINE_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
@@ -121,6 +123,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton crosshairStyleButton;
     private GuiButton crosshairSizeButton;
     private GuiButton resetCrosshairButton;
+    private GuiButton tinkersCrosshairButton;
     private StatusEffectsSection statusEffects;
     private ScreenOverlaysSection screenOverlays;
     private HotbarSection hotbar;
@@ -280,6 +283,10 @@ public class GuiBarCustomize extends GuiScreen {
             FLIP_BUTTON_WIDTH,
             GuiHelpers.BUTTON_HEIGHT,
             "");
+        int columnWidth = Math.min(STATUS_COLUMN_WIDTH, (contentWidth - STATUS_COLUMN_GAP) / 2);
+        tinkersCrosshairButton = Mods.TINKERS.isModLoaded()
+            ? new GuiButton(BUTTON_TINKERS_CROSSHAIR, 0, 0, columnWidth, GuiHelpers.BUTTON_HEIGHT, "")
+            : null;
         updateCrosshairButtons();
 
         lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.section.bars")));
@@ -312,10 +319,12 @@ public class GuiBarCustomize extends GuiScreen {
         lines.add(new HeaderLine(getCrosshairName()));
         lines.add(new Line(null));
         lines.add(new CrosshairLine());
+        if (tinkersCrosshairButton != null) {
+            lines.add(new CenteredLine(tinkersCrosshairButton));
+        }
         lines.add(new CenteredLine(resetCrosshairButton));
         lines.add(new Line(null));
 
-        int columnWidth = Math.min(STATUS_COLUMN_WIDTH, (contentWidth - STATUS_COLUMN_GAP) / 2);
         int leftColumnX = width / 2 - columnWidth - STATUS_COLUMN_GAP / 2;
         int rightColumnX = width / 2 + STATUS_COLUMN_GAP / 2;
         hotbar = new HotbarSection(leftColumnX, rightColumnX, columnWidth, SECTION_BUTTON_WIDTH);
@@ -525,7 +534,12 @@ public class GuiBarCustomize extends GuiScreen {
         crosshairStyleButton.displayString = style == Crosshairs.VANILLA ? getThemeName(null)
             : style + " / " + Crosshairs.getStyleCount();
         crosshairSizeButton.displayString = "x" + DashboardConfig.crosshairSize;
-        resetCrosshairButton.enabled = style != Crosshairs.VANILLA || DashboardConfig.crosshairSize != 1;
+        resetCrosshairButton.enabled = style != Crosshairs.VANILLA || DashboardConfig.crosshairSize != 1
+            || tinkersCrosshairButton != null && !DashboardConfig.tinkersCrosshair;
+        if (tinkersCrosshairButton != null) {
+            tinkersCrosshairButton.displayString = StatCollector.translateToLocal(
+                "dashboard.customize.tinkers_crosshair") + ": " + GuiHelpers.getOnOff(DashboardConfig.tinkersCrosshair);
+        }
     }
 
     /** Ctrl goes back to vanilla. */
@@ -685,6 +699,9 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_ALL_NUMBER_STYLES -> getStyleTooltip(getCommonNumberStyle());
             case BUTTON_ALL_NUMBER_DECIMALS -> getDecimalsTooltip(getCommonDecimals());
             case BUTTON_CROSSHAIR_SIZE -> GuiHelpers.getTooltip("dashboard.customize.crosshair_size");
+            case BUTTON_TINKERS_CROSSHAIR -> Arrays.asList(
+                StatCollector.translateToLocal("dashboard.customize.tinkers_crosshair.on"),
+                StatCollector.translateToLocal("dashboard.customize.tinkers_crosshair.off"));
             default -> getSectionTooltip(button);
         };
     }
@@ -821,6 +838,12 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_RESET_CROSSHAIR -> {
                 DashboardConfig.crosshairStyle = Crosshairs.VANILLA;
                 DashboardConfig.crosshairSize = 1;
+                DashboardConfig.tinkersCrosshair = true;
+                ConfigurationManager.save(DashboardConfig.class);
+                updateCrosshairButtons();
+            }
+            case BUTTON_TINKERS_CROSSHAIR -> {
+                DashboardConfig.tinkersCrosshair = !isCtrlKeyDown() && !DashboardConfig.tinkersCrosshair;
                 ConfigurationManager.save(DashboardConfig.class);
                 updateCrosshairButtons();
             }
