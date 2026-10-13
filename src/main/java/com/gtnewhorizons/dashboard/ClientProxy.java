@@ -10,6 +10,8 @@ import com.gtnewhorizons.dashboard.client.BarThemes;
 import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
+import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
+import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -33,6 +35,9 @@ public class ClientProxy extends CommonProxy {
         VanillaHudElements.register();
         BarNumbers.register();
         StatusEffects.register();
+        if (Mods.GRAVISUITE.isModLoaded()) {
+            GraviSuiteCompat.register();
+        }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);
     }

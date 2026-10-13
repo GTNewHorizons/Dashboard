@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
+import com.gtnewhorizons.dashboard.compat.Mods;
 
 public enum Mixins implements IMixins {
 
@@ -27,7 +28,11 @@ public enum Mixins implements IMixins {
             "MixinItemRenderer_Water",
             "MixinGuiIngameForge_SleepFade",
             "MixinEntityRenderer_Camera")
-        .setPhase(Phase.EARLY));
+        .setPhase(Phase.EARLY)),
+    GRAVISUITE_HUD(new MixinBuilder("Make the GraviSuite status text movable")
+        .addClientMixins("gravisuite.MixinClientTickHandler_Hud")
+        .addRequiredMod(Mods.GRAVISUITE)
+        .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
 

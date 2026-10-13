@@ -53,7 +53,6 @@ dashboard.element.minecraft.mount_health=Mount Health
 dashboard.element.minecraft.item_name=Held Item Name
 dashboard.element.minecraft.action_bar=Action Bar
 dashboard.element.minecraft.scoreboard=Scoreboard
-dashboard.preview.scoreboard=Scores
 dashboard.element.minecraft.achievement=Achievement Popup
 dashboard.element.minecraft.health_number=Health Number
 dashboard.element.minecraft.armor_number=Armor Number
@@ -63,6 +62,14 @@ dashboard.element.minecraft.air_number=Air Number
 dashboard.element.minecraft.mount_health_number=Mount Health Number
 dashboard.element.minecraft.boss_health_number=Boss Health Number
 dashboard.element.minecraft.status_effects=Status Effects
+
+dashboard.preview.scoreboard=Scores
+
+## GraviSuite
+dashboard.element.gravisuite.status=GraviSuite Status
+
+dashboard.preview.gravisuite.mode=Gravitation Engine: ON
+dashboard.preview.gravisuite.energy=Energy Level: 100%
 
 # Customize screen
 dashboard.customize.title=Customize
