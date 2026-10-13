@@ -39,7 +39,7 @@ public final class HudLayout {
     private static int scaleDisplayHeight;
     private static int scaleSetting;
     private static boolean scaleUnicode;
-    private static int gameGuiScale;
+    private static ScaledResolution resolution;
 
     private HudLayout() {}
 
@@ -145,8 +145,12 @@ public final class HudLayout {
         return Math.max(1, gameScale + step) / (float) gameScale;
     }
 
-    /** Measured again only when something it depends on changes, since the HUD asks for it every frame. */
     static int getGameGuiScale() {
+        return getResolution().getScaleFactor();
+    }
+
+    /** Measured again only when something it depends on changes, since the HUD asks for it every frame. */
+    public static ScaledResolution getResolution() {
         Minecraft mc = Minecraft.getMinecraft();
         boolean unicode = mc.func_152349_b();
         if (mc.displayWidth != scaleDisplayWidth || mc.displayHeight != scaleDisplayHeight
@@ -156,9 +160,9 @@ public final class HudLayout {
             scaleDisplayHeight = mc.displayHeight;
             scaleSetting = mc.gameSettings.guiScale;
             scaleUnicode = unicode;
-            gameGuiScale = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight).getScaleFactor();
+            resolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         }
-        return gameGuiScale;
+        return resolution;
     }
 
     public static HudBounds getBounds(HudElement element, int screenWidth, int screenHeight) {

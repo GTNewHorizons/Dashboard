@@ -63,7 +63,7 @@ public class MixinGuiIngameForge_HudText {
             remap = false))
     private void dashboard$moveScoreboard(GuiIngameForge gui, ScoreObjective objective, int height, int width,
         FontRenderer font, Operation<Void> original) {
-        if (!HudEditor.beginRender(VanillaHudElements.SCOREBOARD)) {
+        if (!HudEditor.beginRender(VanillaHudElements.SCOREBOARD, width, height)) {
             return;
         }
         try {

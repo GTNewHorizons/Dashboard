@@ -73,8 +73,7 @@ public final class HudEditor {
     }
 
     public static boolean beginRender(HudElement element) {
-        ScaledResolution resolution = getResolution();
-        return beginRender(element, resolution.getScaledWidth(), resolution.getScaledHeight());
+        return beginRender(element, HudLayout.getResolution());
     }
 
     /** Call right after drawing the element, only if {@link #beginRender} returned true. */
@@ -155,12 +154,7 @@ public final class HudEditor {
     }
 
     public static void translateToPosition(HudElement element) {
-        ScaledResolution resolution = getResolution();
+        ScaledResolution resolution = HudLayout.getResolution();
         translateToPosition(element, resolution.getScaledWidth(), resolution.getScaledHeight());
-    }
-
-    private static ScaledResolution getResolution() {
-        Minecraft mc = Minecraft.getMinecraft();
-        return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
     }
 }

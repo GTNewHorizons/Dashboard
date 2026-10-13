@@ -236,6 +236,10 @@ public final class BarNumbers {
         }
 
         private void draw(int screenWidth, int screenHeight) {
+            // Before reading the player, since most numbers are turned off
+            if (!element.isActive()) {
+                return;
+            }
             String text = getText();
             if (text == null || !HudEditor.beginRender(element, screenWidth, screenHeight)) {
                 return;
