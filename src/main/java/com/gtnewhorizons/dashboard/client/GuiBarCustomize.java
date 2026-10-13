@@ -104,6 +104,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton resetCrosshairButton;
     private StatusEffectsSection statusEffects;
     private ScreenOverlaysSection screenOverlays;
+    private HotbarSection hotbar;
     private int nameWidth;
     private int contentWidth;
     private int crosshairLeft;
@@ -278,11 +279,19 @@ public class GuiBarCustomize extends GuiScreen {
         lines.add(new Line(null));
 
         int columnWidth = Math.min(STATUS_COLUMN_WIDTH, (contentWidth - STATUS_COLUMN_GAP) / 2);
-        statusEffects = new StatusEffectsSection(
-            width / 2 - columnWidth - STATUS_COLUMN_GAP / 2,
-            width / 2 + STATUS_COLUMN_GAP / 2,
-            columnWidth,
-            SECTION_BUTTON_WIDTH);
+        int leftColumnX = width / 2 - columnWidth - STATUS_COLUMN_GAP / 2;
+        int rightColumnX = width / 2 + STATUS_COLUMN_GAP / 2;
+        hotbar = new HotbarSection(leftColumnX, rightColumnX, columnWidth, SECTION_BUTTON_WIDTH);
+        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.hotbar")));
+        lines.add(new Line(null));
+        for (GuiButton[] row : hotbar.getRows()) {
+            lines.add(new Line(null, row));
+        }
+        lines.add(new HotbarPreviewLine());
+        lines.add(new CenteredLine(hotbar.getResetButton()));
+        lines.add(new Line(null));
+
+        statusEffects = new StatusEffectsSection(leftColumnX, rightColumnX, columnWidth, SECTION_BUTTON_WIDTH);
         lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.status_effects")));
         lines.add(new Line(null));
         for (GuiButton[] row : statusEffects.getRows()) {
@@ -755,7 +764,7 @@ public class GuiBarCustomize extends GuiScreen {
                 }
             }
             default -> {
-                if (!statusEffects.actionPerformed(button)) {
+                if (!hotbar.actionPerformed(button) && !statusEffects.actionPerformed(button)) {
                     screenOverlays.actionPerformed(button);
                 }
             }
@@ -922,6 +931,18 @@ public class GuiBarCustomize extends GuiScreen {
         protected void drawName(String name, int y) {
             int textY = y + (BUTTON_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1;
             fontRendererObj.drawStringWithShadow(name, crosshairLeft, textY, ColorUtils.text.getColor());
+        }
+    }
+
+    private final class HotbarPreviewLine extends Line {
+
+        private HotbarPreviewLine() {
+            super(null);
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            hotbar.drawPreview(width / 2, y);
         }
     }
 

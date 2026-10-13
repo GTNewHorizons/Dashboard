@@ -10,6 +10,9 @@ public enum Mixins implements IMixins {
     HOTBAR_TEXT(
         new MixinBuilder("Make the text above the hotbar movable").addClientMixins("MixinGuiIngameForge_HudText")
             .setPhase(Phase.EARLY)),
+    HOTBAR_NUMBERS(new MixinBuilder("Draw the hotbar slot numbers under the items")
+        .addClientMixins("MixinGuiIngameForge_HotbarNumbers")
+        .setPhase(Phase.EARLY)),
     ACHIEVEMENT(new MixinBuilder("Make the achievement popup movable").addClientMixins("MixinGuiAchievement")
         .setPhase(Phase.EARLY)),
     BOSS_HEALTH(new MixinBuilder("Remember the boss for its health number").addClientMixins("MixinBossStatus")

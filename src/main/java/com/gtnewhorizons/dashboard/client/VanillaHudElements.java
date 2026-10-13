@@ -640,6 +640,10 @@ public final class VanillaHudElements {
         if (event.type == ElementType.ALL) {
             endAllShifts();
         } else if (!STACKED_ROWS.containsKey(event.type)) {
+            // Before the shift ends, so the keys move and resize with the hotbar
+            if (event.type == ElementType.HOTBAR && SHIFTED.contains(ElementType.HOTBAR)) {
+                HotbarNumbers.drawOverItems(event.resolution.getScaledWidth(), event.resolution.getScaledHeight());
+            }
             endShift(event.type);
             drawExperienceLevel(event);
         }

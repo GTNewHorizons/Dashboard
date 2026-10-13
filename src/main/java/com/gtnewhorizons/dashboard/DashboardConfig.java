@@ -2,6 +2,7 @@ package com.gtnewhorizons.dashboard;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
 import com.gtnewhorizons.dashboard.client.Crosshairs;
+import com.gtnewhorizons.dashboard.client.HotbarNumbers;
 import com.gtnewhorizons.dashboard.client.ScreenOverlays;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 
@@ -40,6 +41,39 @@ public class DashboardConfig {
     @Config.DefaultInt(1)
     @Config.RangeInt(min = 1, max = Crosshairs.MAX_SIZE)
     public static int crosshairSize;
+
+    @Config.Comment("Show the bound key on each hotbar slot")
+    @Config.LangKey("dashboard.config.editor.hotbar_numbers")
+    @Config.DefaultBoolean(false)
+    public static boolean hotbarNumbers;
+
+    @Config.Comment("Show the key bound in Controls instead of the slot number 1 to 9")
+    @Config.LangKey("dashboard.config.editor.hotbar_number_bound_key")
+    @Config.DefaultBoolean(true)
+    public static boolean hotbarNumberBoundKey;
+
+    @Config.Comment("Draw the hotbar slot keys under the items instead of over them")
+    @Config.LangKey("dashboard.config.editor.hotbar_number_under_items")
+    @Config.DefaultBoolean(false)
+    public static boolean hotbarNumberUnderItems;
+
+    @Config.Comment("Where the key sits in each hotbar slot: 0 top left, 1 top, 2 top right, 3 left, 4 middle, 5 right, 6 bottom left, 7 bottom, 8 bottom right")
+    @Config.LangKey("dashboard.config.editor.hotbar_number_position")
+    @Config.DefaultInt(0)
+    @Config.RangeInt(min = 0, max = HotbarNumbers.POSITION_COUNT - 1)
+    public static int hotbarNumberPosition;
+
+    @Config.Comment("Size of the hotbar slot keys, in percent of normal text")
+    @Config.LangKey("dashboard.config.editor.hotbar_number_size")
+    @Config.DefaultInt(HotbarNumbers.DEFAULT_SIZE)
+    @Config.RangeInt(min = HotbarNumbers.MIN_SIZE, max = HotbarNumbers.MAX_SIZE)
+    public static int hotbarNumberSize;
+
+    @Config.Comment("Color of the hotbar slot keys, one of the 16 chat colors: 0 black to 15 white")
+    @Config.LangKey("dashboard.config.editor.hotbar_number_color")
+    @Config.DefaultInt(HotbarNumbers.DEFAULT_COLOR)
+    @Config.RangeInt(min = 0, max = HotbarNumbers.COLOR_COUNT - 1)
+    public static int hotbarNumberColor;
 
     @Config.Comment("Show the background behind each status effect")
     @Config.LangKey("dashboard.config.editor.status_effect_background")
