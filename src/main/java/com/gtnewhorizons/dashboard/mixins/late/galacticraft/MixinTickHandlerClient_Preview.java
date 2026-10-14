@@ -10,11 +10,14 @@ import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 /**
- * Galacticraft only draws its overlays when no screen (or the chat) is open, so the HUD editor counts as no screen
- * here. That way players see the real elements while moving them.
+ * Galacticraft and GalaxySpace only draw their overlays when no screen (or the chat) is open, so the HUD editor counts
+ * as no screen here. That way players see the real elements while moving them.
  */
 @Pseudo
-@Mixin(targets = "micdoodle8.mods.galacticraft.core.tick.TickHandlerClient", remap = false)
+@Mixin(
+    targets = { "micdoodle8.mods.galacticraft.core.tick.TickHandlerClient",
+        "galaxyspace.core.handler.GSClientEventHandler" },
+    remap = false)
 public class MixinTickHandlerClient_Preview {
 
     @ModifyExpressionValue(

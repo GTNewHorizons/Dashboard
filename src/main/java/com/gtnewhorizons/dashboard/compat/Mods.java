@@ -21,6 +21,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     APPLECORE("AppleCore"),
     GRAVISUITE("GraviSuite"),
     GALACTICRAFT("GalacticraftCore"),
+    GALAXYSPACE("GalaxySpace"),
     ;
     // spotless:on
 

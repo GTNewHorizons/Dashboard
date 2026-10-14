@@ -78,6 +78,9 @@ dashboard.element.galacticraft.launch_countdown=Launch Countdown
 dashboard.element.galacticraft.lander=Lander Warning & Speed
 dashboard.element.galacticraft.rocket_altitude=Rocket Altitude
 
+## GalaxySpace
+dashboard.element.galaxyspace.pressure=Atmospheric Pressure
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

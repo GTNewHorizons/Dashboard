@@ -11,6 +11,7 @@ import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
+import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
 
@@ -41,6 +42,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.GALACTICRAFT.isModLoaded()) {
             GalacticraftCompat.register();
+        }
+        if (Mods.GALAXYSPACE.isModLoaded()) {
+            GalaxySpaceCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

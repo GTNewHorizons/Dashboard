@@ -42,6 +42,10 @@ public enum Mixins implements IMixins {
             "galacticraft.MixinOverlayRocket_Hud",
             "galacticraft.MixinTickHandlerClient_Preview")
         .addRequiredMod(Mods.GALACTICRAFT)
+        .setPhase(Phase.LATE)),
+    GALAXYSPACE_HUD(new MixinBuilder("Make the GalaxySpace pressure bar movable")
+        .addClientMixins("galaxyspace.MixinOverlayAtmosphericPressure_Hud")
+        .addRequiredMod(Mods.GALAXYSPACE)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
