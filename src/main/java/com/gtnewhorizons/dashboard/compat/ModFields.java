@@ -10,9 +10,13 @@ final class ModFields {
 
     private ModFields() {}
 
-    @SuppressWarnings("unchecked")
     static Fields.ClassFields<Object> of(String className) throws ClassNotFoundException {
-        return Fields.ofClass((Class<Object>) Class.forName(className));
+        return of(Class.forName(className));
+    }
+
+    @SuppressWarnings("unchecked")
+    static Fields.ClassFields<Object> of(Class<?> type) {
+        return Fields.ofClass((Class<Object>) type);
     }
 
     static Fields.ClassFields<Object>.Field<Boolean> booleanField(Fields.ClassFields<Object> fields, String name)

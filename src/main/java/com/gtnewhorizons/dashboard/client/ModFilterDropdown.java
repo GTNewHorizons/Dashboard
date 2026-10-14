@@ -44,7 +44,7 @@ final class ModFilterDropdown {
         this.font = font;
         Map<String, String> names = new LinkedHashMap<>();
         for (HudElement element : HudEditor.getElements()) {
-            names.putIfAbsent(EditorModFilter.getModKey(element), element.getModName());
+            names.putIfAbsent(EditorModFilter.getModKey(element), element.getEditorModName());
         }
         int nameWidth = 0;
         for (Map.Entry<String, String> mod : names.entrySet()) {

@@ -434,7 +434,7 @@ public final class VanillaHudElements {
             postExperienceBar(event);
             return;
         }
-        if (HudEditor.isHidingContent() && HudLayout.isVisible(element)) {
+        if (HudEditor.isHidingContent(element) && HudLayout.isVisible(element)) {
             // Drawn invisibly instead of skipped, so the rows above keep their place
             HudEditor.shouldRender(element);
             GL11.glPushMatrix();

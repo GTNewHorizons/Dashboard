@@ -142,6 +142,7 @@ public final class BotaniaCompat {
         manaPool = GameRegistry.findBlock(Mods.BOTANIA.getID(), "pool");
         corporeaIndex = GameRegistry.findBlock(Mods.BOTANIA.getID(), "corporeaIndex");
         PreviewDrawing.setImitationInBounds(MANA_BAR, BotaniaCompat::drawManaBarPreview);
+        MANA_BAR.setPreviewOnTop();
         PreviewDrawing.setImitationInBounds(FLIGHT_BAR, BotaniaCompat::drawFlightBarPreview);
         PreviewDrawing.setImitationInBounds(BOSS_BAR, BotaniaCompat::drawBossBarPreview);
         PreviewDrawing.setImitationInBounds(WAND_MODE, BotaniaCompat::drawWandModePreview);

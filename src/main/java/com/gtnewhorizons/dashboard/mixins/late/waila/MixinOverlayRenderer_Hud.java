@@ -14,7 +14,8 @@ import com.gtnewhorizons.dashboard.compat.WailaCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 @Pseudo
-@Mixin(targets = "mcp.mobius.waila.overlay.OverlayRenderer", remap = false)
+// Above ChromaticTooltips Compat's 1000, which replaces doRenderOverlay, since only then Mixin allows injecting into it
+@Mixin(targets = "mcp.mobius.waila.overlay.OverlayRenderer", remap = false, priority = 1001)
 public class MixinOverlayRenderer_Hud {
 
     /** Waila stops looking at blocks while a screen is open, so the HUD editor counts as no screen here. */
@@ -33,6 +34,13 @@ public class MixinOverlayRenderer_Hud {
         if (!WailaCompat.beginBox(box)) {
             ci.cancel();
         }
+    }
+
+    @Inject(
+        method = "doRenderOverlay",
+        at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glScalef(FFF)V", ordinal = 0))
+    private static void dashboard$placeChromaticBox(CallbackInfo ci) {
+        WailaCompat.placeChromaticBox();
     }
 
     @Inject(method = "doRenderOverlay", at = @At("RETURN"))

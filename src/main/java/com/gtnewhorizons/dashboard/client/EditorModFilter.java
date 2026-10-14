@@ -13,7 +13,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /** Which mods' elements the HUD editor leaves out, so players can tidy it. Their HUD still shows in game. */
 @SideOnly(Side.CLIENT)
-final class EditorModFilter {
+public final class EditorModFilter {
 
     private static final Set<String> HIDDEN = new HashSet<>();
     private static String[] parsedList;
@@ -26,7 +26,7 @@ final class EditorModFilter {
             .toLowerCase(Locale.ROOT);
     }
 
-    static boolean isShown(HudElement element) {
+    public static boolean isShown(HudElement element) {
         return isShown(getModKey(element));
     }
 

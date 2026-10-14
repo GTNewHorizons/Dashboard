@@ -33,9 +33,11 @@ public final class HudElement {
     private final String translationKey;
     private final DefaultBoundsProvider defaultBoundsProvider;
     private PreviewRenderer previewRenderer;
+    private boolean previewOnTop;
     private BooleanSupplier activeCheck = () -> true;
     private String modId;
     private String modName;
+    private String modNameAddon;
     private long lastRenderTime;
 
     /**
@@ -70,6 +72,19 @@ public final class HudElement {
         return previewRenderer;
     }
 
+    /**
+     * Draws the sample on top of other elements, even where one is showing, like a bar a mod draws over another one.
+     * Without it, the sample is left out where another element shows, so samples do not pile up.
+     */
+    public HudElement setPreviewOnTop() {
+        this.previewOnTop = true;
+        return this;
+    }
+
+    public boolean isPreviewOnTop() {
+        return previewOnTop;
+    }
+
     /** False hides the element from the editor completely, like for a mod feature that is turned off. */
     public HudElement setActiveCheck(BooleanSupplier activeCheck) {
         this.activeCheck = activeCheck;
@@ -98,6 +113,17 @@ public final class HudElement {
             modName = findModName();
         }
         return modName;
+    }
+
+    /** Shown after the mod name in the editor, like another mod that draws this element. Optional. */
+    public HudElement setModNameAddon(String modNameAddon) {
+        this.modNameAddon = modNameAddon;
+        return this;
+    }
+
+    /** The mod name as shown in the editor, with the {@link #setModNameAddon addon} after it. */
+    public String getEditorModName() {
+        return modNameAddon != null ? getModName() + " / " + modNameAddon : getModName();
     }
 
     private String findModName() {

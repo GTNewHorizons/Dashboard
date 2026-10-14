@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.client.EditorModFilter;
 import com.gtnewhorizons.dashboard.client.GuiHudEditor;
 import com.gtnewhorizons.dashboard.client.HudLayout;
 
@@ -49,9 +50,12 @@ public final class HudEditor {
         return Minecraft.getMinecraft().currentScreen instanceof GuiHudEditor;
     }
 
-    /** With Preview turned off, the editor shows only the boxes, so elements skip drawing. */
-    public static boolean isHidingContent() {
-        return !drawingPreview && !DashboardConfig.showPreview && isEditorOpen();
+    /**
+     * In the editor, the element skips drawing when Preview is turned off or its mod is unticked in the Mods list, so
+     * only its box is shown, or nothing.
+     */
+    public static boolean isHidingContent(HudElement element) {
+        return !drawingPreview && isEditorOpen() && (!DashboardConfig.showPreview || !EditorModFilter.isShown(element));
     }
 
     /**
@@ -105,7 +109,7 @@ public final class HudEditor {
         if (!drawingPreview) {
             element.markRendered();
         }
-        return HudLayout.isVisible(element) && !isHidingContent();
+        return HudLayout.isVisible(element) && !isHidingContent(element);
     }
 
     /** A preview that' broken, is turned off, so one broken mod can not break the whole editor. */

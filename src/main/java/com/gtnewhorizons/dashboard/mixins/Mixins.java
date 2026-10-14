@@ -47,7 +47,8 @@ public enum Mixins implements IMixins {
         .addClientMixins("galaxyspace.MixinOverlayAtmosphericPressure_Hud")
         .addRequiredMod(Mods.GALAXYSPACE)
         .setPhase(Phase.LATE)),
-    WAILA_HUD(new MixinBuilder("Make the Waila info box movable").addClientMixins("waila.MixinOverlayRenderer_Hud")
+    WAILA_HUD(new MixinBuilder("Make the Waila info box movable")
+        .addClientMixins("waila.MixinOverlayRenderer_Hud", "waila.MixinWailaTickHandler_Hud")
         .addRequiredMod(Mods.WAILA)
         .setPhase(Phase.LATE)),
     ADVENTURE_BACKPACK_HUD(new MixinBuilder("Make the Adventure Backpack potion icons and tanks movable")

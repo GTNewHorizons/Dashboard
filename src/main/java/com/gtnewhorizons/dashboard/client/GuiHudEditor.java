@@ -263,6 +263,7 @@ public class GuiHudEditor extends GuiScreen {
             highlighted = hovered != null ? hovered.element : null;
         }
 
+        FrameEndHud.drawInEditor(partialTicks);
         if (DashboardConfig.showGrid) {
             drawGrid();
         }
@@ -301,15 +302,21 @@ public class GuiHudEditor extends GuiScreen {
                 taken.add(box.bounds);
             }
         }
+        List<HudElement> onTop = new ArrayList<>();
         for (ElementBox box : boxes) {
             if (box.showing || box.element.getPreview() == null || !HudLayout.isVisible(box.element)) {
                 continue;
             }
-            if (taken.stream()
+            if (box.element.isPreviewOnTop()) {
+                onTop.add(box.element);
+            } else if (taken.stream()
                 .noneMatch(other -> isSameSpot(box.bounds, other))) {
-                HudEditor.drawPreview(box.element, width, height);
-                taken.add(box.bounds);
-            }
+                    HudEditor.drawPreview(box.element, width, height);
+                    taken.add(box.bounds);
+                }
+        }
+        for (HudElement element : onTop) {
+            HudEditor.drawPreview(element, width, height);
         }
     }
 
@@ -481,7 +488,7 @@ public class GuiHudEditor extends GuiScreen {
                 EnumChatFormatting.GRAY
                     + StatCollector.translateToLocal("dashboard.editor.element_tooltip.not_showing"));
         }
-        lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getModName());
+        lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getEditorModName());
         return lines;
     }
 
