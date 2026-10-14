@@ -68,8 +68,9 @@ public final class GalacticraftCompat {
 
     private static Fields.ClassFields<Object>.Field<Boolean> oxygenLeft;
     private static Fields.ClassFields<Object>.Field<Boolean> oxygenBottom;
+    private static final ShiftTracker OVERLAY_SHIFT = new ShiftTracker();
+
     private static Method noAtmosphericCombustionMethod;
-    private static boolean overlayShifted;
 
     static {
         // Here rather than in register(), so addons like GalaxySpace can use them in any load order
@@ -100,16 +101,12 @@ public final class GalacticraftCompat {
      * overlay should stop.
      */
     public static boolean beginOverlay(HudElement element) {
-        overlayShifted = HudEditor.beginRender(element);
-        return overlayShifted;
+        return OVERLAY_SHIFT.begin(element);
     }
 
     /** Called when the overlay ends. Overlays that stopped early or never reset the matrix were not moved. */
     public static void endOverlay() {
-        if (overlayShifted) {
-            overlayShifted = false;
-            HudEditor.endRender();
-        }
+        OVERLAY_SHIFT.end();
     }
 
     /**
