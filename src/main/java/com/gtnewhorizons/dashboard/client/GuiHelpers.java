@@ -6,10 +6,14 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -21,6 +25,8 @@ final class GuiHelpers {
     static final int BUTTON_HEIGHT = 20;
     private static final String ELLIPSIS = "...";
     private static final ResourceLocation CLICK_SOUND = new ResourceLocation("gui.button.press");
+    private static final int DIRT_COLOR = 0x404040;
+    private static final float DIRT_TILE = 32;
 
     private GuiHelpers() {}
 
@@ -74,6 +80,25 @@ final class GuiHelpers {
         }
         playClickSound();
         return true;
+    }
+
+    /**
+     * Vanilla's darkened options dirt across the screen, like above and below menu lists. Forge's list only draws it
+     * outside a world, and it hides rows scrolled past the list's edges.
+     */
+    static void drawDirtStrip(int screenWidth, int top, int bottom) {
+        Minecraft.getMinecraft()
+            .getTextureManager()
+            .bindTexture(Gui.optionsBackground);
+        GL11.glColor4f(1, 1, 1, 1);
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.setColorOpaque_I(DIRT_COLOR);
+        tessellator.addVertexWithUV(0, bottom, 0, 0, bottom / DIRT_TILE);
+        tessellator.addVertexWithUV(screenWidth, bottom, 0, screenWidth / DIRT_TILE, bottom / DIRT_TILE);
+        tessellator.addVertexWithUV(screenWidth, top, 0, screenWidth / DIRT_TILE, top / DIRT_TILE);
+        tessellator.addVertexWithUV(0, top, 0, 0, top / DIRT_TILE);
+        tessellator.draw();
     }
 
     /** For buttons that stay clickable while greyed out, since vanilla ignores clicks on disabled buttons. */

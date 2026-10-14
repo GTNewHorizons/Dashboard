@@ -681,11 +681,18 @@ public class GuiBarCustomize extends GuiScreen {
             }
         }
         list.drawScreen(mouseX, mouseY, partialTicks);
+        int listBottom = height - LIST_BOTTOM_MARGIN;
+        // Left out while previewing, so the whole overlay shows
+        if (!screenOverlays.isPreviewing()) {
+            GuiHelpers.drawDirtStrip(width, 0, LIST_TOP);
+            GuiHelpers.drawDirtStrip(width, listBottom, height);
+        }
 
         drawCenteredString(fontRendererObj, title, width / 2, TITLE_Y, ColorUtils.text.getColor());
         super.drawScreen(mouseX, mouseY, partialTicks);
 
-        if (rowTooltip != null) {
+        // Rows scrolled under the strips can still be hovered
+        if (rowTooltip != null && mouseY >= LIST_TOP && mouseY < listBottom) {
             drawHoveringText(rowTooltip, mouseX, mouseY, fontRendererObj);
         }
     }
