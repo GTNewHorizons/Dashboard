@@ -12,12 +12,12 @@ public class DashboardConfig {
 
     @Config.Comment("Show the grid in the HUD editor and snap elements to it")
     @Config.LangKey("dashboard.config.editor.show_grid")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     public static boolean showGrid;
 
     @Config.Comment("Show sample content for elements that are not showing in the HUD editor")
     @Config.LangKey("dashboard.config.editor.show_preview")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     public static boolean showPreview;
 
     @Config.Comment("Show the element names inside their boxes in the HUD editor")
@@ -29,6 +29,11 @@ public class DashboardConfig {
     @Config.LangKey("dashboard.config.editor.show_positions")
     @Config.DefaultBoolean(false)
     public static boolean showPositions;
+
+    @Config.Comment("Mod ids whose elements are left out of the HUD editor, to tidy it. They still show in game")
+    @Config.LangKey("dashboard.config.editor.hidden_editor_mods")
+    @Config.DefaultStringList({})
+    public static String[] hiddenEditorMods;
 
     @Config.Comment("Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet")
     @Config.LangKey("dashboard.config.editor.crosshair_style")

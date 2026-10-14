@@ -87,6 +87,11 @@ public final class HudElement {
         return this;
     }
 
+    /** The mod this element belongs to: the one set with {@link #setModId}, or the part of the id before ':'. */
+    public String getModId() {
+        return modId != null ? modId : id.substring(0, Math.max(0, id.indexOf(':')));
+    }
+
     /** The name of the mod this element belongs to, as shown in the mod list. */
     public String getModName() {
         if (modName == null) {
@@ -96,7 +101,7 @@ public final class HudElement {
     }
 
     private String findModName() {
-        String wantedModId = modId != null ? modId : id.substring(0, Math.max(0, id.indexOf(':')));
+        String wantedModId = getModId();
         if (wantedModId.equalsIgnoreCase("minecraft")) {
             return "Minecraft";
         }

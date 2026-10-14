@@ -230,14 +230,16 @@ public final class HudLayout {
     }
 
     /** Positions, sizes and visibility. Looks are reset in the Customize screen. */
-    public static void resetAll() {
-        for (HudElementState state : getStates().values()) {
-            state.visible = true;
-            state.moved = false;
-            state.sizeStep = 0;
+    public static void reset(Iterable<HudElement> elements) {
+        for (HudElement element : elements) {
+            HudElementState state = getStates().get(element.getId());
+            if (state != null) {
+                state.visible = true;
+                state.moved = false;
+                state.sizeStep = 0;
+                removeIfDefault(element);
+            }
         }
-        getStates().values()
-            .removeIf(HudElementState::isDefault);
         changed = true;
     }
 

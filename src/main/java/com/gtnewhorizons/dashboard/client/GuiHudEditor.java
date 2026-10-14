@@ -34,6 +34,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_POSITIONS = 4;
     private static final int BUTTON_PREVIEW = 5;
     private static final int BUTTON_CUSTOMIZE = 6;
+    private static final int BUTTON_MODS = 7;
     private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS };
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
@@ -61,6 +62,8 @@ public class GuiHudEditor extends GuiScreen {
     private final List<ElementBox> boxes = new ArrayList<>();
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
+    private GuiButton modsButton;
+    private ModFilterDropdown modFilter;
     private String title;
     private int menuWidth;
     private int menuHeight;
@@ -91,7 +94,10 @@ public class GuiHudEditor extends GuiScreen {
         actionButtons.add(createButton(BUTTON_RESET, StatCollector.translateToLocal("dashboard.editor.button.reset")));
         actionButtons
             .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
+        modsButton = createButton(BUTTON_MODS, StatCollector.translateToLocal("dashboard.editor.button.mods"));
+        actionButtons.add(modsButton);
         buttonRows.add(actionButtons);
+        modFilter = new ModFilterDropdown(fontRendererObj);
 
         for (List<GuiButton> row : buttonRows) {
             buttonList.addAll(row);
@@ -246,7 +252,11 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         updateBoxes();
-        boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY);
+        if (modFilter.isOpen()) {
+            modFilter.placeAt(modsButton, width, height);
+        }
+        boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY)
+            || modFilter.contains(mouseX, mouseY);
         HudElement highlighted = draggedElement;
         if (highlighted == null && !overMenu) {
             ElementBox hovered = findBoxAt(mouseX, mouseY);
@@ -269,6 +279,9 @@ public class GuiHudEditor extends GuiScreen {
         drawMenuPanel(mouseX, mouseY);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
+        if (modFilter.isOpen()) {
+            modFilter.draw(mouseX, mouseY);
+        }
 
         if (highlighted != null && draggedElement == null) {
             drawHoveringText(getTooltip(highlighted), mouseX, mouseY, fontRendererObj);
@@ -354,6 +367,10 @@ public class GuiHudEditor extends GuiScreen {
             if (button.mousePressed(mc, mouseX, mouseY)) {
                 lines.add(getToggleStateText(button.id));
             }
+        }
+        if (!modFilter.isOpen() && modsButton.mousePressed(mc, mouseX, mouseY)) {
+            lines.add(StatCollector.translateToLocal("dashboard.editor.mods_tooltip"));
+            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.game"));
         }
         return lines;
     }
@@ -484,7 +501,7 @@ public class GuiHudEditor extends GuiScreen {
     private void updateBoxes() {
         boxes.clear();
         for (HudElement element : HudEditor.getElements()) {
-            if (!element.isActive()) {
+            if (!element.isActive() || !EditorModFilter.isShown(element)) {
                 continue;
             }
             boxes.add(
@@ -527,6 +544,13 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (modFilter.click(mouseX, mouseY)) {
+            return;
+        }
+        // A click anywhere else closes the list, except on the Mods button, which toggles it
+        if (!modsButton.mousePressed(mc, mouseX, mouseY)) {
+            modFilter.close();
+        }
         if (isOverButton(mouseX, mouseY)) {
             super.mouseClicked(mouseX, mouseY, mouseButton);
             return;
@@ -606,12 +630,16 @@ public class GuiHudEditor extends GuiScreen {
     public void handleMouseInput() {
         super.handleMouseInput();
         int wheel = Mouse.getEventDWheel();
-        if (wheel == 0 || !isAltKeyDown()) {
+        if (wheel == 0) {
             return;
         }
         int mouseX = Mouse.getEventX() * width / mc.displayWidth;
         int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-        if (getMenuBounds().contains(mouseX, mouseY)) {
+        if (modFilter.contains(mouseX, mouseY)) {
+            modFilter.scroll(wheel > 0 ? -1 : 1);
+            return;
+        }
+        if (!isAltKeyDown() || getMenuBounds().contains(mouseX, mouseY)) {
             return;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
@@ -656,11 +684,23 @@ public class GuiHudEditor extends GuiScreen {
     protected void actionPerformed(GuiButton button) {
         switch (button.id) {
             case BUTTON_DONE -> mc.displayGuiScreen(null);
-            case BUTTON_RESET -> HudLayout.resetAll();
+            case BUTTON_RESET -> resetShownMods();
             case BUTTON_CUSTOMIZE -> mc.displayGuiScreen(new GuiBarCustomize(this));
+            case BUTTON_MODS -> modFilter.toggle();
             case BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}
         }
+    }
+
+    /** Mods left out of the editor are left alone, so hidden ones can not be reset by accident. */
+    private static void resetShownMods() {
+        List<HudElement> shown = new ArrayList<>();
+        for (HudElement element : HudEditor.getElements()) {
+            if (EditorModFilter.isShown(element)) {
+                shown.add(element);
+            }
+        }
+        HudLayout.reset(shown);
     }
 
     @Override

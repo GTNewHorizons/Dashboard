@@ -1,4 +1,3 @@
-// TODO: Adjust colors
 package com.gtnewhorizons.dashboard.client;
 
 import com.gtnewhorizon.gtnhlib.color.ColorResource;
@@ -10,7 +9,7 @@ public final class ColorUtils {
     public static final ColorResource
     // spotless:off
         text                    = color.rgb("text",                     "0xFFFFFF"),
-        textPosition            = color.rgb("textPosition",             "0xFFFF55"),
+        textPosition            = color.rgb("textPosition",             "0xE2BD3A"),
         textState               = color.rgb("textState",                "0xA0A0A0"),
         textInput               = color.rgb("textInput",                "0xE0E0E0"),
         textUnknown             = color.rgb("textUnknown",              "0xFF5555"),
@@ -20,12 +19,13 @@ public final class ColorUtils {
         buttonTextHovered       = color.rgb("buttonTextHovered",        "0xFFFFA0"),
         buttonTextDisabled      = color.rgb("buttonTextDisabled",       "0xA0A0A0"),
 
-        showingFill             = color.argb("showingFill",             "0x2000FF00"),
-        showingBorder           = color.argb("showingBorder",           "0xA000FF00"),
+        showingFill             = color.argb("showingFill",             "0x507AC25F"),
+        showingBorder           = color.argb("showingBorder",           "0xA04E8F46"),
+        hiddenFill              = color.argb("hiddenFill",              "0x50B13E53"),
+        hiddenBorder            = color.argb("hiddenBorder",            "0xA0B13E53"),
         notShowingFill          = color.argb("notShowingFill",          "0x40FFFFFF"),
         notShowingBorder        = color.argb("notShowingBorder",        "0xA0A0A0A0"),
-        hiddenFill              = color.argb("hiddenFill",              "0x60FF0000"),
-        hiddenBorder            = color.argb("hiddenBorder",            "0xC0FF4040"),
+
         highlightBorder         = color.argb("highlightBorder",         "0xFFFFFFFF"),
 
         menuBackground          = color.argb("menuBackground",          "0xA0202020"),
