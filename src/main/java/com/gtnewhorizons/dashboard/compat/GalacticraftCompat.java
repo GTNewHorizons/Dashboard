@@ -71,6 +71,8 @@ public final class GalacticraftCompat {
     private static final ShiftTracker OVERLAY_SHIFT = new ShiftTracker();
 
     private static Method noAtmosphericCombustionMethod;
+    private static int airlessDimension = Integer.MIN_VALUE;
+    private static boolean airless;
 
     static {
         // Here rather than in register(), so addons like GalaxySpace can use them in any load order
@@ -251,10 +253,16 @@ public final class GalacticraftCompat {
         if (world == null || noAtmosphericCombustionMethod == null) {
             return false;
         }
-        try {
-            return (boolean) noAtmosphericCombustionMethod.invoke(null, world.provider);
-        } catch (ReflectiveOperationException e) {
-            return false;
+        // Asked again only after changing dimension, since the answer belongs to the dimension
+        int dimension = world.provider.dimensionId;
+        if (dimension != airlessDimension) {
+            airlessDimension = dimension;
+            try {
+                airless = (boolean) noAtmosphericCombustionMethod.invoke(null, world.provider);
+            } catch (ReflectiveOperationException e) {
+                airless = false;
+            }
         }
+        return airless;
     }
 }

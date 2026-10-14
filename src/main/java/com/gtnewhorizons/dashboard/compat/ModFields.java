@@ -35,7 +35,11 @@ final class ModFields {
     }
 
     static int readInt(Fields.ClassFields<Object>.Field<Integer> field) {
-        return field == null ? 0 : field.getValue(null);
+        return readInt(field, 0);
+    }
+
+    static int readInt(Fields.ClassFields<Object>.Field<Integer> field, int fallback) {
+        return field == null ? fallback : field.getValue(null);
     }
 
     private static <F> F require(F field, String name) throws NoSuchFieldException {

@@ -1,11 +1,10 @@
 package com.gtnewhorizons.dashboard.compat;
 
-import java.lang.reflect.Field;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.StatCollector;
 
+import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudEditor;
@@ -37,14 +36,13 @@ public final class GraviSuiteCompat {
         "dashboard.element.gravisuite.status",
         GraviSuiteCompat::getStatusBounds);
 
-    private static Field hudPositionField;
+    private static Fields.ClassFields<Object>.Field<Integer> hudPosition;
 
     private GraviSuiteCompat() {}
 
     public static void register() {
         try {
-            hudPositionField = Class.forName("gravisuite.GraviSuite")
-                .getField("hudPos");
+            hudPosition = ModFields.intField(ModFields.of("gravisuite.GraviSuite"), "hudPos");
         } catch (ReflectiveOperationException e) {
             Dashboard.LOG.warn("Could not read the GraviSuite HUD position, assuming top left", e);
         }
@@ -69,22 +67,11 @@ public final class GraviSuiteCompat {
 
     private static HudBounds getStatusBounds(int screenWidth, int screenHeight) {
         int height = Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * 2 + LINE_GAP;
-        int corner = getHudPosition();
+        int corner = ModFields.readInt(hudPosition, TOP_LEFT);
         boolean right = corner == TOP_RIGHT || corner == BOTTOM_RIGHT;
         boolean top = corner == TOP_LEFT || corner == TOP_RIGHT;
         int x = right ? screenWidth - STATUS_WIDTH - EDGE_MARGIN : EDGE_MARGIN;
         int y = top ? EDGE_MARGIN : screenHeight - height - EDGE_MARGIN;
         return new HudBounds(x, y, STATUS_WIDTH, height);
-    }
-
-    private static int getHudPosition() {
-        if (hudPositionField == null) {
-            return TOP_LEFT;
-        }
-        try {
-            return hudPositionField.getInt(null);
-        } catch (IllegalAccessException e) {
-            return TOP_LEFT;
-        }
     }
 }

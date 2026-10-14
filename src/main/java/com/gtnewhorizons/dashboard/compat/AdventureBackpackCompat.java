@@ -61,6 +61,8 @@ public final class AdventureBackpackCompat {
     private static Fields.ClassFields<Object>.Field<Boolean> thaumcraftDialBottom;
     private static Method isThaumcraftTool;
     private static Method getWearingTanks;
+    private static final ShiftTracker POTION_ICONS_SHIFT = new ShiftTracker();
+    private static final ShiftTracker TANKS_SHIFT = new ShiftTracker();
 
     private AdventureBackpackCompat() {}
 
@@ -108,15 +110,41 @@ public final class AdventureBackpackCompat {
         PreviewDrawing.drawTexture(tanksX + TANK_WIDTH + 1, bounds.y, 10, 0, TANK_WIDTH, TANK_HEIGHT);
     }
 
-    /** Adventure Backpack only draws its icons when there are effects. */
-    public static boolean hasPotionEffects() {
+    /**
+     * Called where Adventure Backpack reads its potion icons setting, with that setting. False hides them. Only counts
+     * as showing when there are effects to draw.
+     */
+    public static boolean beginPotionIcons(boolean enabled) {
+        if (!enabled || !hasPotionEffects()) {
+            return enabled;
+        }
+        return POTION_ICONS_SHIFT.begin(POTION_ICONS);
+    }
+
+    public static void endPotionIcons() {
+        POTION_ICONS_SHIFT.end();
+    }
+
+    /** Like {@link #beginPotionIcons}, only counting as showing while wearing something with tanks. */
+    public static boolean beginTanks(boolean enabled) {
+        if (!enabled || !isWearingTanks()) {
+            return enabled;
+        }
+        return TANKS_SHIFT.begin(TANKS);
+    }
+
+    public static void endTanks() {
+        TANKS_SHIFT.end();
+    }
+
+    private static boolean hasPotionEffects() {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         return player != null && !player.getActivePotionEffects()
             .isEmpty();
     }
 
     /** A backpack or another item with tanks, which Adventure Backpack draws the gauges for. */
-    public static boolean isWearingTanks() {
+    private static boolean isWearingTanks() {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         if (player == null || getWearingTanks == null) {
             return false;

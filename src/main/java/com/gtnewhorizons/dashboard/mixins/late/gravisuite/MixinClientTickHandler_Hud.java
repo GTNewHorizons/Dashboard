@@ -39,12 +39,6 @@ public class MixinClientTickHandler_Hud {
             remap = true))
     private static void dashboard$moveStatusLine(GuiIngame gui, FontRenderer font, String text, int x, int y, int color,
         Operation<Void> original) {
-        if (HudEditor.beginRender(GraviSuiteCompat.STATUS)) {
-            try {
-                original.call(gui, font, text, x, y, color);
-            } finally {
-                HudEditor.endRender();
-            }
-        }
+        HudEditor.render(GraviSuiteCompat.STATUS, () -> original.call(gui, font, text, x, y, color));
     }
 }
