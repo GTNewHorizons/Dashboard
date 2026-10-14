@@ -14,6 +14,7 @@ import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
 import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
+import com.gtnewhorizons.dashboard.compat.WailaCompat;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -45,6 +46,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.GALAXYSPACE.isModLoaded()) {
             GalaxySpaceCompat.register();
+        }
+        if (Mods.WAILA.isModLoaded()) {
+            WailaCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

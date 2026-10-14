@@ -46,6 +46,9 @@ public enum Mixins implements IMixins {
     GALAXYSPACE_HUD(new MixinBuilder("Make the GalaxySpace pressure bar movable")
         .addClientMixins("galaxyspace.MixinOverlayAtmosphericPressure_Hud")
         .addRequiredMod(Mods.GALAXYSPACE)
+        .setPhase(Phase.LATE)),
+    WAILA_HUD(new MixinBuilder("Make the Waila info box movable").addClientMixins("waila.MixinOverlayRenderer_Hud")
+        .addRequiredMod(Mods.WAILA)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

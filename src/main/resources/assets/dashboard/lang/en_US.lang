@@ -81,6 +81,9 @@ dashboard.element.galacticraft.rocket_altitude=Rocket Altitude
 ## GalaxySpace
 dashboard.element.galaxyspace.pressure=Atmospheric Pressure
 
+## Waila
+dashboard.element.waila.info_box=Waila
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars
