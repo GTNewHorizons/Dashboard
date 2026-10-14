@@ -1,6 +1,5 @@
 package com.gtnewhorizons.dashboard.compat;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import net.minecraft.client.Minecraft;
@@ -12,6 +11,7 @@ import net.minecraft.world.WorldProvider;
 
 import org.lwjgl.opengl.GL11;
 
+import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudEditor;
@@ -66,17 +66,18 @@ public final class GalacticraftCompat {
         (screenWidth,
             screenHeight) -> new HudBounds(0, screenHeight / 2 - 85, ROCKET_ALTITUDE_WIDTH, ROCKET_ALTITUDE_HEIGHT));
 
-    private static Field oxygenLeftField;
-    private static Field oxygenBottomField;
+    private static Fields.ClassFields<Object>.Field<Boolean> oxygenLeft;
+    private static Fields.ClassFields<Object>.Field<Boolean> oxygenBottom;
     private static Method noAtmosphericCombustionMethod;
     private static boolean overlayShifted;
 
     static {
         // Here rather than in register(), so addons like GalaxySpace can use them in any load order
         try {
-            Class<?> config = Class.forName("micdoodle8.mods.galacticraft.core.util.ConfigManagerCore");
-            oxygenLeftField = config.getField("oxygenIndicatorLeft");
-            oxygenBottomField = config.getField("oxygenIndicatorBottom");
+            Fields.ClassFields<Object> config = ModFields
+                .of("micdoodle8.mods.galacticraft.core.util.ConfigManagerCore");
+            oxygenLeft = ModFields.booleanField(config, "oxygenIndicatorLeft");
+            oxygenBottom = ModFields.booleanField(config, "oxygenIndicatorBottom");
             noAtmosphericCombustionMethod = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil")
                 .getMethod("noAtmosphericCombustion", WorldProvider.class);
         } catch (ReflectiveOperationException e) {
@@ -239,12 +240,12 @@ public final class GalacticraftCompat {
 
     /** Galacticraft's {@code oxygenIndicatorLeft} config, also used by addons for their gauges. */
     public static boolean isIndicatorOnLeft() {
-        return readFlag(oxygenLeftField);
+        return ModFields.readBoolean(oxygenLeft, false);
     }
 
     /** Galacticraft's {@code oxygenIndicatorBottom} config, also used by addons for their gauges. */
     public static boolean isIndicatorAtBottom() {
-        return readFlag(oxygenBottomField);
+        return ModFields.readBoolean(oxygenBottom, false);
     }
 
     /** True on planets without breathable air, where Galacticraft shows the oxygen gauge. */
@@ -256,17 +257,6 @@ public final class GalacticraftCompat {
         try {
             return (boolean) noAtmosphericCombustionMethod.invoke(null, world.provider);
         } catch (ReflectiveOperationException e) {
-            return false;
-        }
-    }
-
-    private static boolean readFlag(Field field) {
-        if (field == null) {
-            return false;
-        }
-        try {
-            return field.getBoolean(null);
-        } catch (IllegalAccessException e) {
             return false;
         }
     }

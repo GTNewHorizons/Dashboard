@@ -46,17 +46,16 @@ public final class WailaCompat {
 
     private WailaCompat() {}
 
-    @SuppressWarnings("unchecked")
     public static void register() {
         try {
-            Class<Object> tooltip = (Class<Object>) Class.forName(OVERLAY + "Tooltip");
-            Fields.ClassFields<Object> fields = Fields.ofClass(tooltip);
-            boxX = fields.getIntField(Fields.LookupType.DECLARED, "x");
-            boxY = fields.getIntField(Fields.LookupType.DECLARED, "y");
-            boxWidth = fields.getIntField(Fields.LookupType.DECLARED, "w");
-            boxHeight = fields.getIntField(Fields.LookupType.DECLARED, "h");
-            scale = Fields.ofClass((Class<Object>) Class.forName(OVERLAY + "OverlayConfig"))
-                .getFloatField(Fields.LookupType.PUBLIC, "scale");
+            Class<?> tooltip = Class.forName(OVERLAY + "Tooltip");
+            Fields.ClassFields<Object> fields = ModFields.of(OVERLAY + "Tooltip");
+            boxX = ModFields.intField(fields, "x");
+            boxY = ModFields.intField(fields, "y");
+            boxWidth = ModFields.intField(fields, "w");
+            boxHeight = ModFields.intField(fields, "h");
+            // Read last, so a found scale means every box field was found too
+            scale = ModFields.floatField(ModFields.of(OVERLAY + "OverlayConfig"), "scale");
             newBox = tooltip.getConstructor(List.class, ItemStack.class);
             drawBox = Class.forName(OVERLAY + "OverlayRenderer")
                 .getDeclaredMethod("doRenderOverlay", tooltip);
@@ -100,7 +99,7 @@ public final class WailaCompat {
                 newBox = null;
             }
         }
-        if (lastBox == null || boxX == null) {
+        if (lastBox == null || scale == null) {
             return new HudBounds(screenWidth / 2 - FALLBACK_WIDTH / 2, 0, FALLBACK_WIDTH, FALLBACK_HEIGHT);
         }
         float boxScale = scale.getValue(null);

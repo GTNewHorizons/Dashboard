@@ -10,6 +10,7 @@ import com.gtnewhorizons.dashboard.client.BarThemes;
 import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
+import com.gtnewhorizons.dashboard.compat.AdventureBackpackCompat;
 import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
 import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
@@ -49,6 +50,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.WAILA.isModLoaded()) {
             WailaCompat.register();
+        }
+        if (Mods.ADVENTURE_BACKPACK.isModLoaded()) {
+            AdventureBackpackCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);
