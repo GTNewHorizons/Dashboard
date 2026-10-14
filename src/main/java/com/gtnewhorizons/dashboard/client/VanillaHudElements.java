@@ -38,6 +38,7 @@ import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
 
 import org.lwjgl.opengl.GL11;
 
@@ -430,7 +431,7 @@ public final class VanillaHudElements {
         BarSlot themedSlot = THEMED_BARS.get(element);
         String theme = themedSlot != null ? HudLayout.getTheme(element) : null;
         if (theme != null && drawThemed(event, element, themedSlot, theme)) {
-            drawExperienceLevel(event);
+            postExperienceBar(event);
             return;
         }
         if (HudEditor.isHidingContent() && HudLayout.isVisible(element)) {
@@ -446,7 +447,18 @@ public final class VanillaHudElements {
             SHIFTED.add(event.type);
         } else {
             cancel(event);
-            drawExperienceLevel(event);
+            postExperienceBar(event);
+        }
+    }
+
+    /**
+     * Forge skips the Post event of a canceled bar. The XP bar's is sent anyway, since mods like Adventure Backpack
+     * draw
+     * their own HUD after it. Other bars' are not, since mods like AppleCore draw on top of the vanilla bar there.
+     */
+    private static void postExperienceBar(RenderGameOverlayEvent.Pre event) {
+        if (event.type == ElementType.EXPERIENCE) {
+            MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(event, ElementType.EXPERIENCE));
         }
     }
 
