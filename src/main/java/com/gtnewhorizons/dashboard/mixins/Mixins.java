@@ -53,7 +53,11 @@ public enum Mixins implements IMixins {
     ADVENTURE_BACKPACK_HUD(new MixinBuilder("Make the Adventure Backpack potion icons and tanks movable")
         .addClientMixins("adventurebackpack.MixinGuiOverlay_Hud")
         .addRequiredMod(Mods.ADVENTURE_BACKPACK)
-        .setPhase(Phase.LATE));
+        .setPhase(Phase.LATE)),
+    BOTANIA_HUD(
+        new MixinBuilder("Make the Botania bars and texts movable").addClientMixins("botania.MixinHUDHandler_Hud")
+            .addRequiredMod(Mods.BOTANIA)
+            .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
 

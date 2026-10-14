@@ -24,6 +24,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     GALAXYSPACE("GalaxySpace"),
     WAILA("Waila"),
     ADVENTURE_BACKPACK("adventurebackpack"),
+    BOTANIA("Botania"),
     ;
     // spotless:on
 

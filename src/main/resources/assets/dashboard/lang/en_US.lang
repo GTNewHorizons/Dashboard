@@ -88,6 +88,14 @@ dashboard.element.waila.info_box=Waila
 dashboard.element.adventurebackpack.potion_icons=Backpack Potion Icons
 dashboard.element.adventurebackpack.tanks=Backpack Tanks
 
+## Botania
+dashboard.element.botania.mana_bar=Mana Bar
+dashboard.element.botania.flight_bar=Flügel Tiara Flight Bar
+dashboard.element.botania.boss_bar=Botania Boss Bar
+dashboard.element.botania.wand_mode=Wand Mode
+dashboard.element.botania.corporea_hint=Corporea Index Hint
+dashboard.element.botania.crosshair_info=Botania Crosshair Info
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

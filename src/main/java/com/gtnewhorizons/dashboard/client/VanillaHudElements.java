@@ -438,7 +438,7 @@ public final class VanillaHudElements {
             // Drawn invisibly instead of skipped, so the rows above keep their place
             HudEditor.shouldRender(element);
             GL11.glPushMatrix();
-            setColorWrites(false);
+            PreviewDrawing.setColorWrites(false);
             SHIFTED.add(event.type);
             INVISIBLE.add(event.type);
             return;
@@ -734,7 +734,7 @@ public final class VanillaHudElements {
             HudEditor.endRender();
         }
         if (INVISIBLE.remove(type)) {
-            setColorWrites(true);
+            PreviewDrawing.setColorWrites(true);
         }
     }
 
@@ -744,14 +744,9 @@ public final class VanillaHudElements {
         }
         SHIFTED.clear();
         if (!INVISIBLE.isEmpty()) {
-            setColorWrites(true);
+            PreviewDrawing.setColorWrites(true);
             INVISIBLE.clear();
         }
-    }
-
-    private static void setColorWrites(boolean enabled) {
-        GL11.glColorMask(enabled, enabled, enabled, enabled);
-        GL11.glDepthMask(enabled);
     }
 
     /**

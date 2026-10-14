@@ -62,6 +62,12 @@ public final class PreviewDrawing {
         GUI.drawTexturedModalRect(x, y, u, v, width, height);
     }
 
+    /** Off draws invisibly, for code that can not be skipped but should not show, like a hidden element. */
+    public static void setColorWrites(boolean enabled) {
+        GL11.glColorMask(enabled, enabled, enabled, enabled);
+        GL11.glDepthMask(enabled);
+    }
+
     /** With its stack count, lit like in inventories, and the lighting turned off again after. */
     public static void drawItem(ItemStack stack, int x, int y) {
         Minecraft mc = Minecraft.getMinecraft();
