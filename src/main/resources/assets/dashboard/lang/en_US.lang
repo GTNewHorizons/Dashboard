@@ -99,6 +99,9 @@ dashboard.element.botania.wand_mode=Wand Mode
 dashboard.element.botania.corporea_hint=Corporea Index Hint
 dashboard.element.botania.crosshair_info=Botania Crosshair Info
 
+## Backhand
+dashboard.element.backhand.offhand_slot=Off-hand Slot
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

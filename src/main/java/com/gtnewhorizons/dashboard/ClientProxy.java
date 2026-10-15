@@ -11,6 +11,7 @@ import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.gtnewhorizons.dashboard.compat.AdventureBackpackCompat;
+import com.gtnewhorizons.dashboard.compat.BackhandCompat;
 import com.gtnewhorizons.dashboard.compat.BotaniaCompat;
 import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
 import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
@@ -57,6 +58,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.BOTANIA.isModLoaded()) {
             BotaniaCompat.register();
+        }
+        if (Mods.BACKHAND.isModLoaded()) {
+            BackhandCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

@@ -58,7 +58,11 @@ public enum Mixins implements IMixins {
     BOTANIA_HUD(
         new MixinBuilder("Make the Botania bars and texts movable").addClientMixins("botania.MixinHUDHandler_Hud")
             .addRequiredMod(Mods.BOTANIA)
-            .setPhase(Phase.LATE));
+            .setPhase(Phase.LATE)),
+    BACKHAND_HUD(new MixinBuilder("Make the Backhand off-hand slot movable apart from the hotbar")
+        .addClientMixins("backhand.MixinClientEventHandler_Hud")
+        .addRequiredMod(Mods.BACKHAND)
+        .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
 

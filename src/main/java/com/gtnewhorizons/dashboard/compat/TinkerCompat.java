@@ -21,15 +21,22 @@ public final class TinkerCompat {
 
     private TinkerCompat() {}
 
-    /** Like Tinkers itself, only counts weapons with their tool data, since only those get its crosshair. */
+    /**
+     * Like Tinkers itself, only counts weapons with their tool data, since only those get its crosshair. Also the
+     * Backhand off-hand, which Backhand draws the Tinkers crosshair for.
+     */
     public static boolean isHoldingRangedWeapon() {
         Class<?> weaponClass = getRangedWeaponClass();
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         if (weaponClass == null || player == null) {
             return false;
         }
-        ItemStack held = player.getCurrentEquippedItem();
-        return held != null && held.getTagCompound() != null && weaponClass.isInstance(held.getItem());
+        return isRangedWeapon(weaponClass, player.getCurrentEquippedItem())
+            || Mods.BACKHAND.isModLoaded() && isRangedWeapon(weaponClass, BackhandCompat.getOffhandItem(player));
+    }
+
+    private static boolean isRangedWeapon(Class<?> weaponClass, ItemStack stack) {
+        return stack != null && stack.getTagCompound() != null && weaponClass.isInstance(stack.getItem());
     }
 
     private static Class<?> getRangedWeaponClass() {

@@ -145,16 +145,28 @@ public final class HudEditor {
      * Does not push the matrix, so only use it where the drawing code restores the matrix itself.
      */
     public static void translateToPosition(HudElement element, int screenWidth, int screenHeight) {
+        translate(element, screenWidth, screenHeight, false);
+    }
+
+    /** Undoes {@link #translateToPosition}, for another element drawn while this element's move is active. */
+    public static void undoTranslateToPosition(HudElement element, int screenWidth, int screenHeight) {
+        translate(element, screenWidth, screenHeight, true);
+    }
+
+    /** From the default bounds to the player's, or back when undoing. */
+    private static void translate(HudElement element, int screenWidth, int screenHeight, boolean undo) {
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
         HudBounds bounds = HudLayout.getBounds(element, defaultBounds, screenWidth, screenHeight);
-        float scale = HudLayout.getScale(element);
+        HudBounds from = undo ? bounds : defaultBounds;
+        HudBounds to = undo ? defaultBounds : bounds;
+        float scale = undo ? 1 / HudLayout.getScale(element) : HudLayout.getScale(element);
         if (scale == 1) {
-            GL11.glTranslatef(bounds.x - defaultBounds.x, bounds.y - defaultBounds.y, 0);
+            GL11.glTranslatef(to.x - from.x, to.y - from.y, 0);
             return;
         }
-        GL11.glTranslatef(bounds.x, bounds.y, 0);
+        GL11.glTranslatef(to.x, to.y, 0);
         GL11.glScalef(scale, scale, 1);
-        GL11.glTranslatef(-defaultBounds.x, -defaultBounds.y, 0);
+        GL11.glTranslatef(-from.x, -from.y, 0);
     }
 
     public static void translateToPosition(HudElement element) {
