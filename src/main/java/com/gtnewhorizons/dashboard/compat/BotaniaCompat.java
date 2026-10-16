@@ -63,12 +63,12 @@ public final class BotaniaCompat {
     public static final HudElement MANA_BAR = new HudElement(
         "botania:mana_bar",
         "dashboard.element.botania.mana_bar",
-        BotaniaCompat::getManaBarBounds);
+        BotaniaCompat::getManaBarBounds).setOwnSettings("dashboard.element.botania.mana_bar.own_settings");
 
     public static final HudElement FLIGHT_BAR = new HudElement(
         "botania:flight_bar",
         "dashboard.element.botania.flight_bar",
-        BotaniaCompat::getFlightBarBounds);
+        BotaniaCompat::getFlightBarBounds).setOwnSettings("dashboard.element.botania.flight_bar.own_settings");
 
     public static final HudElement BOSS_BAR = new HudElement(
         "botania:boss_bar",

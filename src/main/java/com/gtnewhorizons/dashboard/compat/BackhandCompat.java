@@ -38,7 +38,7 @@ public final class BackhandCompat {
     public static final HudElement OFFHAND_SLOT = new HudElement(
         "backhand:offhand_slot",
         "dashboard.element.backhand.offhand_slot",
-        BackhandCompat::getOffhandSlotBounds);
+        BackhandCompat::getOffhandSlotBounds).setOwnSettings("dashboard.element.backhand.offhand_slot.own_settings");
 
     private static Fields.ClassFields<Object>.Field<Integer> slotOffsetX;
     private static Fields.ClassFields<Object>.Field<Integer> slotOffsetY;

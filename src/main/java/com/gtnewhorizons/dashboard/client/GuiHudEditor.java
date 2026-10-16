@@ -496,6 +496,17 @@ public class GuiHudEditor extends GuiScreen {
                 EnumChatFormatting.GRAY
                     + StatCollector.translateToLocal("dashboard.editor.element_tooltip.not_showing"));
         }
+        String ownSettings = element.getOwnSettings();
+        if (ownSettings != null) {
+            lines.add(
+                EnumChatFormatting.GRAY + StatCollector
+                    .translateToLocalFormatted("dashboard.editor.element_tooltip.own_settings", ownSettings));
+            if (HudLayout.isMoved(element)) {
+                lines.add(
+                    EnumChatFormatting.GRAY
+                        + StatCollector.translateToLocal("dashboard.editor.element_tooltip.own_settings_moved"));
+            }
+        }
         lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getEditorModName());
         return lines;
     }

@@ -40,7 +40,8 @@ public final class WailaCompat {
     public static final HudElement INFO_BOX = new HudElement(
         "waila:info_box",
         "dashboard.element.waila.info_box",
-        WailaCompat::getBoxBounds);
+        WailaCompat::getBoxBounds)
+            .setOwnSettings("dashboard.element.waila.info_box.own_settings", "waila.keybind.wailaconfig");
 
     private static Fields.ClassFields<Object>.Field<Integer> boxX;
     private static Fields.ClassFields<Object>.Field<Integer> boxY;

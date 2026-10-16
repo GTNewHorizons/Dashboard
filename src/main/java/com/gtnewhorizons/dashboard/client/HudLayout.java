@@ -219,6 +219,11 @@ public final class HudLayout {
         changed = true;
     }
 
+    public static boolean isMoved(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.moved;
+    }
+
     /** Moves the element back to its default position. A hidden element stays hidden. */
     public static void resetPosition(HudElement element) {
         HudElementState state = getStates().get(element.getId());

@@ -41,6 +41,9 @@ dashboard.editor.element_tooltip.not_showing=Not showing right now
 dashboard.editor.element_tooltip.size=Size: %s (drawn at %s)
 dashboard.editor.element_tooltip.size_smallest=Size: %s (drawn at %s, smallest)
 dashboard.editor.element_tooltip.size_largest=Size: %s (drawn at %s, largest)
+dashboard.editor.element_tooltip.own_settings=Own settings: %s
+dashboard.editor.element_tooltip.own_settings_moved=Moved here, so its own position setting is ignored until Reset
+dashboard.editor.element_tooltip.key_not_set=key not set
 
 # Elements
 ## Minecraft
@@ -71,12 +74,14 @@ dashboard.preview.scoreboard=Scores
 
 ## GraviSuite
 dashboard.element.gravisuite.status=GraviSuite Status
+dashboard.element.gravisuite.status.own_settings=GraviSuite config > hudPosition
 
 dashboard.preview.gravisuite.mode=Gravitation Engine: ON
 dashboard.preview.gravisuite.energy=Energy Level: 100%
 
 ## Galacticraft
 dashboard.element.galacticraft.oxygen=Oxygen & Temperature
+dashboard.element.galacticraft.oxygen.own_settings=Galacticraft config > Minimap Left / Minimap Bottom
 dashboard.element.galacticraft.oxygen_warning=Oxygen Warning
 dashboard.element.galacticraft.launch_countdown=Launch Countdown
 dashboard.element.galacticraft.lander=Lander Warning & Speed
@@ -84,17 +89,23 @@ dashboard.element.galacticraft.rocket_altitude=Rocket Altitude
 
 ## GalaxySpace
 dashboard.element.galaxyspace.pressure=Atmospheric Pressure
+dashboard.element.galaxyspace.pressure.own_settings=Galacticraft config > Minimap Left / Minimap Bottom
 
 ## Waila
 dashboard.element.waila.info_box=Waila
+dashboard.element.waila.info_box.own_settings=Waila settings screen [%s]
 
 ## Adventure Backpack
 dashboard.element.adventurebackpack.potion_icons=Backpack Potion Icons
+dashboard.element.adventurebackpack.potion_icons.own_settings=Adventure Backpack config > status
 dashboard.element.adventurebackpack.tanks=Backpack Tanks
+dashboard.element.adventurebackpack.tanks.own_settings=Adventure Backpack config > tanks
 
 ## Botania
 dashboard.element.botania.mana_bar=Mana Bar
+dashboard.element.botania.mana_bar.own_settings=Botania config > manaBar.height
 dashboard.element.botania.flight_bar=Flügel Tiara Flight Bar
+dashboard.element.botania.flight_bar.own_settings=Botania config > flightBar.height
 dashboard.element.botania.boss_bar=Botania Boss Bar
 dashboard.element.botania.wand_mode=Wand Mode
 dashboard.element.botania.corporea_hint=Corporea Index Hint
@@ -102,6 +113,7 @@ dashboard.element.botania.crosshair_info=Botania Crosshair Info
 
 ## Backhand
 dashboard.element.backhand.offhand_slot=Off-hand Slot
+dashboard.element.backhand.offhand_slot.own_settings=Backhand config > offhand hotbar slot X/Y offset
 
 ## InGameInfoXML
 dashboard.element.ingameinfo.top_left=Info Text: Top Left
@@ -113,6 +125,7 @@ dashboard.element.ingameinfo.middle_right=Info Text: Middle Right
 dashboard.element.ingameinfo.bottom_left=Info Text: Bottom Left
 dashboard.element.ingameinfo.bottom_center=Info Text: Bottom Center
 dashboard.element.ingameinfo.bottom_right=Info Text: Bottom Right
+dashboard.element.ingameinfo.own_settings=InGameInfoXML config > alignment offsets
 
 # Customize screen
 dashboard.customize.title=Customize

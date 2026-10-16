@@ -2,6 +2,9 @@ package com.gtnewhorizons.dashboard.api;
 
 import java.util.function.BooleanSupplier;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.StatCollector;
 
 import cpw.mods.fml.common.Loader;
@@ -38,6 +41,8 @@ public final class HudElement {
     private String modId;
     private String modName;
     private String modNameAddon;
+    private String ownSettingsKey;
+    private String ownSettingsKeyBinding;
     private long lastRenderTime;
 
     /**
@@ -124,6 +129,43 @@ public final class HudElement {
     /** The mod name as shown in the editor, with the {@link #setModNameAddon addon} after it. */
     public String getEditorModName() {
         return modNameAddon != null ? getModName() + " / " + modNameAddon : getModName();
+    }
+
+    /**
+     * Where the mod's own position setting for this element is, shown in the editor, since moving the element there
+     * overrides it. Optional.
+     *
+     * @param translationKey lang key of the text, with {@code %s} for the key that opens the settings, if any
+     * @param keyBinding     description of that key in Controls, or null
+     */
+    public HudElement setOwnSettings(String translationKey, String keyBinding) {
+        this.ownSettingsKey = translationKey;
+        this.ownSettingsKeyBinding = keyBinding;
+        return this;
+    }
+
+    public HudElement setOwnSettings(String translationKey) {
+        return setOwnSettings(translationKey, null);
+    }
+
+    /** Null without {@link #setOwnSettings}. */
+    public String getOwnSettings() {
+        if (ownSettingsKey == null) {
+            return null;
+        }
+        return ownSettingsKeyBinding == null ? StatCollector.translateToLocal(ownSettingsKey)
+            : StatCollector.translateToLocalFormatted(ownSettingsKey, getKeyName(ownSettingsKeyBinding));
+    }
+
+    /** The key the player bound, so the text stays right when they change it. */
+    private static String getKeyName(String keyBinding) {
+        for (KeyBinding key : Minecraft.getMinecraft().gameSettings.keyBindings) {
+            if (key.getKeyDescription()
+                .equals(keyBinding) && key.getKeyCode() != 0) {
+                return GameSettings.getKeyDisplayString(key.getKeyCode());
+            }
+        }
+        return StatCollector.translateToLocal("dashboard.editor.element_tooltip.key_not_set");
     }
 
     private String findModName() {

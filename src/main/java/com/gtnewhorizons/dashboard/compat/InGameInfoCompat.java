@@ -63,7 +63,8 @@ public final class InGameInfoCompat {
                 "ingameinfoxml:" + AREA_NAMES[area],
                 "dashboard.element.ingameinfo." + AREA_NAMES[area],
                 (screenWidth, screenHeight) -> getAreaBounds(index, screenWidth, screenHeight))
-                    .setActiveCheck(() -> lastFrameBounds[index] != null || currentFrameBounds[index] != null);
+                    .setActiveCheck(() -> lastFrameBounds[index] != null || currentFrameBounds[index] != null)
+                    .setOwnSettings("dashboard.element.ingameinfo.own_settings");
             HudEditor.register(AREAS[area]);
         }
     }
