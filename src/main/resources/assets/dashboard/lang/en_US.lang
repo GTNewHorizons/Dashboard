@@ -33,6 +33,7 @@ dashboard.editor.help_tooltip.toggle=§6Right-click§r to toggle visibility of t
 dashboard.editor.help_tooltip.reset=§6Ctrl+click§r to reset position of the element
 dashboard.editor.help_tooltip.resize=§6Alt+scroll§r to resize the element
 dashboard.editor.help_tooltip.reset_size=§6Alt+click§r to reset size of the element
+dashboard.editor.help_tooltip.ingameinfo=InGameInfoXML text only shows up here after it was toggled on in game
 
 ## Element tooltip
 dashboard.editor.element_tooltip.hidden=Hidden
@@ -101,6 +102,17 @@ dashboard.element.botania.crosshair_info=Botania Crosshair Info
 
 ## Backhand
 dashboard.element.backhand.offhand_slot=Off-hand Slot
+
+## InGameInfoXML
+dashboard.element.ingameinfo.top_left=Info Text: Top Left
+dashboard.element.ingameinfo.top_center=Info Text: Top Center
+dashboard.element.ingameinfo.top_right=Info Text: Top Right
+dashboard.element.ingameinfo.middle_left=Info Text: Middle Left
+dashboard.element.ingameinfo.middle_center=Info Text: Middle Center
+dashboard.element.ingameinfo.middle_right=Info Text: Middle Right
+dashboard.element.ingameinfo.bottom_left=Info Text: Bottom Left
+dashboard.element.ingameinfo.bottom_center=Info Text: Bottom Center
+dashboard.element.ingameinfo.bottom_right=Info Text: Bottom Right
 
 # Customize screen
 dashboard.customize.title=Customize

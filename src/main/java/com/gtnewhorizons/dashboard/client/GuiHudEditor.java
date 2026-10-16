@@ -19,6 +19,7 @@ import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -368,6 +369,13 @@ public class GuiHudEditor extends GuiScreen {
         if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
             for (String key : HELP_LINE_KEYS) {
                 lines.add(StatCollector.translateToLocal(key));
+            }
+            // Its areas only show once their text was drawn, which is easy to miss
+            if (Mods.INGAMEINFO.isModLoaded()) {
+                lines.add("");
+                lines.add(
+                    EnumChatFormatting.GRAY
+                        + StatCollector.translateToLocal("dashboard.editor.help_tooltip.ingameinfo"));
             }
         }
         for (ToggleButton button : toggleButtons) {

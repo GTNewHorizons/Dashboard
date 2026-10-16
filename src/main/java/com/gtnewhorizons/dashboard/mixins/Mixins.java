@@ -62,6 +62,13 @@ public enum Mixins implements IMixins {
     BACKHAND_HUD(new MixinBuilder("Make the Backhand off-hand slot movable apart from the hotbar")
         .addClientMixins("backhand.MixinClientEventHandler_Hud")
         .addRequiredMod(Mods.BACKHAND)
+        .setPhase(Phase.LATE)),
+    INGAMEINFO_HUD(new MixinBuilder("Make the InGameInfoXML text areas movable")
+        .addClientMixins(
+            "ingameinfo.MixinInfoText_Hud",
+            "ingameinfo.MixinInGameInfoCore_Hud",
+            "ingameinfo.MixinTicker_Preview")
+        .addRequiredMod(Mods.INGAMEINFO)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

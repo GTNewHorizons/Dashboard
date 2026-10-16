@@ -16,6 +16,7 @@ import com.gtnewhorizons.dashboard.compat.BotaniaCompat;
 import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
 import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
+import com.gtnewhorizons.dashboard.compat.InGameInfoCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
 import com.gtnewhorizons.dashboard.compat.WailaCompat;
 
@@ -61,6 +62,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.BACKHAND.isModLoaded()) {
             BackhandCompat.register();
+        }
+        if (Mods.INGAMEINFO.isModLoaded()) {
+            InGameInfoCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);
