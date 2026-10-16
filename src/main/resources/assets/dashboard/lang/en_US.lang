@@ -127,6 +127,12 @@ dashboard.element.ingameinfo.bottom_center=Info Text: Bottom Center
 dashboard.element.ingameinfo.bottom_right=Info Text: Bottom Right
 dashboard.element.ingameinfo.own_settings=InGameInfoXML config > alignment offsets
 
+## Draconic Evolution
+dashboard.element.draconicevolution.info_box=Draconic Info Box
+dashboard.element.draconicevolution.armor_hud=Draconic Armor HUD
+dashboard.element.draconicevolution.magnet_icon=Draconic Magnet Icon
+dashboard.element.draconicevolution.own_settings=Tool & Armor Config [%s] > Configure HUD Elements
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

@@ -34,6 +34,16 @@ final class ModFields {
         return require(fields.getFloatField(Fields.LookupType.DECLARED, name), name);
     }
 
+    static Fields.ClassFields<Object>.Field<Long> longField(Fields.ClassFields<Object> fields, String name)
+        throws NoSuchFieldException {
+        return require(fields.getLongField(Fields.LookupType.DECLARED, name), name);
+    }
+
+    static <F> Fields.ClassFields<Object>.Field<F> field(Fields.ClassFields<Object> fields, String name, Class<F> type)
+        throws NoSuchFieldException {
+        return require(fields.getField(Fields.LookupType.DECLARED, name, type), name);
+    }
+
     static boolean readBoolean(Fields.ClassFields<Object>.Field<Boolean> field, boolean fallback) {
         return field == null ? fallback : field.getValue(null);
     }

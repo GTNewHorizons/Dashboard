@@ -69,6 +69,10 @@ public enum Mixins implements IMixins {
             "ingameinfo.MixinInGameInfoCore_Hud",
             "ingameinfo.MixinTicker_Preview")
         .addRequiredMod(Mods.INGAMEINFO)
+        .setPhase(Phase.LATE)),
+    DRACONIC_HUD(new MixinBuilder("Make the Draconic Evolution info box, armor HUD and magnet icon movable")
+        .addClientMixins("draconic.MixinHudHandler_Hud", "draconic.MixinItemDisplayManager_Hud")
+        .addRequiredMod(Mods.DRACONIC)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

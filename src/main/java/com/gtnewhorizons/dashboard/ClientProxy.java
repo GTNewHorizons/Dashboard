@@ -13,6 +13,7 @@ import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.gtnewhorizons.dashboard.compat.AdventureBackpackCompat;
 import com.gtnewhorizons.dashboard.compat.BackhandCompat;
 import com.gtnewhorizons.dashboard.compat.BotaniaCompat;
+import com.gtnewhorizons.dashboard.compat.DraconicCompat;
 import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
 import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
@@ -65,6 +66,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.INGAMEINFO.isModLoaded()) {
             InGameInfoCompat.register();
+        }
+        if (Mods.DRACONIC.isModLoaded()) {
+            DraconicCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

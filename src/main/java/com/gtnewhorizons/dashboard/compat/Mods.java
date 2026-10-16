@@ -27,6 +27,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     BOTANIA("Botania"),
     BACKHAND("backhand"),
     INGAMEINFO("InGameInfoXML"),
+    DRACONIC("DraconicEvolution"),
     ;
     // spotless:on
 

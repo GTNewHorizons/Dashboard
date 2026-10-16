@@ -30,7 +30,9 @@ Every part of the HUD gets its own box, even when it is not showing right now, s
 | Reset an element's size        | **Alt + click** the element                              |
 | See the controls again         | Hover the **?** in the editor menu                       |
 
-Hover an element to see its name, its size and which mod it belongs to.
+Hover an element to see its name, its size and which mod it belongs to. If that mod has its own position setting for
+the element, the tooltip also tells you where to find it. Once you move the element in the editor, Dashboard's position
+is used instead, until you reset it.
 
 ### Editor buttons
 
@@ -72,6 +74,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
 - **Backhand**: the off-hand slot, separate from the hotbar
 - **InGameInfoXML**: each text area (top left, top right, and so on)
+- **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
 
 More mods are on the way.
 
