@@ -45,13 +45,9 @@ public class MixinHudHandler_Hud {
             target = "Lcom/brandon3055/draconicevolution/client/utils/GuiHelper;drawHoveringText(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;FDII)V"))
     private void dashboard$moveInfoBox(List<?> lines, int x, int y, FontRenderer font, float alpha, double scale,
         int screenWidth, int screenHeight, Operation<Void> original) {
-        if (DraconicCompat.beginInfoBox()) {
-            try {
-                original.call(lines, x, y, font, alpha, scale, screenWidth, screenHeight);
-            } finally {
-                HudEditor.endRender();
-            }
-        }
+        HudEditor.render(
+            DraconicCompat.INFO_BOX,
+            () -> original.call(lines, x, y, font, alpha, scale, screenWidth, screenHeight));
     }
 
     /** The armor HUD is drawn last, so stopping here skips only it. */

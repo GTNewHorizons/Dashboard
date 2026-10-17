@@ -134,11 +134,6 @@ public final class DraconicCompat {
         hudHandler = handler;
     }
 
-    /** Called by the mixin around the info box. False means the player hid it. */
-    public static boolean beginInfoBox() {
-        return HudEditor.beginRender(INFO_BOX);
-    }
-
     public static boolean beginArmorHud() {
         return ARMOR_SHIFT.begin(ARMOR_HUD);
     }

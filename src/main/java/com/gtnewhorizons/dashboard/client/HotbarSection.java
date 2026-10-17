@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
@@ -27,9 +26,6 @@ final class HotbarSection extends CustomizeSection {
     private static final int BUTTON_COLOR = 306;
     private static final int BUTTON_LAYER = 307;
     private static final int SIZE_STEP = 25;
-    private static final int HOTBAR_WIDTH = 182;
-    private static final int HOTBAR_HEIGHT = 22;
-    private static final ResourceLocation WIDGETS = new ResourceLocation("textures/gui/widgets.png");
     private static final ItemStack[] SAMPLE_ITEMS = { new ItemStack(Items.diamond_sword),
         new ItemStack(Items.iron_pickaxe), new ItemStack(Items.bread, 16), new ItemStack(Blocks.torch, 64),
         new ItemStack(Blocks.cobblestone, 32) };
@@ -144,18 +140,14 @@ final class HotbarSection extends CustomizeSection {
 
     /** The keys are drawn by the same code as in game, so the preview always matches. */
     void drawPreview(int centerX, int y) {
-        int x = centerX - HOTBAR_WIDTH / 2;
-        PreviewDrawing.bindTexture(WIDGETS);
-        PreviewDrawing.drawTexture(x, y, 0, 0, HOTBAR_WIDTH, HOTBAR_HEIGHT);
-        PreviewDrawing.drawTexture(x - 1, y - 1, 0, HOTBAR_HEIGHT, 24, 24);
-        HudBounds bounds = new HudBounds(x, y, HOTBAR_WIDTH, HOTBAR_HEIGHT);
+        int x = centerX - PreviewDrawing.HOTBAR_WIDTH / 2;
+        PreviewDrawing.drawHotbarBackground(x, y);
+        PreviewDrawing.drawTexture(x - 1, y - 1, 0, PreviewDrawing.HOTBAR_HEIGHT, 24, 24);
+        HudBounds bounds = new HudBounds(x, y, PreviewDrawing.HOTBAR_WIDTH, PreviewDrawing.HOTBAR_HEIGHT);
         if (DashboardConfig.hotbarNumberUnderItems) {
             HotbarNumbers.draw(bounds);
         }
-
-        for (int slot = 0; slot < SAMPLE_ITEMS.length; slot++) {
-            PreviewDrawing.drawItem(SAMPLE_ITEMS[slot], x + 3 + slot * 20, y + 3);
-        }
+        PreviewDrawing.drawHotbarItems(x, y, SAMPLE_ITEMS);
 
         if (!DashboardConfig.hotbarNumberUnderItems) {
             HotbarNumbers.draw(bounds);

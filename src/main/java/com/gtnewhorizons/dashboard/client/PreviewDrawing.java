@@ -23,6 +23,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public final class PreviewDrawing {
 
+    public static final int HOTBAR_WIDTH = 182;
+    public static final int HOTBAR_HEIGHT = 22;
+    private static final ResourceLocation HOTBAR_TEXTURE = new ResourceLocation("textures/gui/widgets.png");
     private static final Gui GUI = new Gui();
     private static final RenderItem ITEM_RENDERER = new RenderItem();
 
@@ -60,6 +63,21 @@ public final class PreviewDrawing {
     /** Vanilla's version is not static, hence the shared Gui. */
     public static void drawTexture(int x, int y, int u, int v, int width, int height) {
         GUI.drawTexturedModalRect(x, y, u, v, width, height);
+    }
+
+    /** The vanilla hotbar without its selection. Leaves the hotbar texture bound, which also holds the selection. */
+    public static void drawHotbarBackground(int x, int y) {
+        bindTexture(HOTBAR_TEXTURE);
+        drawTexture(x, y, 0, 0, HOTBAR_WIDTH, HOTBAR_HEIGHT);
+    }
+
+    /** Items in hotbar slots from the left, null for an empty slot. */
+    public static void drawHotbarItems(int x, int y, ItemStack[] items) {
+        for (int slot = 0; slot < items.length; slot++) {
+            if (items[slot] != null) {
+                drawItem(items[slot], x + 3 + slot * 20, y + 3);
+            }
+        }
     }
 
     /** Off draws invisibly, for code that can not be skipped but should not show, like a hidden element. */

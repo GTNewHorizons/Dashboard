@@ -228,8 +228,7 @@ public class GuiBarCustomize extends GuiScreen {
             : null;
         updateCrosshairButtons();
 
-        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.section.bars")));
-        lines.add(new Line(null));
+        addHeader("dashboard.customize.section.bars");
         if (twoLines) {
             lines.add(new Line(getAllBarsName(), allButton, resetFlipsButton));
             lines.add(new Line(null, allNumbersButton, allNumberStylesButton, allDecimalsButton));
@@ -252,33 +251,27 @@ public class GuiBarCustomize extends GuiScreen {
                 lines.add(new BarLine(row, true, true));
             }
         }
-        lines.add(new CenteredLine(statesButton, resetButton));
-        lines.add(new Line(null));
+        addSectionEnd(statesButton, resetButton);
 
-        lines.add(new HeaderLine(getCrosshairName()));
-        lines.add(new Line(null));
+        addHeader("dashboard.customize.crosshair");
         lines.add(new CrosshairLine());
         if (tinkersCrosshairButton != null) {
             lines.add(new CenteredLine(tinkersCrosshairButton));
         }
-        lines.add(new CenteredLine(resetCrosshairButton));
-        lines.add(new Line(null));
+        addSectionEnd(resetCrosshairButton);
 
         int leftColumnX = width / 2 - columnWidth - STATUS_COLUMN_GAP / 2;
         int rightColumnX = width / 2 + STATUS_COLUMN_GAP / 2;
         hotbar = new HotbarSection(leftColumnX, rightColumnX, columnWidth, SECTION_BUTTON_WIDTH);
-        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.hotbar")));
-        lines.add(new Line(null));
+        addHeader("dashboard.customize.hotbar");
         for (GuiButton[] row : hotbar.getRows()) {
             lines.add(new Line(null, row));
         }
         lines.add(new HotbarPreviewLine());
-        lines.add(new CenteredLine(hotbar.getResetButton()));
-        lines.add(new Line(null));
+        addSectionEnd(hotbar.getResetButton());
 
         statusEffects = new StatusEffectsSection(leftColumnX, rightColumnX, columnWidth, SECTION_BUTTON_WIDTH);
-        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.status_effects")));
-        lines.add(new Line(null));
+        addHeader("dashboard.customize.status_effects");
         for (GuiButton[] row : statusEffects.getRows()) {
             lines.add(new Line(null, row));
         }
@@ -286,18 +279,15 @@ public class GuiBarCustomize extends GuiScreen {
         for (int i = 0; i < previewLines; i++) {
             lines.add(new StatusEffectsPreviewLine(i));
         }
-        lines.add(new CenteredLine(statusEffects.getResetButton()));
-        lines.add(new Line(null));
+        addSectionEnd(statusEffects.getResetButton());
 
         screenOverlays = new ScreenOverlaysSection(width / 2, contentWidth, SECTION_BUTTON_WIDTH);
-        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.screen_overlays")));
-        lines.add(new Line(null));
+        addHeader("dashboard.customize.screen_overlays");
         lines.add(new ColumnTitlesLine());
         for (GuiButton[] row : screenOverlays.getRows()) {
             lines.add(new Line(null, row));
         }
-        lines.add(new CenteredLine(screenOverlays.getResetButton()));
-        lines.add(new Line(null));
+        addSectionEnd(screenOverlays.getResetButton());
 
         rendering = new RenderingSection(
             fontRendererObj,
@@ -307,15 +297,13 @@ public class GuiBarCustomize extends GuiScreen {
             renderingText,
             renderingFocused);
         sections.addAll(Arrays.asList(hotbar, statusEffects, screenOverlays, rendering));
-        lines.add(new HeaderLine(StatCollector.translateToLocal("dashboard.customize.rendering")));
-        lines.add(new Line(null));
+        addHeader("dashboard.customize.rendering");
         lines.add(new TextLine(StatCollector.translateToLocal("dashboard.rendering.hidden_held_items")));
         lines.add(new InputLine());
         for (int i = 0; i < rendering.getRemoveButtons().length; i++) {
             lines.add(new EntryLine(i));
         }
-        lines.add(new CenteredLine(rendering.getResetButton()));
-        lines.add(new Line(null));
+        addSectionEnd(rendering.getResetButton());
 
         list = new BarList();
         list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
@@ -332,6 +320,18 @@ public class GuiBarCustomize extends GuiScreen {
                 GuiHelpers.BUTTON_HEIGHT,
                 done));
         updateAllBarsRow();
+    }
+
+    /** A section's title, with a gap below. */
+    private void addHeader(String langKey) {
+        lines.add(new HeaderLine(StatCollector.translateToLocal(langKey)));
+        lines.add(new Line(null));
+    }
+
+    /** A section's last buttons centered, usually its Reset, with a gap below. */
+    private void addSectionEnd(GuiButton... buttons) {
+        lines.add(new CenteredLine(buttons));
+        lines.add(new Line(null));
     }
 
     private void addRow(Row row) {
@@ -494,10 +494,6 @@ public class GuiBarCustomize extends GuiScreen {
             : GuiHelpers.wrap(DashboardConfig.crosshairSize - 1 + GuiHelpers.getClickStep(), Crosshairs.MAX_SIZE) + 1;
         ConfigurationManager.save(DashboardConfig.class);
         updateCrosshairButtons();
-    }
-
-    private static String getCrosshairName() {
-        return StatCollector.translateToLocal("dashboard.customize.crosshair");
     }
 
     private static String getCrosshairStyleName() {

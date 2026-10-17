@@ -8,7 +8,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.util.Constants;
@@ -33,9 +32,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 @EventBusSubscriber(side = Side.CLIENT)
 public final class TinkersBeltHotbar {
 
-    private static final ResourceLocation HOTBAR_TEXTURE = new ResourceLocation("textures/gui/widgets.png");
-    private static final int WIDTH = 182;
-    private static final int HEIGHT = 22;
     private static final int SLOTS = 9;
     /** Tinkers' belt slot in its own armor slots. */
     private static final int BELT_SLOT = 3;
@@ -99,7 +95,11 @@ public final class TinkersBeltHotbar {
     /** Above the rows stacked on the hotbar, like the hearts and food, so it moves up with them. */
     private static HudBounds getDefaultBounds(int screenWidth, int screenHeight) {
         int rowsTop = screenHeight - Math.max(GuiIngameForge.left_height, GuiIngameForge.right_height) + 10;
-        return new HudBounds(screenWidth / 2 - WIDTH / 2, rowsTop - 2 - HEIGHT, WIDTH, HEIGHT);
+        return new HudBounds(
+            screenWidth / 2 - PreviewDrawing.HOTBAR_WIDTH / 2,
+            rowsTop - 2 - PreviewDrawing.HOTBAR_HEIGHT,
+            PreviewDrawing.HOTBAR_WIDTH,
+            PreviewDrawing.HOTBAR_HEIGHT);
     }
 
     /** Like Tinkers: its own belt slot first, then a Baubles belt slot. Null without a belt. */
@@ -146,12 +146,7 @@ public final class TinkersBeltHotbar {
 
     /** Like the vanilla hotbar, without the selection, since its slots can not be selected. */
     private static void draw(HudBounds bounds, ItemStack[] items) {
-        PreviewDrawing.bindTexture(HOTBAR_TEXTURE);
-        PreviewDrawing.drawTexture(bounds.x, bounds.y, 0, 0, WIDTH, HEIGHT);
-        for (int slot = 0; slot < SLOTS; slot++) {
-            if (items[slot] != null) {
-                PreviewDrawing.drawItem(items[slot], bounds.x + 3 + slot * 20, bounds.y + 3);
-            }
-        }
+        PreviewDrawing.drawHotbarBackground(bounds.x, bounds.y);
+        PreviewDrawing.drawHotbarItems(bounds.x, bounds.y, items);
     }
 }
