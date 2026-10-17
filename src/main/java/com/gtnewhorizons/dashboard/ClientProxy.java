@@ -19,6 +19,7 @@ import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.gtnewhorizons.dashboard.compat.InGameInfoCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
+import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
 import com.gtnewhorizons.dashboard.compat.WailaCompat;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -69,6 +70,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.DRACONIC.isModLoaded()) {
             DraconicCompat.register();
+        }
+        if (Mods.THAUMCRAFT.isModLoaded()) {
+            ThaumcraftCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

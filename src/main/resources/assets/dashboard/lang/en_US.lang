@@ -133,6 +133,17 @@ dashboard.element.draconicevolution.armor_hud=Draconic Armor HUD
 dashboard.element.draconicevolution.magnet_icon=Draconic Magnet Icon
 dashboard.element.draconicevolution.own_settings=Tool & Armor Config [%s] > Configure HUD Elements
 
+## Thaumcraft
+dashboard.element.thaumcraft.wand_dial=Wand Vis Dial
+dashboard.element.thaumcraft.wand_dial.own_settings=Thaumcraft config > wand_dial_bottom
+dashboard.element.thaumcraft.warp_meter=Warp Meter
+dashboard.element.thaumcraft.runic_shield=Runic Shielding
+dashboard.element.thaumcraft.hover_harness=Hover Harness
+dashboard.element.thaumcraft.notifications=Research Notifications
+dashboard.element.thaumcraft.notifications.own_settings=Thaumcraft config > notification_max
+
+dashboard.preview.thaumcraft.notification=New research discovered
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

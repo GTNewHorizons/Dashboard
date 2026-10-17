@@ -75,6 +75,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Backhand**: the off-hand slot, separate from the hotbar
 - **InGameInfoXML**: each text area (top left, top right, and so on)
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
+- **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
 
 More mods are on the way.
 
