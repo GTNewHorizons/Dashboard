@@ -90,29 +90,11 @@ public class GuiBarCustomize extends GuiScreen {
     private final List<HudElement> numbers = new ArrayList<>();
     private final GuiButton scrollUp = new GuiButton(SCROLL_UP, 0, 0, "");
     private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
-    private final GuiButton themeButton = new GuiButton(0, 0, 0, THEME_BUTTON_WIDTH, GuiHelpers.BUTTON_HEIGHT, "");
-    private final IconButton flipButton = new IconButton(
-        0,
-        0,
-        0,
-        FLIP_BUTTON_WIDTH,
-        GuiHelpers.BUTTON_HEIGHT,
-        Icons.ARROW_RIGHT);
-    private final GuiButton numberButton = new GuiButton(0, 0, 0, NUMBER_BUTTON_WIDTH, GuiHelpers.BUTTON_HEIGHT, "");
-    private final GuiButton numberStyleButton = new GuiButton(
-        0,
-        0,
-        0,
-        NUMBER_STYLE_BUTTON_WIDTH,
-        GuiHelpers.BUTTON_HEIGHT,
-        "");
-    private final GuiButton decimalsButton = new GuiButton(
-        0,
-        0,
-        0,
-        DECIMALS_BUTTON_WIDTH,
-        GuiHelpers.BUTTON_HEIGHT,
-        "");
+    private final GuiButton themeButton = GuiHelpers.button(0, 0, THEME_BUTTON_WIDTH);
+    private final IconButton flipButton = GuiHelpers.iconButton(0, 0, FLIP_BUTTON_WIDTH, Icons.ARROW_RIGHT);
+    private final GuiButton numberButton = GuiHelpers.button(0, 0, NUMBER_BUTTON_WIDTH);
+    private final GuiButton numberStyleButton = GuiHelpers.button(0, 0, NUMBER_STYLE_BUTTON_WIDTH);
+    private final GuiButton decimalsButton = GuiHelpers.button(0, 0, DECIMALS_BUTTON_WIDTH);
     private BarList list;
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
@@ -216,51 +198,16 @@ public class GuiBarCustomize extends GuiScreen {
         int left = getContentLeft();
         String states = StatCollector
             .translateToLocal(showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states");
-        GuiButton statesButton = new GuiButton(
-            BUTTON_STATES,
-            0,
-            0,
-            SECTION_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            states);
+        GuiButton statesButton = GuiHelpers.button(BUTTON_STATES, 0, SECTION_BUTTON_WIDTH, states);
         String reset = StatCollector.translateToLocal("dashboard.customize.reset");
-        resetButton = new GuiButton(BUTTON_RESET, 0, 0, SECTION_BUTTON_WIDTH, GuiHelpers.BUTTON_HEIGHT, reset);
-        allButton = new GuiButton(BUTTON_ALL, left + getButtonX(), 0, THEME_BUTTON_WIDTH, GuiHelpers.BUTTON_HEIGHT, "");
-        resetFlipsButton = new IconButton(
-            BUTTON_RESET_FLIPS,
-            left + getFlipX(),
-            0,
-            FLIP_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            Icons.RESET);
-        allNumbersButton = new GuiButton(
-            BUTTON_ALL_NUMBERS,
-            left + getNumberX(),
-            0,
-            NUMBER_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            "");
-        allNumberStylesButton = new GuiButton(
-            BUTTON_ALL_NUMBER_STYLES,
-            left + getNumberStyleX(),
-            0,
-            NUMBER_STYLE_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            "");
-        allDecimalsButton = new GuiButton(
-            BUTTON_ALL_NUMBER_DECIMALS,
-            left + getDecimalsX(),
-            0,
-            DECIMALS_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            "");
-        resetCrosshairButton = new GuiButton(
-            BUTTON_RESET_CROSSHAIR,
-            0,
-            0,
-            SECTION_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            reset);
+        resetButton = GuiHelpers.button(BUTTON_RESET, 0, SECTION_BUTTON_WIDTH, reset);
+        allButton = GuiHelpers.button(BUTTON_ALL, left + getButtonX(), THEME_BUTTON_WIDTH);
+        resetFlipsButton = GuiHelpers.iconButton(BUTTON_RESET_FLIPS, left + getFlipX(), FLIP_BUTTON_WIDTH, Icons.RESET);
+        allNumbersButton = GuiHelpers.button(BUTTON_ALL_NUMBERS, left + getNumberX(), NUMBER_BUTTON_WIDTH);
+        allNumberStylesButton = GuiHelpers
+            .button(BUTTON_ALL_NUMBER_STYLES, left + getNumberStyleX(), NUMBER_STYLE_BUTTON_WIDTH);
+        allDecimalsButton = GuiHelpers.button(BUTTON_ALL_NUMBER_DECIMALS, left + getDecimalsX(), DECIMALS_BUTTON_WIDTH);
+        resetCrosshairButton = GuiHelpers.button(BUTTON_RESET_CROSSHAIR, 0, SECTION_BUTTON_WIDTH, reset);
         int crosshairNameWidth = fontRendererObj.getStringWidth(getCrosshairStyleName());
         int crosshairWidth = crosshairNameWidth + COLUMN_GAP
             + THEME_BUTTON_WIDTH
@@ -269,23 +216,15 @@ public class GuiBarCustomize extends GuiScreen {
             + COLUMN_GAP
             + CROSSHAIR_BACKGROUNDS.length * SWATCH_SIZE;
         crosshairLeft = width / 2 - crosshairWidth / 2;
-        crosshairStyleButton = new GuiButton(
-            BUTTON_CROSSHAIR_STYLE,
-            crosshairLeft + crosshairNameWidth + COLUMN_GAP,
-            0,
-            THEME_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            "");
-        crosshairSizeButton = new GuiButton(
+        crosshairStyleButton = GuiHelpers
+            .button(BUTTON_CROSSHAIR_STYLE, crosshairLeft + crosshairNameWidth + COLUMN_GAP, THEME_BUTTON_WIDTH);
+        crosshairSizeButton = GuiHelpers.button(
             BUTTON_CROSSHAIR_SIZE,
             crosshairStyleButton.xPosition + THEME_BUTTON_WIDTH + COLUMN_GAP,
-            0,
-            FLIP_BUTTON_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            "");
+            FLIP_BUTTON_WIDTH);
         int columnWidth = Math.min(STATUS_COLUMN_WIDTH, (contentWidth - STATUS_COLUMN_GAP) / 2);
         tinkersCrosshairButton = Mods.TINKERS.isModLoaded()
-            ? new GuiButton(BUTTON_TINKERS_CROSSHAIR, 0, 0, columnWidth, GuiHelpers.BUTTON_HEIGHT, "")
+            ? GuiHelpers.button(BUTTON_TINKERS_CROSSHAIR, 0, columnWidth)
             : null;
         updateCrosshairButtons();
 

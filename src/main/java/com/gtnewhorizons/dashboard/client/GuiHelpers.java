@@ -30,6 +30,19 @@ final class GuiHelpers {
 
     private GuiHelpers() {}
 
+    /** A button of the usual height, whose row places it later. Its label is set when it updates. */
+    static GuiButton button(int id, int x, int width) {
+        return button(id, x, width, "");
+    }
+
+    static GuiButton button(int id, int x, int width, String label) {
+        return new GuiButton(id, x, 0, width, BUTTON_HEIGHT, label);
+    }
+
+    static IconButton iconButton(int id, int x, int width, int icon) {
+        return new IconButton(id, x, 0, width, BUTTON_HEIGHT, icon);
+    }
+
     static String getOnOff(boolean on) {
         return StatCollector.translateToLocal(on ? "dashboard.customize.number.on" : "dashboard.customize.number.off");
     }

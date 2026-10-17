@@ -67,13 +67,7 @@ final class ScreenOverlaysSection extends CustomizeSection implements GuiSlider.
         overlaysCenterX = overlaysX + overlaysWidth / 2;
         cameraCenterX = cameraX + sliderWidth / 2;
 
-        nightVisionButton = new GuiButton(
-            BUTTON_NIGHT_VISION_FLICKER,
-            cameraX,
-            0,
-            sliderWidth,
-            GuiHelpers.BUTTON_HEIGHT,
-            "");
+        nightVisionButton = GuiHelpers.button(BUTTON_NIGHT_VISION_FLICKER, cameraX, sliderWidth);
         List<GuiButton> camera = new ArrayList<>();
         camera.add(createSlider(BUTTON_HURT_SHAKE_STRENGTH, cameraX, sliderWidth));
         camera.add(createSlider(BUTTON_NAUSEA_STRENGTH, cameraX, sliderWidth));

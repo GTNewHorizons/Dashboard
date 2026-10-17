@@ -78,14 +78,9 @@ final class RenderingSection extends CustomizeSection {
         hint = font.trimStringToWidth(
             StatCollector.translateToLocal("dashboard.rendering.hint"),
             inputWidth - HINT_PADDING * 2);
-        addButton = new GuiButton(
-            BUTTON_ADD,
-            buttonX,
-            0,
-            ADD_WIDTH,
-            GuiHelpers.BUTTON_HEIGHT,
-            StatCollector.translateToLocal("dashboard.rendering.add"));
-        heldButton = new IconButton(BUTTON_HELD, heldX, 0, HELD_WIDTH, GuiHelpers.BUTTON_HEIGHT, Icons.HELD);
+        addButton = GuiHelpers
+            .button(BUTTON_ADD, buttonX, ADD_WIDTH, StatCollector.translateToLocal("dashboard.rendering.add"));
+        heldButton = GuiHelpers.iconButton(BUTTON_HELD, heldX, HELD_WIDTH, Icons.HELD);
         heldButton.enabled = getHeldItem() != null;
 
         String[] entries = DashboardConfig.hiddenHeldItems;
@@ -95,13 +90,7 @@ final class RenderingSection extends CustomizeSection {
         entryFullTexts = new String[entries.length];
         entryKnown = new boolean[entries.length];
         for (int i = 0; i < entries.length; i++) {
-            removeButtons[i] = new IconButton(
-                BUTTON_REMOVE + i,
-                buttonX,
-                0,
-                REMOVE_WIDTH,
-                GuiHelpers.BUTTON_HEIGHT,
-                Icons.REMOVE);
+            removeButtons[i] = GuiHelpers.iconButton(BUTTON_REMOVE + i, buttonX, REMOVE_WIDTH, Icons.REMOVE);
             ItemId id = HiddenHeldItems.parse(entries[i]);
             entryKnown[i] = id != null;
             String name = id != null ? getItemName(id) : StatCollector.translateToLocal("dashboard.rendering.unknown");

@@ -39,12 +39,12 @@ final class HotbarSection extends CustomizeSection {
     HotbarSection(int leftX, int rightX, int buttonWidth, int resetWidth) {
         super(BUTTON_RESET, resetWidth);
         rows = new GuiButton[][] {
-            { new GuiButton(BUTTON_NUMBERS, leftX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, ""),
-                new GuiButton(BUTTON_TEXT, rightX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, "") },
-            { new GuiButton(BUTTON_POSITION, leftX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, ""),
-                new GuiButton(BUTTON_SIZE, rightX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, "") },
-            { new GuiButton(BUTTON_COLOR, leftX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, ""),
-                new GuiButton(BUTTON_LAYER, rightX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, "") } };
+            { GuiHelpers.button(BUTTON_NUMBERS, leftX, buttonWidth),
+                GuiHelpers.button(BUTTON_TEXT, rightX, buttonWidth) },
+            { GuiHelpers.button(BUTTON_POSITION, leftX, buttonWidth),
+                GuiHelpers.button(BUTTON_SIZE, rightX, buttonWidth) },
+            { GuiHelpers.button(BUTTON_COLOR, leftX, buttonWidth),
+                GuiHelpers.button(BUTTON_LAYER, rightX, buttonWidth) } };
         updateButtons();
     }
 

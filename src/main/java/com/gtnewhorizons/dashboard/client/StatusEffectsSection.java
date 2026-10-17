@@ -57,9 +57,8 @@ final class StatusEffectsSection extends CustomizeSection implements GuiSlider.I
         int[] rightColumn = { BUTTON_STACK, BUTTON_GROUP, BUTTON_SORT };
         rows = new GuiButton[leftColumn.length][];
         for (int row = 0; row < leftColumn.length; row++) {
-            GuiButton left = new GuiButton(leftColumn[row], leftX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, "");
-            GuiButton right = row < rightColumn.length
-                ? new GuiButton(rightColumn[row], rightX, 0, buttonWidth, GuiHelpers.BUTTON_HEIGHT, "")
+            GuiButton left = GuiHelpers.button(leftColumn[row], leftX, buttonWidth);
+            GuiButton right = row < rightColumn.length ? GuiHelpers.button(rightColumn[row], rightX, buttonWidth)
                 : row == rightColumn.length ? spacingSlider : pulseSlider;
             rows[row] = new GuiButton[] { left, right };
         }

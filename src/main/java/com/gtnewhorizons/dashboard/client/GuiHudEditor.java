@@ -111,7 +111,7 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     private GuiButton createButton(int id, String text) {
-        return new GuiButton(id, 0, 0, getButtonWidth(text), GuiHelpers.BUTTON_HEIGHT, text);
+        return GuiHelpers.button(id, 0, getButtonWidth(text), text);
     }
 
     private int getButtonWidth(String text) {

@@ -23,13 +23,8 @@ abstract class CustomizeSection extends Gui {
     protected boolean changed;
 
     CustomizeSection(int resetId, int resetWidth) {
-        resetButton = new GuiButton(
-            resetId,
-            0,
-            0,
-            resetWidth,
-            GuiHelpers.BUTTON_HEIGHT,
-            StatCollector.translateToLocal("dashboard.customize.reset"));
+        resetButton = GuiHelpers
+            .button(resetId, 0, resetWidth, StatCollector.translateToLocal("dashboard.customize.reset"));
     }
 
     GuiButton getResetButton() {
