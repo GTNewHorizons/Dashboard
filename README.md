@@ -65,7 +65,8 @@ You can also drag the editor menu itself out of the way.
 Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 
 - **AppleCore**: saturation and exhaustion on the food bar
-- **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar
+- **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar. Dashboard also adds a
+  **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
 - **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
 - **GalaxySpace**: atmospheric pressure bar
 - **GraviSuite**: status text

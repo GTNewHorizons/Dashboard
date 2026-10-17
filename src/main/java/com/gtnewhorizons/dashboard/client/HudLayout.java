@@ -45,11 +45,11 @@ public final class HudLayout {
 
     public static boolean isVisible(HudElement element) {
         HudElementState state = getStates().get(element.getId());
-        return state == null || state.visible;
+        return state == null || state.visible == null ? element.isVisibleByDefault() : state.visible;
     }
 
     public static void setVisible(HudElement element, boolean visible) {
-        getOrCreateState(element).visible = visible;
+        getOrCreateState(element).visible = visible == element.isVisibleByDefault() ? null : visible;
         removeIfDefault(element);
         changed = true;
     }
@@ -239,7 +239,7 @@ public final class HudLayout {
         for (HudElement element : elements) {
             HudElementState state = getStates().get(element.getId());
             if (state != null) {
-                state.visible = true;
+                state.visible = null;
                 state.moved = false;
                 state.sizeStep = 0;
                 removeIfDefault(element);

@@ -72,6 +72,10 @@ dashboard.element.minecraft.status_effects=Status Effects
 
 dashboard.preview.scoreboard=Scores
 
+## Tinkers' Construct (added by Dashboard)
+dashboard.element.tinkers.belt_hotbar=Belt Hotbar
+dashboard.element.tinkers.belt_hotbar.description=The items in your Traveller's Belt,\nswapped with your hotbar by pressing [%s]. Hidden by default.
+
 ## GraviSuite
 dashboard.element.gravisuite.status=GraviSuite Status
 dashboard.element.gravisuite.status.own_settings=GraviSuite config > hudPosition

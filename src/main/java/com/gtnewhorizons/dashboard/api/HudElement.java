@@ -43,6 +43,9 @@ public final class HudElement {
     private String modNameAddon;
     private String ownSettingsKey;
     private String ownSettingsKeyBinding;
+    private boolean visibleByDefault = true;
+    private String descriptionKey;
+    private String descriptionKeyBinding;
     private long lastRenderTime;
 
     /**
@@ -100,6 +103,33 @@ public final class HudElement {
         return activeCheck.getAsBoolean();
     }
 
+    /** For HUD the player did not have before, like Dashboard's own additions, which they turn on in the editor. */
+    public HudElement setHiddenByDefault() {
+        this.visibleByDefault = false;
+        return this;
+    }
+
+    public boolean isVisibleByDefault() {
+        return visibleByDefault;
+    }
+
+    /**
+     * Extra lines in the element's editor tooltip, explaining what it is. Optional.
+     *
+     * @param translationKey lang key of the text, with {@code %s} for a key binding, if any
+     * @param keyBinding     description of that key in Controls, or null
+     */
+    public HudElement setDescription(String translationKey, String keyBinding) {
+        this.descriptionKey = translationKey;
+        this.descriptionKeyBinding = keyBinding;
+        return this;
+    }
+
+    /** Null without {@link #setDescription}. */
+    public String getDescription() {
+        return translate(descriptionKey, descriptionKeyBinding);
+    }
+
     /** Only needed when the part of the id before ':' is not the mod id (ignoring case). */
     public HudElement setModId(String modId) {
         this.modId = modId;
@@ -150,11 +180,16 @@ public final class HudElement {
 
     /** Null without {@link #setOwnSettings}. */
     public String getOwnSettings() {
-        if (ownSettingsKey == null) {
+        return translate(ownSettingsKey, ownSettingsKeyBinding);
+    }
+
+    /** Null without a key, and with the bound key filled in when there is one. */
+    private static String translate(String translationKey, String keyBinding) {
+        if (translationKey == null) {
             return null;
         }
-        return ownSettingsKeyBinding == null ? StatCollector.translateToLocal(ownSettingsKey)
-            : StatCollector.translateToLocalFormatted(ownSettingsKey, getKeyName(ownSettingsKeyBinding));
+        return keyBinding == null ? StatCollector.translateToLocal(translationKey)
+            : StatCollector.translateToLocalFormatted(translationKey, getKeyName(keyBinding));
     }
 
     /** The key the player bound, so the text stays right when they change it. */

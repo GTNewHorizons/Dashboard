@@ -20,6 +20,7 @@ import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.gtnewhorizons.dashboard.compat.InGameInfoCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
 import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
+import com.gtnewhorizons.dashboard.compat.TinkersBeltHotbar;
 import com.gtnewhorizons.dashboard.compat.WailaCompat;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -44,6 +45,9 @@ public class ClientProxy extends CommonProxy {
         VanillaHudElements.register();
         BarNumbers.register();
         StatusEffects.register();
+        if (Mods.TINKERS.isModLoaded()) {
+            TinkersBeltHotbar.register();
+        }
         if (Mods.GRAVISUITE.isModLoaded()) {
             GraviSuiteCompat.register();
         }

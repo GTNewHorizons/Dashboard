@@ -486,6 +486,12 @@ public class GuiHudEditor extends GuiScreen {
     private List<String> getTooltip(HudElement element) {
         List<String> lines = new ArrayList<>();
         lines.add(element.getDisplayName());
+        String description = element.getDescription();
+        if (description != null) {
+            for (String line : description.split("\\\\n")) {
+                lines.add(EnumChatFormatting.GRAY + line);
+            }
+        }
         lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (!HudLayout.isVisible(element)) {
             lines.add(

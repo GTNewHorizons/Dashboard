@@ -16,7 +16,7 @@ package com.gtnewhorizons.dashboard.client;
  */
 public class HudElementState {
 
-    public boolean visible = true;
+    public Boolean visible;
     public boolean moved = false;
     public float anchorX;
     public float anchorY;
@@ -30,7 +30,7 @@ public class HudElementState {
     public int sizeStep;
 
     boolean isDefault() {
-        return visible && !moved
+        return visible == null && !moved
             && theme == null
             && !flipped
             && !numberOn
