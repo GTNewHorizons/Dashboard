@@ -42,6 +42,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int SNAP_DISTANCE = 4;
     private static final int CENTER_MARK_LENGTH = 3;
     private static final float POSITION_TEXT_SCALE = 0.75f;
+    private static final int OUTSIDE_NAME_PADDING = 1;
     private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
         "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset",
         "dashboard.editor.help_tooltip.resize", "dashboard.editor.help_tooltip.reset_size" };
@@ -272,12 +273,7 @@ public class GuiHudEditor extends GuiScreen {
             drawPreviews();
         }
 
-        // The most important boxes are drawn last, so they end up on top
-        for (int i = boxes.size() - 1; i >= 0; i--) {
-            ElementBox box = boxes.get(i);
-            drawElementBox(box, box.element == highlighted);
-        }
-
+        drawElementBoxes(highlighted);
         drawMenuPanel(mouseX, mouseY);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -390,6 +386,40 @@ public class GuiHudEditor extends GuiScreen {
         return lines;
     }
 
+    /**
+     * The most important boxes are drawn last, so they end up on top. Names that do not fit their box go outside it,
+     * after every box so no box covers them, and the highlighted one last.
+     */
+    private void drawElementBoxes(HudElement highlighted) {
+        float smallScale = getSmallTextScale();
+        List<ElementBox> namesOutside = new ArrayList<>();
+        ElementBox highlightedNameOutside = null;
+        for (int i = boxes.size() - 1; i >= 0; i--) {
+            ElementBox box = boxes.get(i);
+            boolean isHighlighted = box.element == highlighted;
+            drawElementBox(box, isHighlighted);
+            if (DashboardConfig.showLabels && !drawNameInside(box.element.getDisplayName(), box.bounds, smallScale)) {
+                if (isHighlighted) {
+                    highlightedNameOutside = box;
+                } else {
+                    namesOutside.add(box);
+                }
+            }
+        }
+        if (highlightedNameOutside != null) {
+            namesOutside.add(highlightedNameOutside);
+        }
+        for (ElementBox box : namesOutside) {
+            drawNameOutside(box.element.getDisplayName(), box.bounds, smallScale);
+        }
+    }
+
+    /** About half size, but only at sizes where each font pixel is whole screen pixels, so the text stays sharp. */
+    private static float getSmallTextScale() {
+        int guiScale = HudLayout.getGameGuiScale();
+        return (float) ((guiScale + 1) / 2) / guiScale;
+    }
+
     private void drawElementBox(ElementBox box, boolean highlighted) {
         HudElement element = box.element;
         HudBounds bounds = box.bounds;
@@ -413,9 +443,6 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
         drawOutline(bounds, borderColor);
         drawCenterMark(bounds, borderColor);
-        if (DashboardConfig.showLabels) {
-            drawElementName(element.getDisplayName(), bounds);
-        }
         if (DashboardConfig.showPositions) {
             drawPosition(bounds);
         }
@@ -433,11 +460,7 @@ public class GuiHudEditor extends GuiScreen {
         if (y < 0) {
             y = bounds.y + 1;
         }
-        GL11.glPushMatrix();
-        GL11.glTranslatef(x, y, 0);
-        GL11.glScalef(POSITION_TEXT_SCALE, POSITION_TEXT_SCALE, 1);
-        fontRendererObj.drawStringWithShadow(text, 0, 0, ColorUtils.textPosition.getColor());
-        GL11.glPopMatrix();
+        PreviewDrawing.drawScaledString(text, x, y, POSITION_TEXT_SCALE, ColorUtils.textPosition.getColor());
     }
 
     private static void drawCenterMark(HudBounds bounds, int color) {
@@ -446,34 +469,67 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     /**
-     * Centered inside the box, wrapped onto several lines if it is too wide. If the lines do not fit either, the name
-     * is shrunk onto one line.
+     * Centered inside the box, trying full size, then sideways for tall boxes, then both smaller. Wrapped onto several
+     * lines if it is too long. False when it does not fit any way.
      */
-    private void drawElementName(String name, HudBounds bounds) {
-        int maxWidth = bounds.width - 2;
-        // Without this, Hodgepodge's MixinFontRenderer crashes on Java 8
-        if (maxWidth < fontRendererObj.getCharWidth('W')) {
-            return;
-        }
+    private boolean drawNameInside(String name, HudBounds bounds, float smallScale) {
+        boolean tall = bounds.height > bounds.width;
+        boolean canShrink = smallScale < 1;
+        return drawNameInside(name, bounds, 1, false) || tall && drawNameInside(name, bounds, 1, true)
+            || canShrink && drawNameInside(name, bounds, smallScale, false)
+            || tall && canShrink && drawNameInside(name, bounds, smallScale, true);
+    }
+
+    private boolean drawNameInside(String name, HudBounds bounds, float scale, boolean sideways) {
+        int roomAlongLines = sideways ? bounds.height : bounds.width;
+        int roomForLines = sideways ? bounds.width : bounds.height;
+        int maxWidth = (int) ((roomAlongLines - 2) / scale);
         int lineHeight = fontRendererObj.FONT_HEIGHT;
-        int centerX = bounds.x + bounds.width / 2;
-        List<String> lines = fontRendererObj.listFormattedStringToWidth(name, maxWidth);
-
-        if (lines.size() == 1 || lines.size() * lineHeight <= bounds.height) {
-            int y = bounds.y + (bounds.height - lines.size() * lineHeight) / 2 + 1;
-            for (String line : lines) {
-                drawCenteredString(fontRendererObj, line, centerX, y, ColorUtils.text.getColor());
-                y += lineHeight;
-            }
-            return;
+        // The width check also keeps Hodgepodge's MixinFontRenderer from crashing on Java 8
+        if (maxWidth < fontRendererObj.getCharWidth('W') || (lineHeight - 2) * scale > roomForLines) {
+            return false;
         }
-
-        float scale = (float) maxWidth / fontRendererObj.getStringWidth(name);
+        List<String> lines = fontRendererObj.listFormattedStringToWidth(name, maxWidth);
+        // The last line's gap and shadow may touch the border
+        if ((lines.size() * lineHeight - 2) * scale > roomForLines) {
+            return false;
+        }
         GL11.glPushMatrix();
-        GL11.glTranslatef(centerX, bounds.y + bounds.height / 2f, 0);
+        GL11.glTranslatef(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, 0);
+        if (sideways) {
+            GL11.glRotatef(-90, 0, 0, 1);
+        }
         GL11.glScalef(scale, scale, 1);
-        drawCenteredString(fontRendererObj, name, 0, -lineHeight / 2 + 1, ColorUtils.text.getColor());
+        int y = -lines.size() * lineHeight / 2 + 1;
+        for (String line : lines) {
+            drawCenteredString(fontRendererObj, line, 0, y, ColorUtils.text.getColor());
+            y += lineHeight;
+        }
         GL11.glPopMatrix();
+        return true;
+    }
+
+    /** Smaller, on a dark backing above the box (and its position), or under it at the top of the screen. */
+    private void drawNameOutside(String name, HudBounds bounds, float scale) {
+        int textWidth = (int) Math.ceil(fontRendererObj.getStringWidth(name) * scale);
+        int textHeight = (int) Math.ceil((fontRendererObj.FONT_HEIGHT - 1) * scale);
+        int backingWidth = textWidth + OUTSIDE_NAME_PADDING * 2;
+        int backingHeight = textHeight + OUTSIDE_NAME_PADDING * 2;
+        int x = HudLayout.clampToScreen(bounds.x + (bounds.width - backingWidth) / 2, backingWidth, width);
+        int y = bounds.y - 2 - backingHeight;
+        if (DashboardConfig.showPositions) {
+            y -= (int) Math.ceil(fontRendererObj.FONT_HEIGHT * POSITION_TEXT_SCALE) + 1;
+        }
+        if (y < 0) {
+            y = Math.min(bounds.getBottom() + 2, height - backingHeight);
+        }
+        drawRect(x, y, x + backingWidth, y + backingHeight, ColorUtils.menuBackground.getColor());
+        PreviewDrawing.drawScaledString(
+            name,
+            x + OUTSIDE_NAME_PADDING,
+            y + OUTSIDE_NAME_PADDING,
+            scale,
+            ColorUtils.text.getColor());
     }
 
     private void drawOutline(HudBounds bounds, int color) {
