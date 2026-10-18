@@ -58,21 +58,31 @@ public final class Crosshairs {
 
     /** Runs before Tinkers' own crosshair, so canceling here also hides that one when its setting is off. */
     @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onPreRenderBeforeTinkers(RenderGameOverlayEvent.Pre event) {
+        if (event.type == ElementType.CROSSHAIRS && !DashboardConfig.tinkersCrosshair
+            && TinkerCompat.isHoldingRangedWeapon()) {
+            drawInstead(event);
+        }
+    }
+
+    /**
+     * Runs last and only if no other mod canceled the crosshair, so mods that hide it (like Thaumic Based while aiming
+     * its revolver) or draw their own still can.
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onPreRender(RenderGameOverlayEvent.Pre event) {
-        if (event.type != ElementType.CROSSHAIRS) {
-            return;
+        if (event.type == ElementType.CROSSHAIRS && (getStyle() != VANILLA || getSize() != 1)) {
+            drawInstead(event);
         }
-        boolean holdingTinkersWeapon = TinkerCompat.isHoldingRangedWeapon();
-        if (holdingTinkersWeapon && DashboardConfig.tinkersCrosshair) {
-            return;
-        }
-        int style = getStyle();
-        int size = MathHelper.clamp_int(DashboardConfig.crosshairSize, 1, MAX_SIZE);
-        if (style == VANILLA && size == 1 && !holdingTinkersWeapon) {
-            return;
-        }
+    }
+
+    private static void drawInstead(RenderGameOverlayEvent.Pre event) {
         event.setCanceled(true);
-        draw(style, size, event.resolution.getScaledWidth() / 2, event.resolution.getScaledHeight() / 2);
+        draw(getStyle(), getSize(), event.resolution.getScaledWidth() / 2, event.resolution.getScaledHeight() / 2);
+    }
+
+    private static int getSize() {
+        return MathHelper.clamp_int(DashboardConfig.crosshairSize, 1, MAX_SIZE);
     }
 
     /** Inverts what is behind it like vanilla, so its more visible on any background. */
