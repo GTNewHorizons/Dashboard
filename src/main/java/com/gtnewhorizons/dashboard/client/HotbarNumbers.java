@@ -97,11 +97,7 @@ public final class HotbarNumbers {
             float width = widths[slot] * scale;
             float x = hotbar.x + ITEM_OFFSET + slot * SLOT_STEP + (ITEM_SIZE - width) * column / 2;
             float y = hotbar.y + ITEM_OFFSET + (ITEM_SIZE - height) * row / 2;
-            GL11.glPushMatrix();
-            GL11.glTranslatef(x, y, 0);
-            GL11.glScalef(scale, scale, 1);
-            font.drawStringWithShadow(text, 0, 0, 0xFFFFFF);
-            GL11.glPopMatrix();
+            PreviewDrawing.drawScaledString(text, x, y, scale, 0xFFFFFF);
         }
         GL11.glPopAttrib();
     }

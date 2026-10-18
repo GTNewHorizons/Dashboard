@@ -3,7 +3,6 @@ package com.gtnewhorizons.dashboard.compat;
 import java.lang.reflect.Method;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -149,11 +148,6 @@ public final class TaintedMagicCompat {
     }
 
     private static void drawDisassemblerPreview(HudBounds bounds) {
-        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-        GL11.glPushMatrix();
-        GL11.glTranslatef(bounds.x, bounds.y, 0);
-        GL11.glScalef(DISASSEMBLER_SCALE, DISASSEMBLER_SCALE, 1);
-        font.drawStringWithShadow(getDisassemblerText(), 0, 0, 0xFFFFFF);
-        GL11.glPopMatrix();
+        PreviewDrawing.drawScaledString(getDisassemblerText(), bounds.x, bounds.y, DISASSEMBLER_SCALE, 0xFFFFFF);
     }
 }

@@ -65,6 +65,15 @@ public final class PreviewDrawing {
         GUI.drawTexturedModalRect(x, y, u, v, width, height);
     }
 
+    /** Text with a shadow, its top left corner at x, y, drawn at the given size. */
+    public static void drawScaledString(String text, float x, float y, float scale, int color) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(x, y, 0);
+        GL11.glScalef(scale, scale, 1);
+        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(text, 0, 0, color);
+        GL11.glPopMatrix();
+    }
+
     /** The vanilla hotbar without its selection. Leaves the hotbar texture bound, which also holds the selection. */
     public static void drawHotbarBackground(int x, int y) {
         bindTexture(HOTBAR_TEXTURE);
