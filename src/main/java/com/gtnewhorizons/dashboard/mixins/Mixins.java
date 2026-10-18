@@ -80,6 +80,13 @@ public enum Mixins implements IMixins {
             "thaumcraft.MixinREHNotifyHandler_Hud",
             "thaumcraft.ClientTickEventsFMLInvoker")
         .addRequiredMod(Mods.THAUMCRAFT)
+        .setPhase(Phase.LATE)),
+    THAUMIC_TINKERER_HUD(new MixinBuilder("Make the Thaumic Tinkerer HUD movable")
+        .addClientMixins(
+            "thaumictinkerer.MixinHUDHandler_Hud",
+            "thaumictinkerer.MixinToolModeHUDHandler_Hud",
+            "thaumictinkerer.MixinSoulHeartClientHandler_Hud")
+        .addRequiredMod(Mods.THAUMIC_TINKERER)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

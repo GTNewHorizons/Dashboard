@@ -20,6 +20,7 @@ import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.gtnewhorizons.dashboard.compat.InGameInfoCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
 import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
+import com.gtnewhorizons.dashboard.compat.ThaumicTinkererCompat;
 import com.gtnewhorizons.dashboard.compat.TinkersBeltHotbar;
 import com.gtnewhorizons.dashboard.compat.WailaCompat;
 
@@ -77,6 +78,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.THAUMCRAFT.isModLoaded()) {
             ThaumcraftCompat.register();
+        }
+        if (Mods.THAUMIC_TINKERER.isModLoaded()) {
+            ThaumicTinkererCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

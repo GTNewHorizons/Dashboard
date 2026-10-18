@@ -148,6 +148,13 @@ dashboard.element.thaumcraft.notifications.own_settings=Thaumcraft config > noti
 
 dashboard.preview.thaumcraft.notification=New research discovered
 
+## Thaumic Tinkerer
+dashboard.element.thaumictinkerer.dislocation_focus=Dislocation Focus
+dashboard.element.thaumictinkerer.dislocation_focus.own_settings=Thaumcraft config > wand_dial_bottom
+dashboard.element.thaumictinkerer.tool_mode=Kami Tool Mode
+dashboard.element.thaumictinkerer.soul_hearts=Soul Hearts
+dashboard.element.thaumictinkerer.soul_hearts.own_settings=Thaumic Tinkerer config > soulHeart.height
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

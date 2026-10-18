@@ -21,6 +21,7 @@ dependencies {
     runtimeOnlyNonPublishable(rfg.deobf("maven.modrinth:journeymap:5.2.20"))
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:InGame-Info-XML:2.9.7:dev")
     runtimeOnlyNonPublishable("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:ThaumicTinkerer:2.12.33:dev")
 
     // configurations.configureEach {
     //     exclude group: "com.github.GTNewHorizons", module: "TinkersConstruct"

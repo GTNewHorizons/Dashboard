@@ -77,6 +77,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **InGameInfoXML**: each text area (top left, top right, and so on)
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
+- **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
 
 More mods are on the way.
 

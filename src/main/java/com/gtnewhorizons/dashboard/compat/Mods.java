@@ -29,6 +29,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     INGAMEINFO("InGameInfoXML"),
     DRACONIC("DraconicEvolution"),
     THAUMCRAFT("Thaumcraft"),
+    THAUMIC_TINKERER("ThaumicTinkerer"),
     ;
     // spotless:on
 
