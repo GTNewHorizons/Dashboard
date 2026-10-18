@@ -155,6 +155,10 @@ dashboard.element.thaumictinkerer.tool_mode=Kami Tool Mode
 dashboard.element.thaumictinkerer.soul_hearts=Soul Hearts
 dashboard.element.thaumictinkerer.soul_hearts.own_settings=Thaumic Tinkerer config > soulHeart.height
 
+## Tainted Magic
+dashboard.element.taintedmagic.katana_charge=Katana Charge
+dashboard.element.taintedmagic.disassembler_mode=Thaumic Disassembler Mode
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

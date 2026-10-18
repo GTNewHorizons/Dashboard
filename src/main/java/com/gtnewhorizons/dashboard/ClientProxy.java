@@ -19,6 +19,7 @@ import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.gtnewhorizons.dashboard.compat.InGameInfoCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
+import com.gtnewhorizons.dashboard.compat.TaintedMagicCompat;
 import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
 import com.gtnewhorizons.dashboard.compat.ThaumicTinkererCompat;
 import com.gtnewhorizons.dashboard.compat.TinkersBeltHotbar;
@@ -81,6 +82,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.THAUMIC_TINKERER.isModLoaded()) {
             ThaumicTinkererCompat.register();
+        }
+        if (Mods.TAINTED_MAGIC.isModLoaded()) {
+            TaintedMagicCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);
