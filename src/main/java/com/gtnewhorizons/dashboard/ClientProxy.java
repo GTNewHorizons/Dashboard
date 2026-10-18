@@ -24,6 +24,7 @@ import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
 import com.gtnewhorizons.dashboard.compat.ThaumicTinkererCompat;
 import com.gtnewhorizons.dashboard.compat.TinkersBeltHotbar;
 import com.gtnewhorizons.dashboard.compat.WailaCompat;
+import com.gtnewhorizons.dashboard.compat.WitcheryCompat;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -85,6 +86,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.TAINTED_MAGIC.isModLoaded()) {
             TaintedMagicCompat.register();
+        }
+        if (Mods.WITCHERY.isModLoaded()) {
+            WitcheryCompat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

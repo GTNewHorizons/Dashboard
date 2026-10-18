@@ -159,6 +159,15 @@ dashboard.element.thaumictinkerer.soul_hearts.own_settings=Thaumic Tinkerer conf
 dashboard.element.taintedmagic.katana_charge=Katana Charge
 dashboard.element.taintedmagic.disassembler_mode=Thaumic Disassembler Mode
 
+## Witchery
+dashboard.element.witchery.side.own_settings=Witchery config > GUIOnLeft
+dashboard.element.witchery.blood_meter=Vampire Blood
+dashboard.element.witchery.target_blood=Target's Blood
+dashboard.element.witchery.infusion_energy=Infusion Energy
+dashboard.element.witchery.creature_power=Creature Power
+dashboard.element.witchery.infused_brew=Infused Brew
+dashboard.element.witchery.bark_belt=Bark Belt Charges
+
 # Customize screen
 dashboard.customize.title=Customize
 dashboard.customize.section.bars=Bars

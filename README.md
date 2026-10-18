@@ -79,6 +79,8 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
 - **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
 - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
+- **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
+  infused brew and bark belt charges (the vampire power bar moves with the hotbar)
 
 More mods are on the way.
 

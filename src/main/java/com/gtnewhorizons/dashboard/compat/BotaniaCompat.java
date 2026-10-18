@@ -112,7 +112,7 @@ public final class BotaniaCompat {
     private static Block corporeaIndex;
     private static final ShiftTracker MANA_BAR_SHIFT = new ShiftTracker();
     private static final ShiftTracker CORPOREA_HINT_SHIFT = new ShiftTracker();
-    private static boolean crosshairInfoInvisible;
+    private static final ShiftTracker CROSSHAIR_INFO_SHIFT = new ShiftTracker();
 
     private BotaniaCompat() {}
 
@@ -178,18 +178,11 @@ public final class BotaniaCompat {
      * drawn invisibly instead.
      */
     public static void beginCrosshairInfo() {
-        crosshairInfoInvisible = !HudEditor.beginRender(CROSSHAIR_INFO);
-        if (crosshairInfoInvisible) {
-            GL11.glPushMatrix();
-            PreviewDrawing.setColorWrites(false);
-        }
+        CROSSHAIR_INFO_SHIFT.beginOrHide(CROSSHAIR_INFO);
     }
 
     public static void endCrosshairInfo() {
-        if (crosshairInfoInvisible) {
-            PreviewDrawing.setColorWrites(true);
-        }
-        HudEditor.endRender();
+        CROSSHAIR_INFO_SHIFT.end();
     }
 
     /** Botania calls it every frame, but it only draws for a moment after using some rods. */

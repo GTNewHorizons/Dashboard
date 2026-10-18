@@ -23,6 +23,9 @@ dependencies {
     runtimeOnlyNonPublishable("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:ThaumicTinkerer:2.12.33:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Tainted-Magic:7.7.8-GTNH:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:ThaumicBases:1.9.22:dev")
+    runtimeOnlyNonPublishable("tuhljin.automagy:Automagy-GTNH:0.29.8-GTNH:dev")
+    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:witchery-69673:2234410"))
 
     // configurations.configureEach {
     //     exclude group: "com.github.GTNewHorizons", module: "TinkersConstruct"

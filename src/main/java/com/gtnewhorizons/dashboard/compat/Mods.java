@@ -31,6 +31,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     THAUMCRAFT("Thaumcraft"),
     THAUMIC_TINKERER("ThaumicTinkerer"),
     TAINTED_MAGIC("TaintedMagic"),
+    WITCHERY("witchery"),
     ;
     // spotless:on
 
