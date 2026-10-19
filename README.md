@@ -86,6 +86,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Battlegear 2**: shield block bar and quiver slots
 - **Nature's Compass**: the biome search text
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
+- **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 
 More mods are on the way.
 

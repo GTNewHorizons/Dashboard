@@ -113,6 +113,9 @@ public enum Mixins implements IMixins {
     BOGOSORTER_HUD(new MixinBuilder("Make the Bogosorter usage ticker movable and its hotbar swap follow the hotbar")
         .addClientMixins("bogosorter.MixinUsageTickerElement_Hud", "bogosorter.MixinHotbarSwap_Hud")
         .addRequiredMod(Mods.BOGOSORTER)
+        .setPhase(Phase.LATE)),
+    GTNHLIB_HUD(new MixinBuilder("Make the GTNHLib text above the hotbar and titles movable")
+        .addClientMixins("gtnhlib.MixinAboveHotbarHUD_Hud", "gtnhlib.MixinTitleRenderer_Hud")
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

@@ -36,6 +36,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     BATTLEGEAR("battlegear2", () -> BattlegearCompat.register()),
     NATURES_COMPASS("naturescompass", () -> NaturesCompassCompat.register()),
     BOGOSORTER("bogosorter", () -> BogosorterCompat.register()),
+    GTNHLIB("gtnhlib", () -> GtnhLibCompat.register()),
     ;
     // spotless:on
 
