@@ -78,6 +78,7 @@ public class GuiHudEditor extends GuiScreen {
     private boolean draggingMenu;
     private int menuGrabOffsetX;
     private int menuGrabOffsetY;
+    private final ImagePan imagePan = new ImagePan();
 
     @Override
     public void initGui() {
@@ -238,6 +239,9 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (imagePan.isActive()) {
+            imagePan.update(mouseX, mouseY, width, height);
+        }
         if (draggedElement != null) {
             if (Mouse.isButtonDown(0)) {
                 dragTo(mouseX, mouseY);
@@ -533,7 +537,7 @@ public class GuiHudEditor extends GuiScreen {
             ColorUtils.text.getColor());
     }
 
-    private void drawOutline(HudBounds bounds, int color) {
+    static void drawOutline(HudBounds bounds, int color) {
         drawRect(bounds.x - 1, bounds.y - 1, bounds.getRight() + 1, bounds.y, color);
         drawRect(bounds.x - 1, bounds.getBottom(), bounds.getRight() + 1, bounds.getBottom() + 1, color);
         drawRect(bounds.x - 1, bounds.y, bounds.x, bounds.getBottom(), color);
@@ -678,6 +682,8 @@ public class GuiHudEditor extends GuiScreen {
         } else if (mouseButton == 1) {
             HudLayout.setVisible(element, !HudLayout.isVisible(element));
             GuiHelpers.playClickSound();
+        } else if (mouseButton == 2 && ImageElements.isImage(element)) {
+            imagePan.start(element, ImagePan.MIDDLE_BUTTON, mouseX, mouseY);
         }
     }
 
@@ -726,18 +732,28 @@ public class GuiHudEditor extends GuiScreen {
         if (wheel == 0) {
             return;
         }
-        int mouseX = Mouse.getEventX() * width / mc.displayWidth;
-        int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+        int mouseX = GuiHelpers.getEventMouseX(width);
+        int mouseY = GuiHelpers.getEventMouseY(height);
         if (modFilter.contains(mouseX, mouseY)) {
             modFilter.scroll(wheel > 0 ? -1 : 1);
             return;
         }
-        if (!isAltKeyDown() || getMenuBounds().contains(mouseX, mouseY)) {
+        if (getMenuBounds().contains(mouseX, mouseY)) {
             return;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
         if (box != null) {
-            resize(box.element, wheel > 0 ? 1 : -1);
+            scrollOver(box.element, box.bounds, mouseX, mouseY, wheel);
+        }
+    }
+
+    /** Alt+scroll resizes, plain scroll zooms an image. Also used in chat. */
+    static void scrollOver(HudElement element, HudBounds bounds, int mouseX, int mouseY, int wheel) {
+        int steps = wheel > 0 ? 1 : -1;
+        if (isAltKeyDown()) {
+            resize(element, steps);
+        } else if (ImageElements.isImage(element)) {
+            ImageElements.zoom(element, bounds, mouseX, mouseY, steps);
         }
     }
 

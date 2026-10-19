@@ -3,6 +3,11 @@
 # Keys
 key.categories.dashboard=Dashboard
 key.dashboard.open_editor=Open Dashboard HUD Editor
+key.dashboard.toggle_images=Show/Hide Pictures
+
+# Messages
+dashboard.message.images_shown=Pictures shown
+dashboard.message.images_hidden=Pictures hidden
 
 # Editor gui
 dashboard.editor.title=Dashboard HUD Editor
@@ -72,6 +77,10 @@ dashboard.element.minecraft.boss_health_number=Boss Health Number
 dashboard.element.minecraft.status_effects=Status Effects
 
 dashboard.preview.scoreboard=Scores
+
+## Pictures (added by Dashboard)
+dashboard.element.image.pack=A picture from a resource pack\nHide or show all pictures with §6[%s]§7 (%s)\n§6Scroll§7 to zoom, §6middle-drag§7 to look around (in chat, just §6drag§7)
+dashboard.element.image.folder=A picture from config/dashboard/images\nHide or show all pictures with §6[%s]§7 (%s)\n§6Scroll§7 to zoom, §6middle-drag§7 to look around (in chat, just §6drag§7)
 
 ## Tinkers' Construct (added by Dashboard)
 dashboard.element.tinkers.belt_hotbar=Belt Hotbar
@@ -325,6 +334,8 @@ dashboard.config.editor.show_labels=Show Labels
 dashboard.config.editor.show_labels.tooltip=Show the element names inside their boxes in the HUD editor
 dashboard.config.editor.show_positions=Show Positions
 dashboard.config.editor.show_positions.tooltip=Show the element position, measured from the middle of the screen, next to its box in the HUD editor
+dashboard.config.editor.show_images=Show Pictures
+dashboard.config.editor.show_images.tooltip=Show pictures from resource packs and the config/dashboard/images folder, toggled with a key
 dashboard.config.editor.hidden_editor_mods=Mods Left Out of the Editor
 dashboard.config.editor.hidden_editor_mods.tooltip=Mod ids whose elements are left out of the HUD editor, to tidy it. They still show in game
 dashboard.config.editor.crosshair_style=Crosshair Style

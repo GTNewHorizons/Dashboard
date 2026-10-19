@@ -30,6 +30,11 @@ public class DashboardConfig {
     @Config.DefaultBoolean(false)
     public static boolean showPositions;
 
+    @Config.Comment("Show pictures from resource packs and the config/dashboard/images folder, toggled with a key")
+    @Config.LangKey("dashboard.config.editor.show_images")
+    @Config.DefaultBoolean(true)
+    public static boolean showImages;
+
     @Config.Comment("Mod ids whose elements are left out of the HUD editor, to tidy it. They still show in game")
     @Config.LangKey("dashboard.config.editor.hidden_editor_mods")
     @Config.DefaultStringList({})

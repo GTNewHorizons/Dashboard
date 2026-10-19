@@ -90,6 +90,8 @@ public final class VanillaHudElements {
         "dashboard.element.minecraft.item_name",
         VanillaHudElements::getItemNameBounds);
 
+    private static String shadowedActionBarText;
+
     public static final HudElement ACTION_BAR = new HudElement(
         "minecraft:action_bar",
         "dashboard.element.minecraft.action_bar",
@@ -451,6 +453,16 @@ public final class VanillaHudElements {
             cancel(event);
             postExperienceBar(event);
         }
+    }
+
+    /** A message above the hotbar, where music disc names show, but with a shadow like other HUD text. */
+    public static void showShadowedActionBarText(String text) {
+        shadowedActionBarText = text;
+        Minecraft.getMinecraft().ingameGUI.func_110326_a(text, false);
+    }
+
+    public static boolean isShadowedActionBarText(String text) {
+        return text.equals(shadowedActionBarText);
     }
 
     /**

@@ -19,6 +19,9 @@ public enum Mixins implements IMixins {
         .setPhase(Phase.EARLY)),
     ACHIEVEMENT(new MixinBuilder("Make the achievement popup movable").addClientMixins("MixinGuiAchievement")
         .setPhase(Phase.EARLY)),
+    CHAT_IMAGES(
+        new MixinBuilder("Move and zoom image elements while chat is open").addClientMixins("MixinGuiChat_Images")
+            .setPhase(Phase.EARLY)),
     BOSS_HEALTH(new MixinBuilder("Remember the boss for its health number").addClientMixins("MixinBossStatus")
         .setPhase(Phase.EARLY)),
     SCREEN_OVERLAYS(new MixinBuilder("Change the screen overlays")

@@ -127,6 +127,33 @@ public final class HudLayout {
         changed = true;
     }
 
+    /** For image elements: 1 shows the whole picture, 2 half of it twice as big. */
+    public static float getZoom(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.zoom == null ? 1 : state.zoom;
+    }
+
+    /** The middle of the shown part, from 0 to 1 across the picture. */
+    public static float getViewX(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.zoom == null ? 0.5f : state.viewX;
+    }
+
+    public static float getViewY(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.zoom == null ? 0.5f : state.viewY;
+    }
+
+    /** A zoom of 1 or less is saved as nothing, so untouched images stay out of the file. */
+    public static void setZoom(HudElement element, float zoom, float viewX, float viewY) {
+        HudElementState state = getOrCreateState(element);
+        state.zoom = zoom > 1 ? zoom : null;
+        state.viewX = zoom > 1 ? viewX : 0;
+        state.viewY = zoom > 1 ? viewY : 0;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     /**
      * The GUI scale this element is drawn at. Whole GUI scales keep every texture pixel the same number of screen
      * pixels, so a resized element stays as sharp as the rest of the HUD.
@@ -234,7 +261,7 @@ public final class HudLayout {
         }
     }
 
-    /** Positions, sizes and visibility. Looks are reset in the Customize screen. */
+    /** Positions, sizes, image zoom and visibility. Looks are reset in the Customize screen. */
     public static void reset(Iterable<HudElement> elements) {
         for (HudElement element : elements) {
             HudElementState state = getStates().get(element.getId());
@@ -242,6 +269,7 @@ public final class HudLayout {
                 state.visible = null;
                 state.moved = false;
                 state.sizeStep = 0;
+                state.zoom = null;
                 removeIfDefault(element);
             }
         }

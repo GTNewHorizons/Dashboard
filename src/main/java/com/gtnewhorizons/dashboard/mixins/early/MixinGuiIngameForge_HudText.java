@@ -29,7 +29,10 @@ public class MixinGuiIngameForge_HudText {
         return dashboard$drawShifted(VanillaHudElements.ITEM_NAME, font, text, x, y, color, original);
     }
 
-    // Action bar - music disc message
+    /**
+     * Action bar, like the music disc message. Forge keeps drawing it down to opacity 1, but the font draws text below
+     * opacity 4 fully opaque, so the faded text would flash at the end.
+     */
     @WrapOperation(
         method = "renderRecordOverlay",
         at = @At(
@@ -38,7 +41,13 @@ public class MixinGuiIngameForge_HudText {
             remap = true))
     private int dashboard$moveActionBar(FontRenderer font, String text, int x, int y, int color,
         Operation<Integer> original) {
-        return dashboard$drawShifted(VanillaHudElements.ACTION_BAR, font, text, x, y, color, original);
+        if (color >>> 24 < 4) {
+            return 0;
+        }
+        Operation<Integer> draw = VanillaHudElements.isShadowedActionBarText(text)
+            ? args -> font.drawStringWithShadow(text, x, y, color)
+            : original;
+        return dashboard$drawShifted(VanillaHudElements.ACTION_BAR, font, text, x, y, color, draw);
     }
 
     // XP level number

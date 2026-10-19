@@ -22,10 +22,16 @@ public final class HudEditorKeybind {
         Keyboard.KEY_K,
         "key.categories.dashboard");
 
+    public static final KeyBinding TOGGLE_IMAGES = new KeyBinding(
+        "key.dashboard.toggle_images",
+        Keyboard.KEY_NONE,
+        "key.categories.dashboard");
+
     private HudEditorKeybind() {}
 
     public static void register() {
         ClientRegistry.registerKeyBinding(OPEN_EDITOR);
+        ClientRegistry.registerKeyBinding(TOGGLE_IMAGES);
     }
 
     @SubscribeEvent
@@ -33,6 +39,9 @@ public final class HudEditorKeybind {
         Minecraft mc = Minecraft.getMinecraft();
         if (OPEN_EDITOR.isPressed() && mc.currentScreen == null && mc.theWorld != null) {
             mc.displayGuiScreen(new GuiHudEditor());
+        }
+        if (TOGGLE_IMAGES.isPressed() && mc.currentScreen == null) {
+            ImageElements.toggleShown();
         }
     }
 }

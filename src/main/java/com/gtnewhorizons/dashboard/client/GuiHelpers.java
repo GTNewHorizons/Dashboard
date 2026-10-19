@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
@@ -112,6 +113,16 @@ final class GuiHelpers {
         tessellator.addVertexWithUV(screenWidth, top, 0, screenWidth / DIRT_TILE, top / DIRT_TILE);
         tessellator.addVertexWithUV(0, top, 0, 0, top / DIRT_TILE);
         tessellator.draw();
+    }
+
+    /** The mouse position of the current mouse event, in GUI pixels. */
+    static int getEventMouseX(int screenWidth) {
+        return Mouse.getEventX() * screenWidth / Minecraft.getMinecraft().displayWidth;
+    }
+
+    /** Counted from the top, unlike the mouse event's own value. */
+    static int getEventMouseY(int screenHeight) {
+        return screenHeight - Mouse.getEventY() * screenHeight / Minecraft.getMinecraft().displayHeight - 1;
     }
 
     /** For buttons that stay clickable while greyed out, since vanilla ignores clicks on disabled buttons. */

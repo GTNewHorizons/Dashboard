@@ -28,6 +28,7 @@ Every part of the HUD gets its own box, even when it is not showing right now, s
 | Reset an element's position    | **Ctrl + click** the element                             |
 | Resize an element              | **Alt + scroll** over the element                        |
 | Reset an element's size        | **Alt + click** the element                              |
+| Zoom into an image             | **Scroll** over it, **middle-drag** to move around, **middle-click** to reset |
 | See the controls again         | Hover the **?** in the editor menu                       |
 
 Hover an element to see its name, its size and which mod it belongs to. If that mod has its own position setting for
@@ -90,6 +91,18 @@ More mods are on the way.
 
 Everything you change in the editor and in the Dashboard Customize menu is saved automatically. Some options can also be found in the
 Dashboard config, in the **Mods** menu of the main screen.
+
+## Your Own Images
+
+Put PNG pictures in `config/dashboard/images/` (the folder is made on the first start), then restart or press
+**F3 + T**. Each picture becomes an element named after its file, which you can move, resize and hide in the editor.
+To hide or show all pictures at once, for example for screenshots, bind **Show/Hide Pictures** in **Controls**,
+under **Dashboard**. While chat is open, you can also zoom into a picture: **scroll** to zoom, **drag** to move around in it and
+**middle-click** to see the whole picture again. Moving and resizing pictures stays in the editor.
+
+To change a picture's starting size, see-through look or animation, add an `images.json` to the same folder, using
+the file names without `.png`. It takes the same settings as pack images, see the
+[Texture Guide](src/main/resources/assets/dashboard/textures/gui/TextureGuide.md).
 
 ## For Resource Pack Makers
 

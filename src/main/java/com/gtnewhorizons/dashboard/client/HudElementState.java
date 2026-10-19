@@ -28,6 +28,9 @@ public class HudElementState {
     public NumberStyle numberStyle;
     public Integer numberDecimals;
     public int sizeStep;
+    public Float zoom;
+    public float viewX;
+    public float viewY;
 
     boolean isDefault() {
         return visible == null && !moved
@@ -36,6 +39,7 @@ public class HudElementState {
             && !numberOn
             && numberStyle == null
             && numberDecimals == null
-            && sizeStep == 0;
+            && sizeStep == 0
+            && zoom == null;
     }
 }
