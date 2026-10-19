@@ -41,8 +41,8 @@ is used instead, until you reset it.
 - **Preview**: shows sample content for elements that are not showing right now, so you can see what you are moving.
 - **Labels**: shows each element's name inside its box.
 - **Position**: shows each element's position next to its box.
-- **Mods**: a list of mods with tick boxes. Untick a mod to leave its elements out of the editor and tidy it up.
-  They still show in game.
+- **Mods**: a list of mods with tick boxes. Only Minecraft and Dashboard are ticked at first, so the editor starts
+  tidy. Tick a mod to arrange its elements too. Unticked mods still show in game.
 - **Reset**: puts every element shown in the editor back where it started.
 - **Customize**: opens the styling options below.
 - **Done**: saves and closes the editor.

@@ -35,10 +35,10 @@ public class DashboardConfig {
     @Config.DefaultBoolean(true)
     public static boolean showImages;
 
-    @Config.Comment("Mod ids whose elements are left out of the HUD editor, to tidy it. They still show in game")
-    @Config.LangKey("dashboard.config.editor.hidden_editor_mods")
-    @Config.DefaultStringList({})
-    public static String[] hiddenEditorMods;
+    @Config.Comment("Mod ids whose elements show in the HUD editor. Other mods are left out, to tidy it. They still show in game")
+    @Config.LangKey("dashboard.config.editor.shown_editor_mods")
+    @Config.DefaultStringList({ "minecraft", Dashboard.MODID })
+    public static String[] shownEditorMods;
 
     @Config.Comment("Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet")
     @Config.LangKey("dashboard.config.editor.crosshair_style")

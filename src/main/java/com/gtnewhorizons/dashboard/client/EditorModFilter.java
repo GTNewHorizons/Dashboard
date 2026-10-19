@@ -12,11 +12,14 @@ import com.gtnewhorizons.dashboard.api.HudElement;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Which mods' elements the HUD editor leaves out, so players can tidy it. Their HUD still shows in game. */
+/**
+ * Which mods' elements the HUD editor shows. Only Minecraft and Dashboard at first, so the editor starts tidy, and
+ * players tick the mods they want to arrange. Left out mods' HUD still shows in game.
+ */
 @SideOnly(Side.CLIENT)
 public final class EditorModFilter {
 
-    private static final Set<String> HIDDEN = new HashSet<>();
+    private static final Set<String> SHOWN = new HashSet<>();
     private static String[] parsedList;
 
     private EditorModFilter() {}
@@ -32,34 +35,34 @@ public final class EditorModFilter {
     }
 
     static boolean isShown(String modKey) {
-        return !getHidden().contains(modKey);
+        return getShown().contains(modKey);
     }
 
     /** Several mods at once, so the config is saved once. */
     static void setShown(Collection<String> modKeys, boolean shown) {
-        Set<String> hidden = new HashSet<>(getHidden());
+        Set<String> shownMods = new HashSet<>(getShown());
         if (shown) {
-            hidden.removeAll(modKeys);
+            shownMods.addAll(modKeys);
         } else {
-            hidden.addAll(modKeys);
+            shownMods.removeAll(modKeys);
         }
-        DashboardConfig.hiddenEditorMods = hidden.toArray(new String[0]);
+        DashboardConfig.shownEditorMods = shownMods.toArray(new String[0]);
         ConfigurationManager.save(DashboardConfig.class);
     }
 
     /** Asked every frame for every element, so the list is only read again when it changes. */
-    private static Set<String> getHidden() {
+    private static Set<String> getShown() {
         // The config gives a new list whenever it changes
-        String[] list = DashboardConfig.hiddenEditorMods;
+        String[] list = DashboardConfig.shownEditorMods;
         if (list != parsedList) {
             parsedList = list;
-            HIDDEN.clear();
+            SHOWN.clear();
             for (String modId : list) {
-                HIDDEN.add(
+                SHOWN.add(
                     modId.trim()
                         .toLowerCase(Locale.ROOT));
             }
         }
-        return HIDDEN;
+        return SHOWN;
     }
 }
