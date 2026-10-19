@@ -169,6 +169,14 @@ dashboard.element.witchery.creature_power=Creature Power
 dashboard.element.witchery.infused_brew=Infused Brew
 dashboard.element.witchery.bark_belt=Bark Belt Charges
 
+## Battlegear 2
+dashboard.element.battlegear2.shield_bar=Shield Block Bar
+dashboard.element.battlegear2.shield_bar.description=Shows while holding a shield in the off hand
+dashboard.element.battlegear2.shield_bar.own_settings=Battlegear config > Shield bar relative position
+dashboard.element.battlegear2.quiver=Quiver Slots
+dashboard.element.battlegear2.quiver.description=Shows while holding a bow with a quiver in your inventory
+dashboard.element.battlegear2.quiver.own_settings=Battlegear config > Quiver hotbar relative position
+
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
 dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)

@@ -9,6 +9,7 @@ dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:AdventureBackpack2:1.4.26-GTNH:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:AppleCore:3.3.13:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Backhand:1.8.16:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Battlegear2-for-Backhand:1.6.8-backhand:dev") // Needs Backhand
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Botania:1.13.37-GTNH:dev")
 
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:TinkersConstruct:1.14.119-GTNH:dev")

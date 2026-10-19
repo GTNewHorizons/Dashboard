@@ -98,6 +98,10 @@ public enum Mixins implements IMixins {
         .setPhase(Phase.LATE)),
     IC2_HUD(new MixinBuilder("Make the IC2 helmet HUD movable").addClientMixins("ic2.MixinGuiOverlayer_Hud")
         .addRequiredMod(Mods.IC2)
+        .setPhase(Phase.LATE)),
+    BATTLEGEAR_HUD(new MixinBuilder("Make the Battlegear shield bar and quiver slots movable")
+        .addClientMixins("battlegear2.MixinBattlegearInGameGUI_Hud")
+        .addRequiredMod(Mods.BATTLEGEAR)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
