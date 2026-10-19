@@ -87,6 +87,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Nature's Compass**: the biome search text
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
+- **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 
 More mods are on the way.
 

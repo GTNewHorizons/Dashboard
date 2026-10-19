@@ -201,6 +201,10 @@ dashboard.element.gtnhlib.above_hotbar_text.description=Short messages GTNH mods
 dashboard.element.gtnhlib.title=Title
 dashboard.element.gtnhlib.title.own_settings=GTNHLib config > titleOffsetX / titleOffsetY / titleScale
 
+## Infernal Mobs
+dashboard.element.infernalmobs.health_bar=Elite Mob Health
+dashboard.element.infernalmobs.health_bar.description=Shows while looking at an elite mob, when no boss bar shows\nWith the mob's name and its modifiers
+
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
 dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)
