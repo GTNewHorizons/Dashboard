@@ -1,5 +1,6 @@
 package com.gtnewhorizons.dashboard.client;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -34,12 +35,13 @@ public final class EditorModFilter {
         return !getHidden().contains(modKey);
     }
 
-    static void setShown(String modKey, boolean shown) {
+    /** Several mods at once, so the config is saved once. */
+    static void setShown(Collection<String> modKeys, boolean shown) {
         Set<String> hidden = new HashSet<>(getHidden());
         if (shown) {
-            hidden.remove(modKey);
+            hidden.removeAll(modKeys);
         } else {
-            hidden.add(modKey);
+            hidden.addAll(modKeys);
         }
         DashboardConfig.hiddenEditorMods = hidden.toArray(new String[0]);
         ConfigurationManager.save(DashboardConfig.class);

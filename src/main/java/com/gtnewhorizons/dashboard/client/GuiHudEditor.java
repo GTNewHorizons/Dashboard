@@ -382,6 +382,7 @@ public class GuiHudEditor extends GuiScreen {
         if (!modFilter.isOpen() && modsButton.mousePressed(mc, mouseX, mouseY)) {
             lines.add(StatCollector.translateToLocal("dashboard.editor.mods_tooltip"));
             lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.game"));
+            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.ctrl"));
         }
         return lines;
     }

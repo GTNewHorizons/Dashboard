@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
@@ -104,7 +106,7 @@ final class ModFilterDropdown {
         }
     }
 
-    /** True if the click was on the list. Clicking a row ticks or unticks its mod. */
+    /** True if the click was on the list. Clicking a row ticks or unticks its mod, Ctrl+click all the others. */
     boolean click(int mouseX, int mouseY) {
         if (!contains(mouseX, mouseY)) {
             return false;
@@ -112,10 +114,31 @@ final class ModFilterDropdown {
         int row = getRowAt(mouseX, mouseY);
         if (row >= 0) {
             String key = entries.get(row).key;
-            EditorModFilter.setShown(key, !EditorModFilter.isShown(key));
+            if (GuiScreen.isCtrlKeyDown()) {
+                setOthersOpposite(key);
+            } else {
+                EditorModFilter.setShown(Collections.singleton(key), !EditorModFilter.isShown(key));
+            }
             GuiHelpers.playClickSound();
         }
         return true;
+    }
+
+    /**
+     * Gives every other mod the opposite of this mod's state, like showing only this one. If they all have it already,
+     * gives them this mod's state back, so a second Ctrl+click undoes the first.
+     */
+    private void setOthersOpposite(String key) {
+        boolean shown = EditorModFilter.isShown(key);
+        List<String> others = new ArrayList<>();
+        boolean allOpposite = true;
+        for (Entry entry : entries) {
+            if (!entry.key.equals(key)) {
+                others.add(entry.key);
+                allOpposite &= EditorModFilter.isShown(entry.key) != shown;
+            }
+        }
+        EditorModFilter.setShown(others, allOpposite ? shown : !shown);
     }
 
     void scroll(int rows) {

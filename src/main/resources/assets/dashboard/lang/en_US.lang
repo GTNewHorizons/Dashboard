@@ -14,6 +14,7 @@ dashboard.editor.button.customize=Customize
 dashboard.editor.button.mods=Mods
 dashboard.editor.mods_tooltip=Choose which mods' elements show in the editor
 dashboard.editor.mods_tooltip.game=Unticked mods still show in game
+dashboard.editor.mods_tooltip.ctrl=§6Ctrl+click§7 a mod to switch all the others
 dashboard.editor.button.grid=Grid
 dashboard.editor.button.grid.on=Grid: ON
 dashboard.editor.button.grid.off=Grid: OFF
