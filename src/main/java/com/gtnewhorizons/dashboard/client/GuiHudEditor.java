@@ -260,6 +260,7 @@ public class GuiHudEditor extends GuiScreen {
         updateBoxes();
         if (modFilter.isOpen()) {
             modFilter.placeAt(modsButton, width, height);
+            modFilter.updateHandleDrag(mouseY);
         }
         boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY)
             || modFilter.contains(mouseX, mouseY);

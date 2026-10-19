@@ -32,6 +32,10 @@ public final class ColorUtils {
         grid                    = color.argb("grid",                    "0x20FFFFFF"),
         gridCenter              = color.argb("gridCenter",              "0x50FFFFFF"),
         sectionHeader           = color.argb("sectionHeader",           "0x50A0A0A0"),
+        
+        scrollbarTrack          = color.argb("scrollbarTrack",          "0x50A0A0A0"),
+        scrollbarHandle         = color.argb("scrollbarHandle",         "0xFFE0E0E0"),
+        scrollbarHandleHovered  = color.argb("scrollbarHandleHovered",  "0xFFFFFFA0"),
 
         crosshairBackground1    = color.argb("crosshairBackground1",    "0xFFC6C6C6"),
         crosshairBackground2    = color.argb("crosshairBackground2",    "0xFF2B2B2B"),
