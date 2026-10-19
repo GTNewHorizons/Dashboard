@@ -17,7 +17,7 @@ Every other mod listed below is optional. Dashboard only adds its features for a
 
 ## The HUD Editor
 
-Press **Numpad 7** to open the editor. You can change the key in **Controls**, under **Dashboard**.
+Press **K** to open the editor. You can change the key in **Controls**, under **Dashboard**.
 
 Every part of the HUD gets its own box, even when it is not showing right now, so you can always find and grab it.
 

@@ -19,7 +19,7 @@ public final class HudEditorKeybind {
 
     public static final KeyBinding OPEN_EDITOR = new KeyBinding(
         "key.dashboard.open_editor",
-        Keyboard.KEY_NUMPAD7,
+        Keyboard.KEY_K,
         "key.categories.dashboard");
 
     private HudEditorKeybind() {}
