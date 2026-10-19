@@ -34,6 +34,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     WITCHERY("witchery", () -> WitcheryCompat.register()),
     IC2("IC2", () -> Ic2Compat.register()),
     BATTLEGEAR("battlegear2", () -> BattlegearCompat.register()),
+    NATURES_COMPASS("naturescompass", () -> NaturesCompassCompat.register()),
     ;
     // spotless:on
 

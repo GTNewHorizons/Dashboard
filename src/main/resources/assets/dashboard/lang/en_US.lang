@@ -186,6 +186,11 @@ dashboard.element.battlegear2.quiver=Quiver Slots
 dashboard.element.battlegear2.quiver.description=Shows while holding a bow with a quiver in your inventory
 dashboard.element.battlegear2.quiver.own_settings=Battlegear config > Quiver hotbar relative position
 
+## Nature's Compass
+dashboard.element.naturescompass.biome_info=Biome Search Info
+dashboard.element.naturescompass.biome_info.description=Shows while holding a Nature's Compass
+dashboard.element.naturescompass.biome_info.own_settings=Nature's Compass config > overlaySide / lineOffset
+
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
 dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)

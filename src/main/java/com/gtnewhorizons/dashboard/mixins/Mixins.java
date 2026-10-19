@@ -105,6 +105,10 @@ public enum Mixins implements IMixins {
     BATTLEGEAR_HUD(new MixinBuilder("Make the Battlegear shield bar and quiver slots movable")
         .addClientMixins("battlegear2.MixinBattlegearInGameGUI_Hud")
         .addRequiredMod(Mods.BATTLEGEAR)
+        .setPhase(Phase.LATE)),
+    NATURES_COMPASS_HUD(new MixinBuilder("Make the Nature's Compass biome search text movable")
+        .addClientMixins("naturescompass.MixinRenderTickHandler_Hud")
+        .addRequiredMod(Mods.NATURES_COMPASS)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

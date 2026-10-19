@@ -84,6 +84,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
   infused brew and bark belt charges (the vampire power bar moves with the hotbar)
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
 - **Battlegear 2**: shield block bar and quiver slots
+- **Nature's Compass**: the biome search text
 
 More mods are on the way.
 

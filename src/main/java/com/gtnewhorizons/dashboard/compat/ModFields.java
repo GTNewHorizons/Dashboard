@@ -39,6 +39,7 @@ final class ModFields {
         return require(fields.getLongField(Fields.LookupType.DECLARED, name), name);
     }
 
+    /** The type must be the field's exact type, not a parent of it, or GTNHLib throws a ClassCastException. */
     static <F> Fields.ClassFields<Object>.Field<F> field(Fields.ClassFields<Object> fields, String name, Class<F> type)
         throws NoSuchFieldException {
         return require(fields.getField(Fields.LookupType.DECLARED, name, type), name);
