@@ -195,9 +195,9 @@ dashboard.element.naturescompass.biome_info.own_settings=Nature's Compass config
 dashboard.element.bogosorter.usage_ticker=Usage Ticker
 dashboard.element.bogosorter.usage_ticker.description=Pops up for a moment when the held item or armor changes count\nThe hotbar swap column (§6hold Alt§7) moves with the hotbar
 
-## GTNHLib
+## GTNHLib (+ServerUtilities)
 dashboard.element.gtnhlib.above_hotbar_text=Text Above Hotbar
-dashboard.element.gtnhlib.above_hotbar_text.description=Short messages GTNH mods show above the hotbar
+dashboard.element.gtnhlib.above_hotbar_text.description=Short messages GTNH mods show above the hotbar\nServerUtilities notifications move with it
 dashboard.element.gtnhlib.title=Title
 dashboard.element.gtnhlib.title.own_settings=GTNHLib config > titleOffsetX / titleOffsetY / titleScale
 

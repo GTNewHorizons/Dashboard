@@ -90,6 +90,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
+- **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 
 More mods are on the way.
 

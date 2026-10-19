@@ -40,6 +40,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     INFERNAL_MOBS("InfernalMobs", () -> InfernalMobsCompat.register()),
     ET_FUTURUM("etfuturum", () -> EtFuturumCompat.register()),
     HEE("HardcoreEnderExpansion", () -> HeeCompat.register()),
+    SERVER_UTILITIES("serverutilities"),
     ;
     // spotless:on
 
