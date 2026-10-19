@@ -8,6 +8,7 @@ import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.client.BarNumbers;
 import com.gtnewhorizons.dashboard.client.BarThemes;
 import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
+import com.gtnewhorizons.dashboard.client.PackImages;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.gtnewhorizons.dashboard.compat.Mods;
@@ -35,7 +36,9 @@ public class ClientProxy extends CommonProxy {
         BarNumbers.register();
         StatusEffects.register();
         Mods.registerLoadedCompat();
-        ((IReloadableResourceManager) Minecraft.getMinecraft()
-            .getResourceManager()).registerReloadListener(BarThemes::load);
+        IReloadableResourceManager resources = (IReloadableResourceManager) Minecraft.getMinecraft()
+            .getResourceManager();
+        resources.registerReloadListener(BarThemes::load);
+        resources.registerReloadListener(PackImages::load);
     }
 }

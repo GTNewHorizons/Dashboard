@@ -1,7 +1,7 @@
-# Dashboard bar themes
+# Dashboard textures
 
 Each PNG listed in `themes.json` is one bar theme. The file name is the theme id (`simple.png` is the theme `simple`).
-`crosshairs.png` in this folder is the crosshair sheet, not a theme.
+`crosshairs.png` in this folder is the crosshair sheet, not a theme. The `images` folder holds pack images.
 Every theme uses the same layout, shown below.
 
 ## themes.json
@@ -25,6 +25,51 @@ Themes are listed in `themes.json`, next to the PNGs: theme id on the left, the 
 The `"crosshairs": 34` entry in `themes.json` is not a theme: it says how many crosshairs `crosshairs.png` holds.
 The sheet is 256 x 256 with one 16 x 16 cell per crosshair, filled left to right, then top to bottom (up to 256).
 A resource pack that replaces `crosshairs.png` sets its own count the same way. The top pack's count is used.
+
+## Pack images
+
+Pictures a resource pack adds to the HUD, like a logo or a frame around the hotbar. Each one is its own element that
+players can move, resize and hide. They are listed in `images.json`, next to `themes.json`, and each PNG goes in the
+`images` folder, named after its entry (`logo` is `images/logo.png`).
+
+```json
+{
+  "logo": {
+    "name": "Server Logo",
+    "width": 64,
+    "height": 32,
+    "anchor": "top_left",
+    "x": 4,
+    "y": 4
+  },
+  "flame": {
+    "name": "Flame",
+    "width": 16,
+    "height": 16,
+    "anchor": "bottom_right",
+    "opacity": 0.8,
+    "frames": 4,
+    "frametime": 2
+  }
+}
+```
+
+| Setting     | Meaning                                                                                       | Default    |
+|-------------|-----------------------------------------------------------------------------------------------|------------|
+| `name`      | The name shown in the editor (a lang key works too)                                           | the entry  |
+| `width`     | Size on screen, in GUI pixels. The picture is stretched to it, so larger PNGs look sharper    | 32         |
+| `height`    |                                                                                               | 32         |
+| `anchor`    | `top_left`, `top_center`, `top_right`, `center_left`, `center`, `center_right`, `bottom_left`, `bottom_center` or `bottom_right` | `top_left` |
+| `x`, `y`    | Moves it from the anchor, right and down (negative for left and up)                           | 0          |
+| `opacity`   | From 0 (invisible) to 1 (solid)                                                               | 1          |
+| `visible`   | `false` keeps it hidden until the player turns it on in the editor                            | `true`     |
+| `frames`    | For animations: the number of frames, stacked from top to bottom in the PNG                   | 1          |
+| `frametime` | How long each frame shows, in game ticks (20 per second)                                      | 1          |
+
+- The lists of all packs are merged, like `themes.json`. An entry whose PNG is missing is skipped (and noted in the log).
+- Transparent pixels stay transparent, also partly see-through ones.
+- An image's name is read once, so a renamed image shows its new name after a restart.
+- Use lowercase file names without spaces.
 
 ## Sheet
 

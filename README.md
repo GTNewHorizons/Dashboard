@@ -91,6 +91,18 @@ More mods are on the way.
 Everything you change in the editor and in the Dashboard Customize menu is saved automatically. Some options can also be found in the
 Dashboard config, in the **Mods** menu of the main screen.
 
+## For Resource Pack Makers
+
+A resource pack can change how Dashboard looks and add to it, all from `assets/dashboard/textures/gui/`:
+
+- **Bar themes**: new looks for the health, food, armor, XP and other bars, listed in `themes.json`.
+- **Crosshairs**: extra crosshair styles in `crosshairs.png`.
+- **Pack images**: pictures shown on the HUD, like a logo or a frame around the hotbar, listed in `images.json`. Each
+  one is an element players can move, resize and hide in the editor. Images can be see-through and animated.
+
+The [Texture Guide](src/main/resources/assets/dashboard/textures/gui/TextureGuide.md) explains each one: file names,
+sheet layouts and every setting.
+
 ## License
 
 [![License](https://img.shields.io/badge/License-LGPL--3.0-yellow.svg?style=flat-square)](LICENSE)

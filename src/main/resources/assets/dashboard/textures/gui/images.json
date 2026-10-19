@@ -1,0 +1,13 @@
+{
+  "ethel_the_cat": {
+    "name": "Ethel the Cat",
+    "width": 64,
+    "height": 64,
+    "anchor": "top_left",
+    "x": 187,
+    "y": 9,
+    "visible": false,
+    "frames": 82,
+    "frametime": 1
+  }
+}
