@@ -74,7 +74,7 @@ dashboard.preview.scoreboard=Scores
 
 ## Tinkers' Construct (added by Dashboard)
 dashboard.element.tinkers.belt_hotbar=Belt Hotbar
-dashboard.element.tinkers.belt_hotbar.description=The items in your Traveller's Belt,\nswapped with your hotbar by pressing [%s]. Hidden by default.
+dashboard.element.tinkers.belt_hotbar.description=The items in your Traveller's Belt,\nswapped with your hotbar by pressing §6[%s]§7 (%s). Hidden by default.
 
 ## GraviSuite
 dashboard.element.gravisuite.status=GraviSuite Status
@@ -97,7 +97,7 @@ dashboard.element.galaxyspace.pressure.own_settings=Galacticraft config > Minima
 
 ## Waila
 dashboard.element.waila.info_box=Waila
-dashboard.element.waila.info_box.own_settings=Waila settings screen [%s]
+dashboard.element.waila.info_box.own_settings=§6[%s]§7 (%s)
 
 ## Adventure Backpack
 dashboard.element.adventurebackpack.potion_icons=Backpack Potion Icons
@@ -135,7 +135,7 @@ dashboard.element.ingameinfo.own_settings=InGameInfoXML config > alignment offse
 dashboard.element.draconicevolution.info_box=Draconic Info Box
 dashboard.element.draconicevolution.armor_hud=Draconic Armor HUD
 dashboard.element.draconicevolution.magnet_icon=Draconic Magnet Icon
-dashboard.element.draconicevolution.own_settings=Tool & Armor Config [%s] > Configure HUD Elements
+dashboard.element.draconicevolution.own_settings=§6[%s]§7 (%s) > Configure HUD Elements
 
 ## Thaumcraft
 dashboard.element.thaumcraft.wand_dial=Wand Vis Dial
@@ -167,6 +167,12 @@ dashboard.element.witchery.infusion_energy=Infusion Energy
 dashboard.element.witchery.creature_power=Creature Power
 dashboard.element.witchery.infused_brew=Infused Brew
 dashboard.element.witchery.bark_belt=Bark Belt Charges
+
+## IndustrialCraft 2
+dashboard.element.ic2.armor_charge=Armor Charge
+dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)
+dashboard.element.ic2.held_item=Held Item Info
+dashboard.element.ic2.held_item.description=Shows in the Nano or Quantum helmet's extended HUD mode\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)
 
 # Customize screen
 dashboard.customize.title=Customize

@@ -539,26 +539,30 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.getRight(), bounds.y, bounds.getRight() + 1, bounds.getBottom(), color);
     }
 
+    /** The name and the element's state first, then what it is and where its own settings are, then its mod. */
     private List<String> getTooltip(HudElement element) {
         List<String> lines = new ArrayList<>();
         lines.add(element.getDisplayName());
-        String description = element.getDescription();
-        if (description != null) {
-            for (String line : description.split("\\\\n")) {
-                lines.add(EnumChatFormatting.GRAY + line);
-            }
-        }
-        lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (!HudLayout.isVisible(element)) {
             lines.add(
                 EnumChatFormatting.RED + StatCollector.translateToLocal("dashboard.editor.element_tooltip.hidden"));
         }
+        lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (!element.isCurrentlyShowing()) {
             lines.add(
                 EnumChatFormatting.GRAY
                     + StatCollector.translateToLocal("dashboard.editor.element_tooltip.not_showing"));
         }
+        String description = element.getDescription();
         String ownSettings = element.getOwnSettings();
+        if (description != null || ownSettings != null) {
+            lines.add("");
+        }
+        if (description != null) {
+            for (String line : description.split("\\\\n")) {
+                lines.add(EnumChatFormatting.GRAY + line);
+            }
+        }
         if (ownSettings != null) {
             lines.add(
                 EnumChatFormatting.GRAY + StatCollector

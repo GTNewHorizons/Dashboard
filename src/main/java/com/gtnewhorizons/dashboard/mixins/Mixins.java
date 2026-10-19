@@ -95,6 +95,9 @@ public enum Mixins implements IMixins {
     WITCHERY_HUD(new MixinBuilder("Make the Witchery HUD movable")
         .addClientMixins("witchery.MixinClientEvents_Hud", "witchery.MixinPlayerRender_Hud")
         .addRequiredMod(Mods.WITCHERY)
+        .setPhase(Phase.LATE)),
+    IC2_HUD(new MixinBuilder("Make the IC2 helmet HUD movable").addClientMixins("ic2.MixinGuiOverlayer_Hud")
+        .addRequiredMod(Mods.IC2)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;

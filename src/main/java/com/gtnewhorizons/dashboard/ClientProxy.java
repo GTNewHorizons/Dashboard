@@ -17,6 +17,7 @@ import com.gtnewhorizons.dashboard.compat.DraconicCompat;
 import com.gtnewhorizons.dashboard.compat.GalacticraftCompat;
 import com.gtnewhorizons.dashboard.compat.GalaxySpaceCompat;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
+import com.gtnewhorizons.dashboard.compat.Ic2Compat;
 import com.gtnewhorizons.dashboard.compat.InGameInfoCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
 import com.gtnewhorizons.dashboard.compat.TaintedMagicCompat;
@@ -89,6 +90,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (Mods.WITCHERY.isModLoaded()) {
             WitcheryCompat.register();
+        }
+        if (Mods.IC2.isModLoaded()) {
+            Ic2Compat.register();
         }
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener(BarThemes::load);

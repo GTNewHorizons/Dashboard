@@ -42,10 +42,10 @@ public final class HudElement {
     private String modName;
     private String modNameAddon;
     private String ownSettingsKey;
-    private String ownSettingsKeyBinding;
+    private String[] ownSettingsKeyBindings;
     private boolean visibleByDefault = true;
     private String descriptionKey;
-    private String descriptionKeyBinding;
+    private String[] descriptionKeyBindings;
     private long lastRenderTime;
 
     /**
@@ -116,18 +116,18 @@ public final class HudElement {
     /**
      * Extra lines in the element's editor tooltip, explaining what it is. Optional.
      *
-     * @param translationKey lang key of the text, with {@code %s} for a key binding, if any
-     * @param keyBinding     description of that key in Controls, or null
+     * @param translationKey lang key of the text, with {@code %s} for key bindings, see {@link #translate}
+     * @param keyBindings    descriptions of those keys in Controls, in order
      */
-    public HudElement setDescription(String translationKey, String keyBinding) {
+    public HudElement setDescription(String translationKey, String... keyBindings) {
         this.descriptionKey = translationKey;
-        this.descriptionKeyBinding = keyBinding;
+        this.descriptionKeyBindings = keyBindings;
         return this;
     }
 
     /** Null without {@link #setDescription}. */
     public String getDescription() {
-        return translate(descriptionKey, descriptionKeyBinding);
+        return translate(descriptionKey, descriptionKeyBindings);
     }
 
     /** Only needed when the part of the id before ':' is not the mod id (ignoring case). */
@@ -165,31 +165,38 @@ public final class HudElement {
      * Where the mod's own position setting for this element is, shown in the editor, since moving the element there
      * overrides it. Optional.
      *
-     * @param translationKey lang key of the text, with {@code %s} for the key that opens the settings, if any
-     * @param keyBinding     description of that key in Controls, or null
+     * @param translationKey lang key of the text, with {@code %s} for key bindings, like the one that opens
+     *                       the settings
+     * @param keyBindings    descriptions of those keys in Controls, in order
      */
-    public HudElement setOwnSettings(String translationKey, String keyBinding) {
+    public HudElement setOwnSettings(String translationKey, String... keyBindings) {
         this.ownSettingsKey = translationKey;
-        this.ownSettingsKeyBinding = keyBinding;
+        this.ownSettingsKeyBindings = keyBindings;
         return this;
-    }
-
-    public HudElement setOwnSettings(String translationKey) {
-        return setOwnSettings(translationKey, null);
     }
 
     /** Null without {@link #setOwnSettings}. */
     public String getOwnSettings() {
-        return translate(ownSettingsKey, ownSettingsKeyBinding);
+        return translate(ownSettingsKey, ownSettingsKeyBindings);
     }
 
-    /** Null without a key, and with the bound key filled in when there is one. */
-    private static String translate(String translationKey, String keyBinding) {
+    /**
+     * Null without a key. Each key binding fills two {@code %s} in order: the bound key, then its name in Controls. A
+     * text with a single key can leave out the name.
+     */
+    private static String translate(String translationKey, String[] keyBindings) {
         if (translationKey == null) {
             return null;
         }
-        return keyBinding == null ? StatCollector.translateToLocal(translationKey)
-            : StatCollector.translateToLocalFormatted(translationKey, getKeyName(keyBinding));
+        if (keyBindings.length == 0) {
+            return StatCollector.translateToLocal(translationKey);
+        }
+        Object[] keyTexts = new Object[keyBindings.length * 2];
+        for (int i = 0; i < keyBindings.length; i++) {
+            keyTexts[i * 2] = getKeyName(keyBindings[i]);
+            keyTexts[i * 2 + 1] = StatCollector.translateToLocal(keyBindings[i]);
+        }
+        return StatCollector.translateToLocalFormatted(translationKey, keyTexts);
     }
 
     /** The key the player bound, so the text stays right when they change it. */
