@@ -11,44 +11,59 @@ import com.gtnewhorizon.gtnhmixins.builders.TargetModBuilder;
 import cpw.mods.fml.common.Loader;
 
 /**
- * The other mods Dashboard adds things for, also used as mixin targets. Anything for one of them only runs when it is
- * loaded.
+ * Mods Dashboard supports, also used as mixin targets. Their compat only runs when the mod is loaded. Keep it as
+ * lambdas, not method references, which would load compat classes even without their mod and crash.
  */
 public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+setCoreModClass)
 
     // spotless:off
-    TINKERS("TConstruct", "tinker"),
+    TINKERS("TConstruct", "tinker", () -> TinkersBeltHotbar.register()),
     APPLECORE("AppleCore"),
-    GRAVISUITE("GraviSuite"),
-    GALACTICRAFT("GalacticraftCore"),
-    GALAXYSPACE("GalaxySpace"),
-    WAILA("Waila"),
-    ADVENTURE_BACKPACK("adventurebackpack"),
-    BOTANIA("Botania"),
-    BACKHAND("backhand"),
-    INGAMEINFO("InGameInfoXML"),
-    DRACONIC("DraconicEvolution"),
-    THAUMCRAFT("Thaumcraft"),
-    THAUMIC_TINKERER("ThaumicTinkerer"),
-    TAINTED_MAGIC("TaintedMagic"),
-    WITCHERY("witchery"),
-    IC2("IC2"),
+    GRAVISUITE("GraviSuite", () -> GraviSuiteCompat.register()),
+    GALACTICRAFT("GalacticraftCore", () -> GalacticraftCompat.register()),
+    GALAXYSPACE("GalaxySpace", () -> GalaxySpaceCompat.register()),
+    WAILA("Waila", () -> WailaCompat.register()),
+    ADVENTURE_BACKPACK("adventurebackpack", () -> AdventureBackpackCompat.register()),
+    BOTANIA("Botania", () -> BotaniaCompat.register()),
+    BACKHAND("backhand", () -> BackhandCompat.register()),
+    INGAMEINFO("InGameInfoXML", () -> InGameInfoCompat.register()),
+    DRACONIC("DraconicEvolution", () -> DraconicCompat.register()),
+    THAUMCRAFT("Thaumcraft", () -> ThaumcraftCompat.register()),
+    THAUMIC_TINKERER("ThaumicTinkerer", () -> ThaumicTinkererCompat.register()),
+    TAINTED_MAGIC("TaintedMagic", () -> TaintedMagicCompat.register()),
+    WITCHERY("witchery", () -> WitcheryCompat.register()),
+    IC2("IC2", () -> Ic2Compat.register()),
     ;
     // spotless:on
 
     private final String id;
     private final String resourceDomain;
     private final TargetModBuilder targetBuilder;
+    private final Runnable registerCompat;
     private Boolean loaded;
 
     Mods(String id) {
-        this(id, id.toLowerCase(Locale.ENGLISH));
+        this(id, null);
     }
 
-    Mods(String id, String resourceDomain) {
+    Mods(String id, Runnable registerCompat) {
+        this(id, id.toLowerCase(Locale.ENGLISH), registerCompat);
+    }
+
+    Mods(String id, String resourceDomain, Runnable registerCompat) {
         this.id = id;
         this.resourceDomain = resourceDomain;
         this.targetBuilder = new TargetModBuilder().setModId(id);
+        this.registerCompat = registerCompat;
+    }
+
+    /** Client only, since the additions are HUD. */
+    public static void registerLoadedCompat() {
+        for (Mods mod : values()) {
+            if (mod.registerCompat != null && mod.isModLoaded()) {
+                mod.registerCompat.run();
+            }
+        }
     }
 
     @Nonnull
