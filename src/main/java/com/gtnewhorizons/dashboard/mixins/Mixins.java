@@ -120,6 +120,10 @@ public enum Mixins implements IMixins {
     INFERNAL_MOBS_HUD(new MixinBuilder("Make the Infernal Mobs health bar movable")
         .addClientMixins("infernalmobs.MixinInfernalMobsClient_Hud")
         .addRequiredMod(Mods.INFERNAL_MOBS)
+        .setPhase(Phase.LATE)),
+    ET_FUTURUM_HUD(new MixinBuilder("Make the Et Futurum sound captions movable")
+        .addClientMixins("etfuturum.MixinGuiSubtitles_Hud")
+        .addRequiredMod(Mods.ET_FUTURUM)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
