@@ -91,6 +91,7 @@ public final class VanillaHudElements {
         VanillaHudElements::getItemNameBounds);
 
     private static String shadowedActionBarText;
+    private static final Set<ElementType> POSTED_WHEN_SKIPPED = EnumSet.of(ElementType.EXPERIENCE, ElementType.HOTBAR);
 
     public static final HudElement ACTION_BAR = new HudElement(
         "minecraft:action_bar",
@@ -434,7 +435,7 @@ public final class VanillaHudElements {
         BarSlot themedSlot = THEMED_BARS.get(element);
         String theme = themedSlot != null ? HudLayout.getTheme(element) : null;
         if (theme != null && drawThemed(event, element, themedSlot, theme)) {
-            postExperienceBar(event);
+            postSkippedEvent(event);
             return;
         }
         if (HudEditor.isHidingContent(element) && HudLayout.isVisible(element)) {
@@ -451,7 +452,7 @@ public final class VanillaHudElements {
         } else {
             HIDDEN.add(event.type);
             cancel(event);
-            postExperienceBar(event);
+            postSkippedEvent(event);
         }
     }
 
@@ -502,13 +503,13 @@ public final class VanillaHudElements {
     }
 
     /**
-     * Forge skips the Post event of a canceled bar. The XP bar's is sent anyway, since mods like Adventure Backpack
-     * draw
-     * their own HUD after it. Other bars' are not, since mods like AppleCore draw on top of the vanilla bar there.
+     * Forge skips the Post event of a canceled element. The XP bar's and hotbar's are sent anyway, since mods draw
+     * their own HUD after them (Adventure Backpack after the XP bar, IC2 and Battlegear after the hotbar). Other bars'
+     * are not, since mods like AppleCore draw on top of the vanilla bar there.
      */
-    private static void postExperienceBar(RenderGameOverlayEvent.Pre event) {
-        if (event.type == ElementType.EXPERIENCE) {
-            MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(event, ElementType.EXPERIENCE));
+    private static void postSkippedEvent(RenderGameOverlayEvent.Pre event) {
+        if (POSTED_WHEN_SKIPPED.contains(event.type)) {
+            MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(event, event.type));
         }
     }
 
