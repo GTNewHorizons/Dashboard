@@ -85,6 +85,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
 - **Battlegear 2**: shield block bar and quiver slots
 - **Nature's Compass**: the biome search text
+- **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 
 More mods are on the way.
 

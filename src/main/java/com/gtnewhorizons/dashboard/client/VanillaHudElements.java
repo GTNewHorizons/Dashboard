@@ -177,7 +177,7 @@ public final class VanillaHudElements {
         return Collections.unmodifiableMap(THEMED_BARS);
     }
 
-    static HudElement getElement(ElementType type) {
+    public static HudElement getElement(ElementType type) {
         return ELEMENTS.get(type);
     }
 

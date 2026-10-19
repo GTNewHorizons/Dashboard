@@ -191,6 +191,10 @@ dashboard.element.naturescompass.biome_info=Biome Search Info
 dashboard.element.naturescompass.biome_info.description=Shows while holding a Nature's Compass
 dashboard.element.naturescompass.biome_info.own_settings=Nature's Compass config > overlaySide / lineOffset
 
+## Bogosorter
+dashboard.element.bogosorter.usage_ticker=Usage Ticker
+dashboard.element.bogosorter.usage_ticker.description=Pops up for a moment when the held item or armor changes count\nThe hotbar swap column (§6hold Alt§7) moves with the hotbar
+
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
 dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)

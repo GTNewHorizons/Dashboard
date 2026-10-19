@@ -109,6 +109,10 @@ public enum Mixins implements IMixins {
     NATURES_COMPASS_HUD(new MixinBuilder("Make the Nature's Compass biome search text movable")
         .addClientMixins("naturescompass.MixinRenderTickHandler_Hud")
         .addRequiredMod(Mods.NATURES_COMPASS)
+        .setPhase(Phase.LATE)),
+    BOGOSORTER_HUD(new MixinBuilder("Make the Bogosorter usage ticker movable and its hotbar swap follow the hotbar")
+        .addClientMixins("bogosorter.MixinUsageTickerElement_Hud", "bogosorter.MixinHotbarSwap_Hud")
+        .addRequiredMod(Mods.BOGOSORTER)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
