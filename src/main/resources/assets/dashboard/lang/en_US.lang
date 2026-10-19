@@ -210,6 +210,11 @@ dashboard.element.etfuturum.subtitles=Subtitles
 dashboard.element.etfuturum.subtitles.description=Sound captions: name nearby sounds and point where they come from
 dashboard.element.etfuturum.subtitles.own_settings=Et Futurum config > functions > enableSubtitles
 
+## Hardcore Ender Expansion
+dashboard.element.hee.notifications=Notes
+dashboard.element.hee.energy_cluster=Energy Cluster Info
+dashboard.element.hee.energy_cluster.description=Shows while looking at an Energy Cluster
+
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
 dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)
