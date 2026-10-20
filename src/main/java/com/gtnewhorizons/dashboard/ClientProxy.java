@@ -14,6 +14,7 @@ import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
@@ -35,10 +36,16 @@ public class ClientProxy extends CommonProxy {
         VanillaHudElements.register();
         BarNumbers.register();
         StatusEffects.register();
-        Mods.registerLoadedCompat();
         IReloadableResourceManager resources = (IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager();
         resources.registerReloadListener(BarThemes::load);
         resources.registerReloadListener(ImageElements::load);
+    }
+
+    /** After every mod's init, so mods that register their own elements come first. */
+    @Override
+    public void postInit(FMLPostInitializationEvent event) {
+        super.postInit(event);
+        Mods.registerLoadedCompat();
     }
 }
