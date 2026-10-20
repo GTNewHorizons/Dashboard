@@ -3,9 +3,9 @@ name: Build and test
 
 on:
   pull_request:
-    branches: [ Xmaster, Xmain ]
+    branches: [ master, main ]
   push:
-    branches: [ Xmaster, Xmain ]
+    branches: [ master, main ]
 
 jobs:
   build-and-test:
