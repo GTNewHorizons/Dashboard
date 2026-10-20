@@ -37,7 +37,6 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     NATURES_COMPASS("naturescompass", () -> NaturesCompassCompat.register()),
     GTNHLIB("gtnhlib", () -> GtnhLibCompat.register()),
     INFERNAL_MOBS("InfernalMobs", () -> InfernalMobsCompat.register()),
-    ET_FUTURUM("etfuturum", () -> EtFuturumCompat.register()),
     SERVER_UTILITIES("serverutilities"),
     ;
     // spotless:on

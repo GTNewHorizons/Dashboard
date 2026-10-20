@@ -87,7 +87,6 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Nature's Compass**: the biome search text
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
-- **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 
 More mods are on the way.
@@ -99,6 +98,7 @@ These mods add their own Dashboard support, so their HUD can be moved as soon as
 
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
+- **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 -->
 
 ## Settings
