@@ -121,10 +121,6 @@ public enum Mixins implements IMixins {
         .addClientMixins("etfuturum.MixinGuiSubtitles_Hud")
         .addRequiredMod(Mods.ET_FUTURUM)
         .setPhase(Phase.LATE)),
-    HEE_HUD(new MixinBuilder("Make the HEE notes and energy cluster info movable")
-        .addClientMixins("hee.MixinOverlayManager_Hud")
-        .addRequiredMod(Mods.HEE)
-        .setPhase(Phase.LATE)),
     SERVER_UTILITIES_HUD(new MixinBuilder("Move ServerUtilities notifications with the text above the hotbar")
         .addClientMixins("serverutilities.MixinNotificationWidget_Hud")
         .addRequiredMod(Mods.SERVER_UTILITIES)

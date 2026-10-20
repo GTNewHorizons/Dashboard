@@ -211,9 +211,9 @@ dashboard.element.etfuturum.subtitles.description=Sound captions: name nearby so
 dashboard.element.etfuturum.subtitles.own_settings=Et Futurum config > functions > enableSubtitles
 
 ## Hardcore Ender Expansion
-dashboard.element.hee.notifications=Notes
-dashboard.element.hee.energy_cluster=Energy Cluster Info
-dashboard.element.hee.energy_cluster.description=Shows while looking at an Energy Cluster
+dashboard.element.hardcoreenderexpansion.notifications=Notes
+dashboard.element.hardcoreenderexpansion.energy_cluster=Energy Cluster Info
+dashboard.element.hardcoreenderexpansion.energy_cluster.description=Shows while looking at an Energy Cluster
 
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
