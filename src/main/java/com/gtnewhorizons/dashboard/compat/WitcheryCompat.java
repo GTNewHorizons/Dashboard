@@ -13,8 +13,9 @@ import net.minecraft.util.ResourceLocation;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -85,7 +86,7 @@ public final class WitcheryCompat {
     private static Method drawBar;
     private static Object infusionBar;
     private static Object creatureBar;
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
 
     private WitcheryCompat() {}
 
@@ -117,7 +118,7 @@ public final class WitcheryCompat {
         PreviewDrawing.setImitationInBounds(BARK_BELT, WitcheryCompat::drawBark);
         for (HudElement element : new HudElement[] { BLOOD_METER, TARGET_BLOOD, INFUSION_ENERGY, CREATURE_POWER,
             INFUSED_BREW, BARK_BELT }) {
-            HudEditor.register(element);
+            HudRegistry.register(element);
         }
     }
 

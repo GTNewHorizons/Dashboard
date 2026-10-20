@@ -40,8 +40,8 @@ import com.gtnewhorizon.gtnhlib.util.ResourceUtil;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -229,7 +229,7 @@ public final class ImageElements {
 
     /** The editor still shows them, so they can be arranged while toggled off. */
     private static boolean areShown() {
-        return DashboardConfig.showImages || HudEditor.isEditorOpen();
+        return DashboardConfig.showImages || HudRegistry.isLayoutScreenOpen();
     }
 
     public static boolean isImage(HudElement element) {
@@ -306,7 +306,7 @@ public final class ImageElements {
         int screenWidth = event.resolution.getScaledWidth();
         int screenHeight = event.resolution.getScaledHeight();
         for (ImageElement image : IMAGES.values()) {
-            HudEditor.render(image.element, () -> image.draw(image.getDefaultBounds(screenWidth, screenHeight)));
+            HudRegistry.render(image.element, () -> image.draw(image.getDefaultBounds(screenWidth, screenHeight)));
         }
     }
 
@@ -350,7 +350,7 @@ public final class ImageElements {
             if (!visible) {
                 element.setHiddenByDefault();
             }
-            HudEditor.register(element);
+            HudRegistry.register(element);
         }
 
         /** Anchored to a corner, edge or the middle of the screen, then moved by the offset. */

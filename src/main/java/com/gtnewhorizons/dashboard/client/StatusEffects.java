@@ -24,8 +24,8 @@ import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -77,7 +77,7 @@ public final class StatusEffects {
     private StatusEffects() {}
 
     public static void register() {
-        HudEditor.register(ELEMENT);
+        HudRegistry.register(ELEMENT);
         PreviewDrawing.setImitationInBounds(ELEMENT, bounds -> draw(SAMPLES, bounds));
     }
 
@@ -272,13 +272,13 @@ public final class StatusEffects {
         }
         int screenWidth = event.resolution.getScaledWidth();
         int screenHeight = event.resolution.getScaledHeight();
-        if (!HudEditor.beginRender(ELEMENT, screenWidth, screenHeight)) {
+        if (!HudRegistry.beginRender(ELEMENT, screenWidth, screenHeight)) {
             return;
         }
         try {
             draw(effects, ELEMENT.getDefaultBounds(screenWidth, screenHeight));
         } finally {
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
     }
 

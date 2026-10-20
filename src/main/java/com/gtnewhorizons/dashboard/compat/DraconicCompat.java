@@ -14,8 +14,9 @@ import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -78,8 +79,8 @@ public final class DraconicCompat {
     private static Method drawInfoBox;
     private static Method drawArmorHud;
     private static Object hudHandler;
-    private static final ShiftTracker ARMOR_SHIFT = new ShiftTracker();
-    private static final ShiftTracker MAGNET_SHIFT = new ShiftTracker();
+    private static final HudShift ARMOR_SHIFT = new HudShift();
+    private static final HudShift MAGNET_SHIFT = new HudShift();
     private static boolean magnetIconShown;
 
     private DraconicCompat() {}
@@ -124,9 +125,9 @@ public final class DraconicCompat {
             PreviewDrawing
                 .setImitationInBounds(MAGNET_ICON, bounds -> PreviewDrawing.drawItem(magnetStack, bounds.x, bounds.y));
         }
-        HudEditor.register(INFO_BOX);
-        HudEditor.register(ARMOR_HUD);
-        HudEditor.register(MAGNET_ICON);
+        HudRegistry.register(INFO_BOX);
+        HudRegistry.register(ARMOR_HUD);
+        HudRegistry.register(MAGNET_ICON);
     }
 
     /** Called by the mixin each frame, since the box lines and armor values live in Draconic's HUD handler. */

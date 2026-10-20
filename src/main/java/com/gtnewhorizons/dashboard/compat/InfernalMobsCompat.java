@@ -5,8 +5,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -41,13 +42,13 @@ public final class InfernalMobsCompat {
             MODIFIERS_TOP + TEXT_HEIGHT - NAME_TOP))
                 .setDescription("dashboard.element.infernalmobs.health_bar.description");
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
 
     private InfernalMobsCompat() {}
 
     public static void register() {
         PreviewDrawing.setImitationInBounds(HEALTH_BAR, InfernalMobsCompat::drawSample);
-        HudEditor.register(HEALTH_BAR);
+        HudRegistry.register(HEALTH_BAR);
     }
 
     /** Called by the mixin right before drawing. False means hidden, so the drawing should be skipped. */

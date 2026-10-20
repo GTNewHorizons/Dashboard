@@ -9,8 +9,9 @@ import net.minecraft.util.ResourceLocation;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -46,7 +47,7 @@ public final class Ic2Compat {
         (screenWidth, screenHeight) -> new HudBounds(5, 74, 120, 46))
             .setDescription("dashboard.element.ic2.held_item.description", ALT_KEY, HUD_KEY);
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
     /** A full Quantum suit, helmet first, for the previews. Read once, since IC2 makes them at startup. */
     private static final ItemStack[] SAMPLE_ARMOR = new ItemStack[SAMPLE_ARMOR_NAMES.length];
 
@@ -64,8 +65,8 @@ public final class Ic2Compat {
         }
         PreviewDrawing.setImitationInBounds(ARMOR_CHARGE, Ic2Compat::drawArmorCharge);
         PreviewDrawing.setImitationInBounds(HELD_ITEM, Ic2Compat::drawHeldItem);
-        HudEditor.register(ARMOR_CHARGE);
-        HudEditor.register(HELD_ITEM);
+        HudRegistry.register(ARMOR_CHARGE);
+        HudRegistry.register(HELD_ITEM);
     }
 
     /** Called by the mixin around each part. A hidden part is drawn invisibly, since the method can not be cut. */

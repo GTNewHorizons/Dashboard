@@ -12,8 +12,8 @@ import net.minecraft.util.StatCollector;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -62,12 +62,12 @@ public final class NaturesCompassCompat {
             Dashboard.LOG.warn("Could not read the Nature's Compass text position, assuming the default", e);
         }
         PreviewDrawing.setImitationInBounds(BIOME_INFO, NaturesCompassCompat::drawSample);
-        HudEditor.register(BIOME_INFO);
+        HudRegistry.register(BIOME_INFO);
     }
 
     /** Called by the mixin for every line. */
     public static void drawLine(Runnable draw) {
-        HudEditor.render(BIOME_INFO, draw);
+        HudRegistry.render(BIOME_INFO, draw);
     }
 
     /**

@@ -9,8 +9,8 @@ import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 import com.gtnewhorizons.dashboard.mixins.late.thaumcraft.ClientTickEventsFMLInvoker;
 
@@ -85,7 +85,7 @@ public final class ThaumcraftCompat {
         setPreviews();
         for (HudElement element : new HudElement[] { WAND_DIAL, WARP_METER, RUNIC_SHIELD, HOVER_HARNESS,
             NOTIFICATIONS }) {
-            HudEditor.register(element);
+            HudRegistry.register(element);
         }
     }
 

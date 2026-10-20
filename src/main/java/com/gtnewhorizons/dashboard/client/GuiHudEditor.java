@@ -17,8 +17,8 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.relauncher.Side;
@@ -313,12 +313,12 @@ public class GuiHudEditor extends GuiScreen {
                 onTop.add(box.element);
             } else if (taken.stream()
                 .noneMatch(other -> isSameSpot(box.bounds, other))) {
-                    HudEditor.drawPreview(box.element, width, height);
+                    HudRegistry.drawPreview(box.element, width, height);
                     taken.add(box.bounds);
                 }
         }
         for (HudElement element : onTop) {
-            HudEditor.drawPreview(element, width, height);
+            HudRegistry.drawPreview(element, width, height);
         }
     }
 
@@ -579,7 +579,7 @@ public class GuiHudEditor extends GuiScreen {
                         + StatCollector.translateToLocal("dashboard.editor.element_tooltip.own_settings_moved"));
             }
         }
-        lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getEditorModName());
+        lines.add(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.ITALIC + element.getDisplayModName());
         return lines;
     }
 
@@ -598,7 +598,7 @@ public class GuiHudEditor extends GuiScreen {
 
     private void updateBoxes() {
         boxes.clear();
-        for (HudElement element : HudEditor.getElements()) {
+        for (HudElement element : HudRegistry.getElements()) {
             if (!element.isActive() || !EditorModFilter.isShown(element)) {
                 continue;
             }
@@ -805,7 +805,7 @@ public class GuiHudEditor extends GuiScreen {
     /** Mods left out of the editor are left alone, so hidden ones can not be reset by accident. */
     private static void resetShownMods() {
         List<HudElement> shown = new ArrayList<>();
-        for (HudElement element : HudEditor.getElements()) {
+        for (HudElement element : HudRegistry.getElements()) {
             if (EditorModFilter.isShown(element)) {
                 shown.add(element);
             }

@@ -16,8 +16,9 @@ import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.HudLayout;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
@@ -65,8 +66,8 @@ public final class ThaumicTinkererCompat {
     private static Fields.ClassFields<Object>.Field<Integer> soulHp;
     private static Fields.ClassFields<Object>.Field<Integer> soulHeartHeight;
     private static Method drawSoulHearts;
-    private static final ShiftTracker DISLOCATION_SHIFT = new ShiftTracker();
-    private static final ShiftTracker TOOL_MODE_SHIFT = new ShiftTracker();
+    private static final HudShift DISLOCATION_SHIFT = new HudShift();
+    private static final HudShift TOOL_MODE_SHIFT = new HudShift();
 
     private ThaumicTinkererCompat() {}
 
@@ -95,7 +96,7 @@ public final class ThaumicTinkererCompat {
         PreviewDrawing.setImitationInBounds(DISLOCATION_FOCUS, ThaumicTinkererCompat::drawDislocationPreview);
         PreviewDrawing.setImitationInBounds(TOOL_MODE, ThaumicTinkererCompat::drawToolModePreview);
         for (HudElement element : new HudElement[] { DISLOCATION_FOCUS, TOOL_MODE, SOUL_HEARTS }) {
-            HudEditor.register(element);
+            HudRegistry.register(element);
         }
     }
 
@@ -127,7 +128,7 @@ public final class ThaumicTinkererCompat {
             || soulHp.getValue(null) <= 0) {
             return;
         }
-        HudEditor.render(SOUL_HEARTS, () -> drawSoulHearts(event.resolution));
+        HudRegistry.render(SOUL_HEARTS, () -> drawSoulHearts(event.resolution));
     }
 
     private static void drawSoulHearts(ScaledResolution resolution) {

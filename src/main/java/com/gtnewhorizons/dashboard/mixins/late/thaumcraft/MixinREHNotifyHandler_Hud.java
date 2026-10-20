@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
 
 import thaumcraft.client.lib.REHNotifyHandler;
@@ -19,7 +19,7 @@ public class MixinREHNotifyHandler_Hud {
 
     @Inject(method = "renderNotifyHUD", at = @At("HEAD"), cancellable = true)
     private void dashboard$hideNotifications(CallbackInfo ci) {
-        if (!HudEditor.shouldRender(ThaumcraftCompat.NOTIFICATIONS)) {
+        if (!HudRegistry.shouldRender(ThaumcraftCompat.NOTIFICATIONS)) {
             ci.cancel();
         }
     }
@@ -32,6 +32,6 @@ public class MixinREHNotifyHandler_Hud {
             ordinal = 1,
             shift = At.Shift.AFTER))
     private void dashboard$moveNotifications(CallbackInfo ci) {
-        HudEditor.translateToPosition(ThaumcraftCompat.NOTIFICATIONS);
+        HudRegistry.translateToPosition(ThaumcraftCompat.NOTIFICATIONS);
     }
 }

@@ -18,8 +18,8 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -85,7 +85,7 @@ public final class WailaCompat {
         } catch (ReflectiveOperationException | RuntimeException e) {
             Dashboard.LOG.warn("Could not read Waila's info box, its HUD editor size and preview are off", e);
         }
-        HudEditor.register(INFO_BOX);
+        HudRegistry.register(INFO_BOX);
     }
 
     /** Found by its type, since mixins may rename the fields they add. Null without ChromaticTooltips Compat. */
@@ -104,7 +104,7 @@ public final class WailaCompat {
     /** Called by the mixin when Waila starts drawing a box. False means the element is hidden. */
     public static boolean beginBox(Object box) {
         lastBox = box;
-        return HudEditor.beginRender(INFO_BOX);
+        return HudRegistry.beginRender(INFO_BOX);
     }
 
     /**
@@ -118,7 +118,7 @@ public final class WailaCompat {
         }
         GL11.glPopMatrix();
         GL11.glPushMatrix();
-        HudEditor.translateToPosition(INFO_BOX);
+        HudRegistry.translateToPosition(INFO_BOX);
     }
 
     /**

@@ -24,8 +24,8 @@ import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil;
 import com.gtnewhorizon.gtnhlib.util.numberformatting.options.FormatOptions;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -142,7 +142,7 @@ public final class BarNumbers {
         element.setActiveCheck(() -> HudLayout.isNumberOn(element))
             .setModId(Dashboard.MODID);
         number.element = element;
-        HudEditor.register(element);
+        HudRegistry.register(element);
         PreviewDrawing.setImitationInBounds(element, bounds -> number.drawText(number.getSampleText(), bounds));
         NUMBERS.add(number);
         if (besideNumber == null) {
@@ -241,13 +241,13 @@ public final class BarNumbers {
                 return;
             }
             String text = getText();
-            if (text == null || !HudEditor.beginRender(element, screenWidth, screenHeight)) {
+            if (text == null || !HudRegistry.beginRender(element, screenWidth, screenHeight)) {
                 return;
             }
             try {
                 drawText(text, getDefaultBounds(screenWidth, screenHeight));
             } finally {
-                HudEditor.endRender();
+                HudRegistry.endRender();
             }
         }
 

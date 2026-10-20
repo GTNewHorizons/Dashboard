@@ -15,8 +15,8 @@ import net.minecraftforge.common.util.Constants;
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.common.Loader;
@@ -74,7 +74,7 @@ public final class TinkersBeltHotbar {
         }
         baublesLoaded = Loader.isModLoaded("Baubles");
         PreviewDrawing.setImitationInBounds(BELT_HOTBAR, bounds -> draw(bounds, EMPTY_SLOTS));
-        HudEditor.register(BELT_HOTBAR);
+        HudRegistry.register(BELT_HOTBAR);
     }
 
     @SubscribeEvent
@@ -84,7 +84,7 @@ public final class TinkersBeltHotbar {
         }
         ItemStack belt = findBelt(Minecraft.getMinecraft().thePlayer);
         if (belt != null) {
-            HudEditor.render(
+            HudRegistry.render(
                 BELT_HOTBAR,
                 () -> draw(
                     BELT_HOTBAR.getDefaultBounds(event.resolution.getScaledWidth(), event.resolution.getScaledHeight()),

@@ -13,8 +13,9 @@ import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -48,8 +49,8 @@ public final class TaintedMagicCompat {
     private static Class<?> disassembler;
     private static Method getModeName;
     private static Method getEfficiency;
-    private static final ShiftTracker KATANA_SHIFT = new ShiftTracker();
-    private static final ShiftTracker DISASSEMBLER_SHIFT = new ShiftTracker();
+    private static final HudShift KATANA_SHIFT = new HudShift();
+    private static final HudShift DISASSEMBLER_SHIFT = new HudShift();
 
     private TaintedMagicCompat() {}
 
@@ -63,8 +64,8 @@ public final class TaintedMagicCompat {
         }
         PreviewDrawing.setImitationInBounds(KATANA_CHARGE, TaintedMagicCompat::drawKatanaPreview);
         PreviewDrawing.setImitationInBounds(DISASSEMBLER_MODE, TaintedMagicCompat::drawDisassemblerPreview);
-        HudEditor.register(KATANA_CHARGE);
-        HudEditor.register(DISASSEMBLER_MODE);
+        HudRegistry.register(KATANA_CHARGE);
+        HudRegistry.register(DISASSEMBLER_MODE);
     }
 
     /** Called by the mixins right before the drawing shrinks itself. False means the player hid it. */

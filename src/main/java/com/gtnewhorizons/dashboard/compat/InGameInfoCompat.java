@@ -9,8 +9,8 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -65,7 +65,7 @@ public final class InGameInfoCompat {
                 (screenWidth, screenHeight) -> getAreaBounds(index, screenWidth, screenHeight))
                     .setActiveCheck(() -> lastFrameBounds[index] != null || currentFrameBounds[index] != null)
                     .setOwnSettings("dashboard.element.ingameinfo.own_settings");
-            HudEditor.register(AREAS[area]);
+            HudRegistry.register(AREAS[area]);
         }
     }
 
@@ -93,13 +93,13 @@ public final class InGameInfoCompat {
                 Math.round(Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * textScale));
             currentFrameBounds[area] = union(currentFrameBounds[area], line);
 
-            if (!HudEditor.shouldRender(AREAS[area])) {
+            if (!HudRegistry.shouldRender(AREAS[area])) {
                 return false;
             }
             // The line is drawn with InGameInfoXML's scale applied, so the move is applied without it
             GL11.glPushMatrix();
             GL11.glScalef(1 / textScale, 1 / textScale, 1);
-            HudEditor.translateToPosition(AREAS[area]);
+            HudRegistry.translateToPosition(AREAS[area]);
             GL11.glScalef(textScale, textScale, 1);
             lineShifted = true;
             return true;
@@ -114,7 +114,7 @@ public final class InGameInfoCompat {
     public static void endLine() {
         if (lineShifted) {
             lineShifted = false;
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
     }
 

@@ -26,8 +26,8 @@ public final class HudElement {
     public interface PreviewRenderer {
 
         /**
-         * Draw through {@link HudEditor#beginRender} or {@link HudEditor#render}, so the sample moves and resizes like
-         * the real element.
+         * Draw through {@link HudRegistry#beginRender} or {@link HudRegistry#render}, so the sample moves and resizes
+         * like the real element.
          */
         void drawPreview(int screenWidth, int screenHeight);
     }
@@ -157,7 +157,7 @@ public final class HudElement {
     }
 
     /** The mod name as shown in the editor, with the {@link #setModNameAddon addon} after it. */
-    public String getEditorModName() {
+    public String getDisplayModName() {
         return modNameAddon != null ? getModName() + " / " + modNameAddon : getModName();
     }
 

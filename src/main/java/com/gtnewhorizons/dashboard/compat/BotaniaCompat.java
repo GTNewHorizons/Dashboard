@@ -19,8 +19,9 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.HudLayout;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
@@ -110,9 +111,9 @@ public final class BotaniaCompat {
     private static Method drawManaInfo;
     private static Block manaPool;
     private static Block corporeaIndex;
-    private static final ShiftTracker MANA_BAR_SHIFT = new ShiftTracker();
-    private static final ShiftTracker CORPOREA_HINT_SHIFT = new ShiftTracker();
-    private static final ShiftTracker CROSSHAIR_INFO_SHIFT = new ShiftTracker();
+    private static final HudShift MANA_BAR_SHIFT = new HudShift();
+    private static final HudShift CORPOREA_HINT_SHIFT = new HudShift();
+    private static final HudShift CROSSHAIR_INFO_SHIFT = new HudShift();
 
     private BotaniaCompat() {}
 
@@ -149,7 +150,7 @@ public final class BotaniaCompat {
         PreviewDrawing.setImitationInBounds(CORPOREA_HINT, BotaniaCompat::drawCorporeaHintPreview);
         for (HudElement element : new HudElement[] { MANA_BAR, FLIGHT_BAR, BOSS_BAR, WAND_MODE, CORPOREA_HINT,
             CROSSHAIR_INFO }) {
-            HudEditor.register(element);
+            HudRegistry.register(element);
         }
     }
 
@@ -207,7 +208,7 @@ public final class BotaniaCompat {
         try {
             IInventory baubles = (IInventory) getBaubles.invoke(null, player);
             ItemStack amulet = baubles == null ? null : baubles.getStackInSlot(0);
-            if (amulet == null || amulet.getItem() != flightTiara || !HudEditor.beginRender(FLIGHT_BAR, resolution)) {
+            if (amulet == null || amulet.getItem() != flightTiara || !HudRegistry.beginRender(FLIGHT_BAR, resolution)) {
                 return;
             }
             GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT | GL11.GL_CURRENT_BIT);
@@ -217,7 +218,7 @@ public final class BotaniaCompat {
                 drawTiara.invoke(null, resolution, player, amulet);
             } finally {
                 GL11.glPopAttrib();
-                HudEditor.endRender();
+                HudRegistry.endRender();
             }
         } catch (ReflectiveOperationException e) {
             drawTiara = null;

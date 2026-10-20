@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -72,26 +72,26 @@ public class MixinGuiIngameForge_HudText {
             remap = false))
     private void dashboard$moveScoreboard(GuiIngameForge gui, ScoreObjective objective, int height, int width,
         FontRenderer font, Operation<Void> original) {
-        if (!HudEditor.beginRender(VanillaHudElements.SCOREBOARD, width, height)) {
+        if (!HudRegistry.beginRender(VanillaHudElements.SCOREBOARD, width, height)) {
             return;
         }
         try {
             original.call(gui, objective, height, width, font);
         } finally {
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
     }
 
     @Unique
     private static int dashboard$drawShifted(HudElement element, FontRenderer font, String text, int x, int y,
         int color, Operation<Integer> original) {
-        if (!HudEditor.beginRender(element)) {
+        if (!HudRegistry.beginRender(element)) {
             return 0;
         }
         try {
             return original.call(font, text, x, y, color);
         } finally {
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
     }
 }

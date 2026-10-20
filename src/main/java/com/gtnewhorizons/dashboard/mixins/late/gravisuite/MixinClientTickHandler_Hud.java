@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.GraviSuiteCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -28,7 +28,7 @@ public class MixinClientTickHandler_Hud {
         method = "onTickRedner",
         at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;inGameHasFocus:Z", remap = true))
     private static boolean dashboard$drawInHudEditor(boolean inGameHasFocus) {
-        return inGameHasFocus || HudEditor.isEditorOpen();
+        return inGameHasFocus || HudRegistry.isLayoutScreenOpen();
     }
 
     @WrapOperation(
@@ -39,6 +39,6 @@ public class MixinClientTickHandler_Hud {
             remap = true))
     private static void dashboard$moveStatusLine(GuiIngame gui, FontRenderer font, String text, int x, int y, int color,
         Operation<Void> original) {
-        HudEditor.render(GraviSuiteCompat.STATUS, () -> original.call(gui, font, text, x, y, color));
+        HudRegistry.render(GraviSuiteCompat.STATUS, () -> original.call(gui, font, text, x, y, color));
     }
 }

@@ -1,9 +1,12 @@
 package com.gtnewhorizons.dashboard.api;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -13,9 +16,11 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.client.EditorModFilter;
+import com.gtnewhorizons.dashboard.client.FrameEndHud;
 import com.gtnewhorizons.dashboard.client.GuiHudEditor;
 import com.gtnewhorizons.dashboard.client.HudLayout;
 
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -24,21 +29,25 @@ import cpw.mods.fml.relauncher.SideOnly;
  * it in the editor.
  */
 @SideOnly(Side.CLIENT)
-public final class HudEditor {
+public final class HudRegistry {
 
     private static final Map<String, HudElement> ELEMENTS = new LinkedHashMap<>();
     /** A read-only view, so it always shows the current elements. */
     private static final Collection<HudElement> ELEMENTS_VIEW = Collections.unmodifiableCollection(ELEMENTS.values());
+    private static final List<Runnable> LAYOUT_LISTENERS = new ArrayList<>();
 
     private static boolean drawingPreview;
 
-    private HudEditor() {}
+    private HudRegistry() {}
 
+    /**
+     * Register during {@code preInit} or {@code init}, so code that registers an element only when nobody else did can
+     * check with {@link #getElement} in {@code postInit}.
+     */
     public static HudElement register(HudElement element) {
-        if (ELEMENTS.containsKey(element.getId())) {
+        if (ELEMENTS.putIfAbsent(element.getId(), element) != null) {
             throw new IllegalArgumentException("HUD element " + element.getId() + " is already registered");
         }
-        ELEMENTS.put(element.getId(), element);
         return element;
     }
 
@@ -46,7 +55,45 @@ public final class HudEditor {
         return ELEMENTS_VIEW;
     }
 
-    public static boolean isEditorOpen() {
+    /** Null if no element with this id is registered. */
+    public static HudElement getElement(String id) {
+        return ELEMENTS.get(id);
+    }
+
+    /** Where the element is drawn now, after the player moved or resized it. */
+    public static HudBounds getBounds(HudElement element) {
+        ScaledResolution resolution = HudLayout.getResolution();
+        return HudLayout.getBounds(element, resolution.getScaledWidth(), resolution.getScaledHeight());
+    }
+
+    /** Runs whenever the player moves, resizes, hides or resets elements, for code that remembers positions. */
+    public static void addLayoutListener(Runnable listener) {
+        LAYOUT_LISTENERS.add(listener);
+    }
+
+    /** Called by the layout after it changed. */
+    public static void notifyLayoutChanged() {
+        for (Runnable listener : LAYOUT_LISTENERS) {
+            try {
+                listener.run();
+            } catch (RuntimeException e) {
+                Dashboard.LOG.error("HUD layout listener {} failed", listener, e);
+            }
+        }
+    }
+
+    /**
+     * For HUD drawn in a render tick handler at the end of the frame, which draws over open screens. Call at the start
+     * of the handler, passing a way to run it, so it can be run at another time instead.
+     *
+     * @return true to skip the handler this time
+     */
+    public static boolean skipFrameEndHandler(Object handler, Consumer<TickEvent.RenderTickEvent> run,
+        TickEvent.RenderTickEvent event) {
+        return FrameEndHud.skip(handler, run, event);
+    }
+
+    public static boolean isLayoutScreenOpen() {
         return Minecraft.getMinecraft().currentScreen instanceof GuiHudEditor;
     }
 
@@ -55,7 +102,8 @@ public final class HudEditor {
      * only its box is shown, or nothing.
      */
     public static boolean isHidingContent(HudElement element) {
-        return !drawingPreview && isEditorOpen() && (!DashboardConfig.showPreview || !EditorModFilter.isShown(element));
+        return !drawingPreview && isLayoutScreenOpen()
+            && (!DashboardConfig.showPreview || !EditorModFilter.isShown(element));
     }
 
     /**

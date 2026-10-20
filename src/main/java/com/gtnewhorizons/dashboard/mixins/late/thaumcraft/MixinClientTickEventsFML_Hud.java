@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.ThaumcraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
@@ -33,12 +33,12 @@ public class MixinClientTickEventsFML_Hud {
         method = "renderTick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;inGameHasFocus:Z", remap = true))
     private boolean dashboard$drawInHudEditor(boolean inGameHasFocus) {
-        return inGameHasFocus || HudEditor.isEditorOpen();
+        return inGameHasFocus || HudRegistry.isLayoutScreenOpen();
     }
 
     @Inject(method = "renderCastingWandHud", at = @At("HEAD"), cancellable = true)
     private void dashboard$hideWandDial(CallbackInfo ci) {
-        if (!HudEditor.shouldRender(ThaumcraftCompat.WAND_DIAL)) {
+        if (!HudRegistry.shouldRender(ThaumcraftCompat.WAND_DIAL)) {
             ci.cancel();
         }
     }
@@ -47,12 +47,12 @@ public class MixinClientTickEventsFML_Hud {
         method = "renderCastingWandHud",
         at = @At(value = "INVOKE", target = MODELVIEW_RESET, ordinal = 1, shift = At.Shift.AFTER))
     private void dashboard$moveWandDial(CallbackInfo ci) {
-        HudEditor.translateToPosition(ThaumcraftCompat.WAND_DIAL);
+        HudRegistry.translateToPosition(ThaumcraftCompat.WAND_DIAL);
     }
 
     @Inject(method = "renderSanityHud", at = @At("HEAD"), cancellable = true)
     private void dashboard$hideWarpMeter(CallbackInfo ci) {
-        if (!HudEditor.shouldRender(ThaumcraftCompat.WARP_METER)) {
+        if (!HudRegistry.shouldRender(ThaumcraftCompat.WARP_METER)) {
             ci.cancel();
         }
     }
@@ -61,12 +61,12 @@ public class MixinClientTickEventsFML_Hud {
         method = "renderSanityHud",
         at = @At(value = "INVOKE", target = MODELVIEW_RESET, ordinal = 1, shift = At.Shift.AFTER))
     private void dashboard$moveWarpMeter(CallbackInfo ci) {
-        HudEditor.translateToPosition(ThaumcraftCompat.WARP_METER);
+        HudRegistry.translateToPosition(ThaumcraftCompat.WARP_METER);
     }
 
     @Inject(method = "renderRunicArmorBar", at = @At("HEAD"), cancellable = true)
     private void dashboard$hideRunicShield(CallbackInfo ci) {
-        if (!HudEditor.shouldRender(ThaumcraftCompat.RUNIC_SHIELD)) {
+        if (!HudRegistry.shouldRender(ThaumcraftCompat.RUNIC_SHIELD)) {
             ci.cancel();
         }
     }
@@ -75,12 +75,12 @@ public class MixinClientTickEventsFML_Hud {
         method = "renderRunicArmorBar",
         at = @At(value = "INVOKE", target = MODELVIEW_RESET, ordinal = 1, shift = At.Shift.AFTER))
     private void dashboard$moveRunicShield(CallbackInfo ci) {
-        HudEditor.translateToPosition(ThaumcraftCompat.RUNIC_SHIELD);
+        HudRegistry.translateToPosition(ThaumcraftCompat.RUNIC_SHIELD);
     }
 
     @Inject(method = "renderHoverHUD", at = @At("HEAD"), cancellable = true)
     private void dashboard$hideHoverHarness(CallbackInfo ci) {
-        if (!HudEditor.shouldRender(ThaumcraftCompat.HOVER_HARNESS)) {
+        if (!HudRegistry.shouldRender(ThaumcraftCompat.HOVER_HARNESS)) {
             ci.cancel();
         }
     }
@@ -89,6 +89,6 @@ public class MixinClientTickEventsFML_Hud {
         method = "renderHoverHUD",
         at = @At(value = "INVOKE", target = MODELVIEW_RESET, ordinal = 1, shift = At.Shift.AFTER))
     private void dashboard$moveHoverHarness(CallbackInfo ci) {
-        HudEditor.translateToPosition(ThaumcraftCompat.HOVER_HARNESS);
+        HudRegistry.translateToPosition(ThaumcraftCompat.HOVER_HARNESS);
     }
 }

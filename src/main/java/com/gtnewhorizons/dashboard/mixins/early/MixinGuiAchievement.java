@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 
 @Mixin(GuiAchievement.class)
@@ -19,7 +19,7 @@ public class MixinGuiAchievement {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/achievement/GuiAchievement;func_146258_c()V"),
         cancellable = true)
     private void dashboard$hideAchievement(CallbackInfo ci) {
-        if (!HudEditor.shouldRender(VanillaHudElements.ACHIEVEMENT)) {
+        if (!HudRegistry.shouldRender(VanillaHudElements.ACHIEVEMENT)) {
             ci.cancel();
         }
     }
@@ -32,6 +32,6 @@ public class MixinGuiAchievement {
             target = "Lnet/minecraft/client/gui/achievement/GuiAchievement;func_146258_c()V",
             shift = At.Shift.AFTER))
     private void dashboard$moveAchievement(CallbackInfo ci) {
-        HudEditor.translateToPosition(VanillaHudElements.ACHIEVEMENT);
+        HudRegistry.translateToPosition(VanillaHudElements.ACHIEVEMENT);
     }
 }

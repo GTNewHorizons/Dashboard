@@ -14,8 +14,9 @@ import org.lwjgl.opengl.GL11;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -68,7 +69,7 @@ public final class GalacticraftCompat {
 
     private static Fields.ClassFields<Object>.Field<Boolean> oxygenLeft;
     private static Fields.ClassFields<Object>.Field<Boolean> oxygenBottom;
-    private static final ShiftTracker OVERLAY_SHIFT = new ShiftTracker();
+    private static final HudShift OVERLAY_SHIFT = new HudShift();
 
     private static Method noAtmosphericCombustionMethod;
     private static int airlessDimension = Integer.MIN_VALUE;
@@ -94,7 +95,7 @@ public final class GalacticraftCompat {
         setPreviews();
         for (HudElement element : new HudElement[] { OXYGEN, OXYGEN_WARNING, LAUNCH_COUNTDOWN, LANDER,
             ROCKET_ALTITUDE }) {
-            HudEditor.register(element.setModId(Mods.GALACTICRAFT.getID()));
+            HudRegistry.register(element.setModId(Mods.GALACTICRAFT.getID()));
         }
     }
 

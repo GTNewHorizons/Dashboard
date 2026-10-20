@@ -10,8 +10,9 @@ import net.minecraftforge.common.ForgeHooks;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -52,7 +53,7 @@ public final class BattlegearCompat {
             23)).setDescription("dashboard.element.battlegear2.quiver.description")
                 .setOwnSettings("dashboard.element.battlegear2.quiver.own_settings");
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
 
     private BattlegearCompat() {}
 
@@ -66,8 +67,8 @@ public final class BattlegearCompat {
         }
         PreviewDrawing.setImitationInBounds(SHIELD_BAR, BattlegearCompat::drawShieldBar);
         PreviewDrawing.setImitationInBounds(QUIVER, BattlegearCompat::drawQuiver);
-        HudEditor.register(SHIELD_BAR);
-        HudEditor.register(QUIVER);
+        HudRegistry.register(SHIELD_BAR);
+        HudRegistry.register(QUIVER);
     }
 
     /** Called by the mixin at the start of each bar's method. False means hidden, so the method should be skipped. */

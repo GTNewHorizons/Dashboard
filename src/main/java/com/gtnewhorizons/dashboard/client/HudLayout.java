@@ -19,6 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -162,7 +163,7 @@ public final class HudLayout {
         return Math.max(1, getGameGuiScale() + getSizeStep(element));
     }
 
-    /** The factor HudEditor resizes this element's drawing by, on top of the game's own GUI scale. */
+    /** The factor HudRegistry resizes this element's drawing by, on top of the game's own GUI scale. */
     public static float getScale(HudElement element) {
         int step = getSizeStep(element);
         if (step == 0) {
@@ -281,6 +282,7 @@ public final class HudLayout {
         if (!changed) {
             return;
         }
+        HudRegistry.notifyLayoutChanged();
         File file = getFile();
         try {
             Files.createDirectories(

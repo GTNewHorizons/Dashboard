@@ -7,8 +7,9 @@ import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.HudLayout;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
@@ -50,15 +51,15 @@ public final class HeeCompat {
             CLUSTER_WIDTH,
             CLUSTER_HEIGHT)).setDescription("dashboard.element.hee.energy_cluster.description");
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
 
     private HeeCompat() {}
 
     public static void register() {
         PreviewDrawing.setImitationInBounds(NOTIFICATIONS, HeeCompat::drawNoteSample);
         PreviewDrawing.setImitationInBounds(ENERGY_CLUSTER, HeeCompat::drawClusterSample);
-        HudEditor.register(NOTIFICATIONS);
-        HudEditor.register(ENERGY_CLUSTER);
+        HudRegistry.register(NOTIFICATIONS);
+        HudRegistry.register(ENERGY_CLUSTER);
     }
 
     /** Called by the mixin around each part. A hidden part is drawn invisibly, since the method can not be cut. */

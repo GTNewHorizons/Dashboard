@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.FrameEndHud;
 import com.gtnewhorizons.dashboard.compat.NaturesCompassCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -43,7 +43,7 @@ public abstract class MixinRenderTickHandler_Hud {
             target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;",
             remap = true))
     private GuiScreen dashboard$drawInHudEditor(GuiScreen currentScreen) {
-        return HudEditor.isEditorOpen() ? null : currentScreen;
+        return HudRegistry.isLayoutScreenOpen() ? null : currentScreen;
     }
 
     @WrapOperation(

@@ -7,8 +7,8 @@ import net.minecraft.util.StatCollector;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -47,7 +47,7 @@ public final class GraviSuiteCompat {
             Dashboard.LOG.warn("Could not read the GraviSuite HUD position, assuming top left", e);
         }
         PreviewDrawing.setImitation(STATUS, GraviSuiteCompat::drawStatusPreview);
-        HudEditor.register(STATUS);
+        HudRegistry.register(STATUS);
     }
 
     /** Right aligned in the right corners, like the real text. */

@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.FrameEndHud;
 import com.gtnewhorizons.dashboard.compat.WitcheryCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -45,7 +45,7 @@ public abstract class MixinPlayerRender_Hud {
             ordinal = 1,
             remap = true))
     private GuiScreen dashboard$drawInHudEditor(GuiScreen currentScreen) {
-        return HudEditor.isEditorOpen() ? null : currentScreen;
+        return HudRegistry.isLayoutScreenOpen() ? null : currentScreen;
     }
 
     @Inject(method = "onRenderTick", at = @At(value = "INVOKE", target = DRAW_BAR, ordinal = 0))

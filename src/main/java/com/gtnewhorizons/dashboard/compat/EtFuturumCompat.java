@@ -7,8 +7,9 @@ import net.minecraft.client.gui.Gui;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -37,7 +38,7 @@ public final class EtFuturumCompat {
             .setDescription("dashboard.element.etfuturum.subtitles.description")
             .setOwnSettings("dashboard.element.etfuturum.subtitles.own_settings");
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
     private static Fields.ClassFields<Object>.Field<Boolean> subtitlesOn;
 
     private EtFuturumCompat() {}
@@ -51,7 +52,7 @@ public final class EtFuturumCompat {
             Dashboard.LOG.warn("Could not read whether Et Futurum's subtitles are on, showing them in the editor", e);
         }
         PreviewDrawing.setImitationInBounds(SUBTITLES, EtFuturumCompat::drawSample);
-        HudEditor.register(SUBTITLES);
+        HudRegistry.register(SUBTITLES);
     }
 
     /** Called by the mixin right before drawing. False means hidden, so the drawing should be skipped. */

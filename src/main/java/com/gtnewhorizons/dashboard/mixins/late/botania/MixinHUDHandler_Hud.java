@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.BotaniaCompat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -62,7 +62,7 @@ public class MixinHUDHandler_Hud {
             target = "Lvazkii/botania/client/core/handler/BossBarHandler;render(Lnet/minecraft/client/gui/ScaledResolution;)V"))
     private void dashboard$moveBossBar(ScaledResolution resolution, Operation<Void> original) {
         if (BotaniaCompat.hasBoss()) {
-            HudEditor.render(BotaniaCompat.BOSS_BAR, () -> original.call(resolution));
+            HudRegistry.render(BotaniaCompat.BOSS_BAR, () -> original.call(resolution));
         } else {
             original.call(resolution);
         }
@@ -77,7 +77,7 @@ public class MixinHUDHandler_Hud {
             remap = true))
     private int dashboard$moveWandMode(FontRenderer font, String text, int x, int y, int color,
         Operation<Integer> original) {
-        HudEditor.render(BotaniaCompat.WAND_MODE, () -> original.call(font, text, x, y, color));
+        HudRegistry.render(BotaniaCompat.WAND_MODE, () -> original.call(font, text, x, y, color));
         return 0;
     }
 

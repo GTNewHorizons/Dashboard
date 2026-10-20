@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.DraconicCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -30,7 +30,7 @@ public class MixinHudHandler_Hud {
             target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;",
             remap = true))
     private GuiScreen dashboard$fillInHudEditor(GuiScreen currentScreen) {
-        return HudEditor.isEditorOpen() ? null : currentScreen;
+        return HudRegistry.isLayoutScreenOpen() ? null : currentScreen;
     }
 
     @Inject(method = "drawHUD", at = @At("HEAD"))
@@ -45,7 +45,7 @@ public class MixinHudHandler_Hud {
             target = "Lcom/brandon3055/draconicevolution/client/utils/GuiHelper;drawHoveringText(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;FDII)V"))
     private void dashboard$moveInfoBox(List<?> lines, int x, int y, FontRenderer font, float alpha, double scale,
         int screenWidth, int screenHeight, Operation<Void> original) {
-        HudEditor.render(
+        HudRegistry.render(
             DraconicCompat.INFO_BOX,
             () -> original.call(lines, x, y, font, alpha, scale, screenWidth, screenHeight));
     }

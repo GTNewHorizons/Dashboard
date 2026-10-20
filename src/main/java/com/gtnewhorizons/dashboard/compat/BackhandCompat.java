@@ -11,8 +11,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 
@@ -64,7 +64,7 @@ public final class BackhandCompat {
         }
         doubleWideHotbar = Loader.isModLoaded("dws");
         PreviewDrawing.setImitationInBounds(OFFHAND_SLOT, BackhandCompat::drawOffhandSlotPreview);
-        HudEditor.register(OFFHAND_SLOT);
+        HudRegistry.register(OFFHAND_SLOT);
     }
 
     /** Called by the mixin right where Backhand starts drawing the slot. False means the slot is hidden. */

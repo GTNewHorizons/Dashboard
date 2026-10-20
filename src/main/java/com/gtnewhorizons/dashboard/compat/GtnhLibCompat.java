@@ -7,8 +7,9 @@ import net.minecraft.util.IChatComponent;
 import com.gtnewhorizon.gtnhlib.GTNHLibConfig;
 import com.gtnewhorizon.gtnhlib.client.title.TitleAPI;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
@@ -44,15 +45,15 @@ public final class GtnhLibCompat {
         "dashboard.element.gtnhlib.title",
         GtnhLibCompat::getTitleBounds).setOwnSettings("dashboard.element.gtnhlib.title.own_settings");
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
 
     private GtnhLibCompat() {}
 
     public static void register() {
         PreviewDrawing.setImitationInBounds(ABOVE_HOTBAR_TEXT, GtnhLibCompat::drawAboveHotbarText);
         PreviewDrawing.setImitation(TITLE, GtnhLibCompat::drawTitle);
-        HudEditor.register(ABOVE_HOTBAR_TEXT);
-        HudEditor.register(TITLE);
+        HudRegistry.register(ABOVE_HOTBAR_TEXT);
+        HudRegistry.register(TITLE);
     }
 
     /** Called by the mixins right before drawing. False means hidden, so the drawing should be skipped. */

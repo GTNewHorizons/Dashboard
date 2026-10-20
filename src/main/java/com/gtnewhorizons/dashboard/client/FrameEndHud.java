@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import com.gtnewhorizons.dashboard.Dashboard;
-import com.gtnewhorizons.dashboard.api.HudEditor;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -39,7 +39,7 @@ public final class FrameEndHud {
             return false;
         }
         HANDLERS.put(handler.getClass(), run);
-        return HudEditor.isEditorOpen();
+        return HudRegistry.isLayoutScreenOpen();
     }
 
     static void drawInEditor(float partialTicks) {

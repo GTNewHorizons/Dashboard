@@ -13,8 +13,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -34,11 +34,11 @@ public final class PreviewDrawing {
     /** Draws the imitation at the element's default position, moved like the real element. */
     public static void setImitation(HudElement element, HudElement.PreviewRenderer draw) {
         element.setPreview((screenWidth, screenHeight) -> {
-            if (HudEditor.beginRender(element, screenWidth, screenHeight)) {
+            if (HudRegistry.beginRender(element, screenWidth, screenHeight)) {
                 try {
                     draw.drawPreview(screenWidth, screenHeight);
                 } finally {
-                    HudEditor.endRender();
+                    HudRegistry.endRender();
                 }
             }
         });

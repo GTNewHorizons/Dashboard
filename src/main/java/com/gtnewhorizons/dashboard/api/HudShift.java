@@ -1,33 +1,34 @@
-package com.gtnewhorizons.dashboard.compat;
+package com.gtnewhorizons.dashboard.api;
 
 import net.minecraft.client.gui.ScaledResolution;
 
-import com.gtnewhorizons.dashboard.api.HudEditor;
-import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
-/** Remembers whether a move was started, for mixins that start and end it in separate hooks. */
-final class ShiftTracker {
+/**
+ * Remembers whether a move was started, for code that starts and ends it in separate places, like two mixin hooks.
+ * Use one per element.
+ */
+public final class HudShift {
 
     private boolean shifted;
     private boolean invisible;
 
     /** False means the element is hidden, so its drawing should be skipped. */
-    boolean begin(HudElement element) {
-        shifted = HudEditor.beginRender(element);
+    public boolean begin(HudElement element) {
+        shifted = HudRegistry.beginRender(element);
         return shifted;
     }
 
-    boolean begin(HudElement element, ScaledResolution resolution) {
-        shifted = HudEditor.beginRender(element, resolution);
+    public boolean begin(HudElement element, ScaledResolution resolution) {
+        shifted = HudRegistry.beginRender(element, resolution);
         return shifted;
     }
 
     /**
-     * For drawing a mixin can not skip, like one of several things in the same method: moved when shown, drawn
+     * For drawing that can not be skipped, like one of several things in the same method: moved when shown, drawn
      * invisibly when hidden. Call {@link #end()} after it either way.
      */
-    void beginOrHide(HudElement element) {
+    public void beginOrHide(HudElement element) {
         begin(element);
         invisible = !shifted;
         if (invisible) {
@@ -36,10 +37,10 @@ final class ShiftTracker {
     }
 
     /** Safe to call also when the drawing stopped early or the move was never started. */
-    void end() {
+    public void end() {
         if (shifted) {
             shifted = false;
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
         if (invisible) {
             invisible = false;

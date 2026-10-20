@@ -6,8 +6,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.api.HudShift;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 
@@ -41,7 +42,7 @@ public final class BogosorterCompat {
             ROW_WIDTH,
             ITEM_SIZE)).setDescription("dashboard.element.bogosorter.usage_ticker.description");
 
-    private static final ShiftTracker SHIFT = new ShiftTracker();
+    private static final HudShift SHIFT = new HudShift();
     private static final ItemStack SAMPLE_HELD = new ItemStack(Blocks.cobblestone, 48);
     private static final ItemStack SAMPLE_HELMET = new ItemStack(Items.iron_helmet);
 
@@ -49,7 +50,7 @@ public final class BogosorterCompat {
 
     public static void register() {
         PreviewDrawing.setImitationInBounds(USAGE_TICKER, BogosorterCompat::drawUsageTicker);
-        HudEditor.register(USAGE_TICKER);
+        HudRegistry.register(USAGE_TICKER);
     }
 
     /** Called by the mixins right before drawing. False means hidden, so the drawing should be skipped. */

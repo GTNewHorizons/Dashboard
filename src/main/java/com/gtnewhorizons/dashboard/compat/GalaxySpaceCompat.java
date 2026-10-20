@@ -4,8 +4,8 @@ import java.lang.reflect.Method;
 
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -49,7 +49,7 @@ public final class GalaxySpaceCompat {
         } catch (ReflectiveOperationException e) {
             Dashboard.LOG.warn("Could not find the GalaxySpace pressure bar, its HUD editor preview is off", e);
         }
-        HudEditor.register(PRESSURE);
+        HudRegistry.register(PRESSURE);
     }
 
     private static HudBounds getPressureBounds(int screenWidth, int screenHeight) {

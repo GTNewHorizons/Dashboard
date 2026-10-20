@@ -17,8 +17,8 @@ import org.lwjgl.input.Mouse;
 
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -54,8 +54,8 @@ final class ModFilterDropdown {
     ModFilterDropdown(FontRenderer font) {
         this.font = font;
         Map<String, String> names = new LinkedHashMap<>();
-        for (HudElement element : HudEditor.getElements()) {
-            names.putIfAbsent(EditorModFilter.getModKey(element), element.getEditorModName());
+        for (HudElement element : HudRegistry.getElements()) {
+            names.putIfAbsent(EditorModFilter.getModKey(element), element.getDisplayModName());
         }
         int nameWidth = 0;
         for (Map.Entry<String, String> mod : names.entrySet()) {

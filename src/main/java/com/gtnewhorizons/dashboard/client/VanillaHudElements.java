@@ -44,8 +44,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizons.dashboard.api.HudBounds;
-import com.gtnewhorizons.dashboard.api.HudEditor;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.AppleCoreCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
 
@@ -122,13 +122,13 @@ public final class VanillaHudElements {
     private VanillaHudElements() {}
 
     public static void register() {
-        HudEditor.register(ITEM_NAME);
+        HudRegistry.register(ITEM_NAME);
         PreviewDrawing.setImitationInBounds(ITEM_NAME, VanillaHudElements::drawItemNamePreview);
-        HudEditor.register(ACTION_BAR);
+        HudRegistry.register(ACTION_BAR);
         PreviewDrawing.setImitationInBounds(ACTION_BAR, VanillaHudElements::drawActionBarPreview);
-        HudEditor.register(SCOREBOARD);
+        HudRegistry.register(SCOREBOARD);
         PreviewDrawing.setImitationInBounds(SCOREBOARD, VanillaHudElements::drawScoreboardPreview);
-        HudEditor.register(ACHIEVEMENT);
+        HudRegistry.register(ACHIEVEMENT);
         PreviewDrawing.setImitationInBounds(ACHIEVEMENT, VanillaHudElements::drawAchievementPreview);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
@@ -138,7 +138,7 @@ public final class VanillaHudElements {
         PreviewDrawing.setImitationInBounds(
             experience,
             bounds -> drawBarSample(experience, BarSlot.EXPERIENCE, bounds.x, bounds.y));
-        HudEditor.register(EXPERIENCE_LEVEL);
+        HudRegistry.register(EXPERIENCE_LEVEL);
         PreviewDrawing.setImitationInBounds(EXPERIENCE_LEVEL, bounds -> drawLevelNumber(bounds, SAMPLE_LEVEL));
         HudElement jumpBar = add(
             ElementType.JUMPBAR,
@@ -183,7 +183,7 @@ public final class VanillaHudElements {
 
     private static HudElement add(ElementType type, String name, HudElement.DefaultBoundsProvider bounds) {
         String id = "minecraft:" + name;
-        HudElement element = HudEditor.register(new HudElement(id, "dashboard.element.minecraft." + name, bounds));
+        HudElement element = HudRegistry.register(new HudElement(id, "dashboard.element.minecraft." + name, bounds));
         ELEMENTS.put(type, element);
         return element;
     }
@@ -438,16 +438,16 @@ public final class VanillaHudElements {
             postSkippedEvent(event);
             return;
         }
-        if (HudEditor.isHidingContent(element) && HudLayout.isVisible(element)) {
+        if (HudRegistry.isHidingContent(element) && HudLayout.isVisible(element)) {
             // Drawn invisibly instead of skipped, so the rows above keep their place
-            HudEditor.shouldRender(element);
+            HudRegistry.shouldRender(element);
             GL11.glPushMatrix();
             PreviewDrawing.setColorWrites(false);
             SHIFTED.add(event.type);
             INVISIBLE.add(event.type);
             return;
         }
-        if (HudEditor.beginRender(element, event.resolution)) {
+        if (HudRegistry.beginRender(element, event.resolution)) {
             SHIFTED.add(event.type);
         } else {
             HIDDEN.add(event.type);
@@ -482,21 +482,21 @@ public final class VanillaHudElements {
      */
     public static boolean beginSeparateElement(ElementType type, HudElement separate, int screenWidth,
         int screenHeight) {
-        if (!HudEditor.shouldRender(separate)) {
+        if (!HudRegistry.shouldRender(separate)) {
             return false;
         }
         GL11.glPushMatrix();
         if (INVISIBLE.contains(type)) {
             PreviewDrawing.setColorWrites(true);
         } else if (SHIFTED.contains(type)) {
-            HudEditor.undoTranslateToPosition(ELEMENTS.get(type), screenWidth, screenHeight);
+            HudRegistry.undoTranslateToPosition(ELEMENTS.get(type), screenWidth, screenHeight);
         }
-        HudEditor.translateToPosition(separate, screenWidth, screenHeight);
+        HudRegistry.translateToPosition(separate, screenWidth, screenHeight);
         return true;
     }
 
     public static void endSeparateElement(ElementType type) {
-        HudEditor.endRender();
+        HudRegistry.endRender();
         if (INVISIBLE.contains(type)) {
             PreviewDrawing.setColorWrites(false);
         }
@@ -520,7 +520,7 @@ public final class VanillaHudElements {
         ScaledResolution resolution = event.resolution;
         if (event.type != ElementType.EXPERIENCE || level <= 0
             || !willDraw(ElementType.EXPERIENCE)
-            || !HudEditor.beginRender(EXPERIENCE_LEVEL, resolution)) {
+            || !HudRegistry.beginRender(EXPERIENCE_LEVEL, resolution)) {
             return;
         }
         try {
@@ -528,7 +528,7 @@ public final class VanillaHudElements {
                 .getDefaultBounds(resolution.getScaledWidth(), resolution.getScaledHeight());
             drawLevelNumber(bounds, level);
         } finally {
-            HudEditor.endRender();
+            HudRegistry.endRender();
             mc.getTextureManager()
                 .bindTexture(Gui.icons);
         }
@@ -574,7 +574,7 @@ public final class VanillaHudElements {
             row.addToStack(ROW_HEIGHT * rows);
             row.growth = ROW_HEIGHT * rows;
         }
-        if (!HudEditor.beginRender(element, event.resolution)) {
+        if (!HudRegistry.beginRender(element, event.resolution)) {
             return true;
         }
         boolean fromRight = BarThemes.fillsFromRight(element, slot);
@@ -602,7 +602,7 @@ public final class VanillaHudElements {
             }
         } finally {
             GL11.glPopAttrib();
-            HudEditor.endRender();
+            HudRegistry.endRender();
             mc.getTextureManager()
                 .bindTexture(Gui.icons);
         }
@@ -782,7 +782,7 @@ public final class VanillaHudElements {
 
     private static void endShift(ElementType type) {
         if (SHIFTED.remove(type)) {
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
         if (INVISIBLE.remove(type)) {
             PreviewDrawing.setColorWrites(true);
@@ -791,7 +791,7 @@ public final class VanillaHudElements {
 
     private static void endAllShifts() {
         for (int i = 0; i < SHIFTED.size(); i++) {
-            HudEditor.endRender();
+            HudRegistry.endRender();
         }
         SHIFTED.clear();
         HIDDEN.clear();
