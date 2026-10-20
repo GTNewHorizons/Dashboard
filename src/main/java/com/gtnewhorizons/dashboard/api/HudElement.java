@@ -14,6 +14,8 @@ import cpw.mods.fml.common.ModContainer;
 public final class HudElement {
 
     private static final long SHOWING_TIMEOUT_MILLIS = 500;
+    private static final String KEY_PREFIX = "dashboard.element.";
+    private static final String[] NO_KEY_BINDINGS = {};
 
     @FunctionalInterface
     public interface DefaultBoundsProvider {
@@ -42,14 +44,27 @@ public final class HudElement {
     private String modName;
     private String modNameAddon;
     private String ownSettingsKey;
-    private String[] ownSettingsKeyBindings;
+    private String[] ownSettingsKeyBindings = NO_KEY_BINDINGS;
     private boolean visibleByDefault = true;
     private String descriptionKey;
-    private String[] descriptionKeyBindings;
+    private String[] descriptionKeyBindings = NO_KEY_BINDINGS;
     private long lastRenderTime;
     private boolean replaced;
 
     /**
+     * Named by Dashboard's lang key {@code dashboard.element.<id with ':' as '.'>}, like
+     * {@code dashboard.element.mymod.mana_bar}.
+     *
+     * @param id unique id used in the saved layout, like {@code "mymod:mana_bar"}
+     */
+    public HudElement(String id, DefaultBoundsProvider defaultBoundsProvider) {
+        this(id, KEY_PREFIX + id.replace(':', '.'), defaultBoundsProvider);
+    }
+
+    /**
+     * The tooltip also shows {@code <translationKey>.description} and {@code <translationKey>.own_settings} when those
+     * keys exist, see {@link #setDescription} and {@link #setOwnSettings}.
+     *
      * @param id             unique id used in the saved layout, like {@code "mymod:mana_bar"}
      * @param translationKey lang key of the name shown in the editor
      */
@@ -57,6 +72,8 @@ public final class HudElement {
         this.id = id;
         this.translationKey = translationKey;
         this.defaultBoundsProvider = defaultBoundsProvider;
+        this.descriptionKey = translationKey + ".description";
+        this.ownSettingsKey = translationKey + ".own_settings";
     }
 
     public String getId() {
@@ -115,7 +132,8 @@ public final class HudElement {
     }
 
     /**
-     * Extra lines in the element's editor tooltip, explaining what it is. Optional.
+     * Extra lines in the element's editor tooltip, explaining what it is. Only needed for another key or for key
+     * bindings, since {@code <name key>.description} is used by default.
      *
      * @param translationKey lang key of the text, with {@code %s} for key bindings, see {@link #translate}
      * @param keyBindings    descriptions of those keys in Controls, in order
@@ -126,7 +144,7 @@ public final class HudElement {
         return this;
     }
 
-    /** Null without {@link #setDescription}. */
+    /** Null if its lang key does not exist. */
     public String getDescription() {
         return translate(descriptionKey, descriptionKeyBindings);
     }
@@ -164,7 +182,8 @@ public final class HudElement {
 
     /**
      * Where the mod's own position setting for this element is, shown in the editor, since moving the element there
-     * overrides it. Optional.
+     * overrides it. Only needed for another key or for key bindings, since {@code <name key>.own_settings} is used by
+     * default.
      *
      * @param translationKey lang key of the text, with {@code %s} for key bindings, like the one that opens
      *                       the settings
@@ -176,17 +195,17 @@ public final class HudElement {
         return this;
     }
 
-    /** Null without {@link #setOwnSettings}. */
+    /** Null if its lang key does not exist. */
     public String getOwnSettings() {
         return translate(ownSettingsKey, ownSettingsKeyBindings);
     }
 
     /**
-     * Null without a key. Each key binding fills two {@code %s} in order: the bound key, then its name in Controls. A
-     * text with a single key can leave out the name.
+     * Null if the key does not exist. Each key binding fills two {@code %s} in order: the bound key, then its name in
+     * Controls. A text with a single key can leave out the name.
      */
     private static String translate(String translationKey, String[] keyBindings) {
-        if (translationKey == null) {
+        if (!StatCollector.canTranslate(translationKey)) {
             return null;
         }
         if (keyBindings.length == 0) {
