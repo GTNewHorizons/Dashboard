@@ -17,7 +17,8 @@ public class MixinGuiIngameForge_SleepFade {
         method = "renderSleepFade",
         at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/GuiIngameForge;drawRect(IIIII)V", remap = true),
         index = 4,
-        require = 0)
+        require = 0,
+        expect = 0)
     private int dashboard$sleepFade(int color) {
         return ScreenOverlays.scaleAlpha(color, ScreenOverlays.getSleepFadeStrength());
     }
@@ -26,7 +27,8 @@ public class MixinGuiIngameForge_SleepFade {
         method = "renderSleepFade",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;drawRect(IIIII)V", remap = true),
         index = 4,
-        require = 0)
+        require = 0,
+        expect = 0)
     private int dashboard$sleepFadeGui(int color) {
         return ScreenOverlays.scaleAlpha(color, ScreenOverlays.getSleepFadeStrength());
     }
