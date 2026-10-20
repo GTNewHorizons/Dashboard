@@ -60,9 +60,14 @@ public final class HudRegistry {
         return ELEMENTS.get(id);
     }
 
+    /** The game's screen size, measured again only when it changes, since the HUD asks for it every frame. */
+    public static ScaledResolution getResolution() {
+        return HudLayout.getResolution();
+    }
+
     /** Where the element is drawn now, after the player moved or resized it. */
     public static HudBounds getBounds(HudElement element) {
-        ScaledResolution resolution = HudLayout.getResolution();
+        ScaledResolution resolution = getResolution();
         return HudLayout.getBounds(element, resolution.getScaledWidth(), resolution.getScaledHeight());
     }
 
@@ -125,7 +130,7 @@ public final class HudRegistry {
     }
 
     public static boolean beginRender(HudElement element) {
-        return beginRender(element, HudLayout.getResolution());
+        return beginRender(element, getResolution());
     }
 
     /** Call right after drawing the element, only if {@link #beginRender} returned true. */
@@ -160,7 +165,7 @@ public final class HudRegistry {
         return HudLayout.isVisible(element) && !isHidingContent(element);
     }
 
-    /** A preview that' broken, is turned off, so one broken mod can not break the whole editor. */
+    /** A preview that breaks is turned off, so one broken mod can not break the whole editor. */
     public static void drawPreview(HudElement element, int screenWidth, int screenHeight) {
         HudElement.PreviewRenderer preview = element.getPreview();
         if (preview == null) {
@@ -205,9 +210,13 @@ public final class HudRegistry {
     private static void translate(HudElement element, int screenWidth, int screenHeight, boolean undo) {
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
         HudBounds bounds = HudLayout.getBounds(element, defaultBounds, screenWidth, screenHeight);
+        float playerScale = HudLayout.getScale(element);
+        if (bounds == defaultBounds && playerScale == 1) {
+            return;
+        }
         HudBounds from = undo ? bounds : defaultBounds;
         HudBounds to = undo ? defaultBounds : bounds;
-        float scale = undo ? 1 / HudLayout.getScale(element) : HudLayout.getScale(element);
+        float scale = undo ? 1 / playerScale : playerScale;
         if (scale == 1) {
             GL11.glTranslatef(to.x - from.x, to.y - from.y, 0);
             return;
@@ -218,7 +227,7 @@ public final class HudRegistry {
     }
 
     public static void translateToPosition(HudElement element) {
-        ScaledResolution resolution = HudLayout.getResolution();
+        ScaledResolution resolution = getResolution();
         translateToPosition(element, resolution.getScaledWidth(), resolution.getScaledHeight());
     }
 }
