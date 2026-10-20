@@ -64,7 +64,7 @@ public final class BackhandCompat {
         }
         doubleWideHotbar = Loader.isModLoaded("dws");
         PreviewDrawing.setImitationInBounds(OFFHAND_SLOT, BackhandCompat::drawOffhandSlotPreview);
-        HudRegistry.register(OFFHAND_SLOT);
+        HudRegistry.registerFallback(OFFHAND_SLOT);
     }
 
     /** Called by the mixin right where Backhand starts drawing the slot. False means the slot is hidden. */

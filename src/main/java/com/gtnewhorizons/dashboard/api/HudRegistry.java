@@ -51,6 +51,18 @@ public final class HudRegistry {
         return element;
     }
 
+    /**
+     * For Dashboard's own hooks into another mod's HUD, registered in {@code postInit}. If the mod registered the same
+     * id itself, this copy only lets the mod's drawing through, so nothing is moved twice.
+     */
+    public static HudElement registerFallback(HudElement element) {
+        if (ELEMENTS.putIfAbsent(element.getId(), element) != null) {
+            element.markReplaced();
+            Dashboard.LOG.info("{} is registered by its own mod, so Dashboard's hooks for it are off", element.getId());
+        }
+        return element;
+    }
+
     public static Collection<HudElement> getElements() {
         return ELEMENTS_VIEW;
     }
@@ -107,7 +119,8 @@ public final class HudRegistry {
      * only its box is shown, or nothing.
      */
     public static boolean isHidingContent(HudElement element) {
-        return !drawingPreview && isLayoutScreenOpen()
+        return !drawingPreview && !element.isReplaced()
+            && isLayoutScreenOpen()
             && (!DashboardConfig.showPreview || !EditorModFilter.isShown(element));
     }
 
@@ -156,6 +169,9 @@ public final class HudRegistry {
      * @return false if the element should not be drawn
      */
     public static boolean shouldRender(HudElement element) {
+        if (element.isReplaced()) {
+            return true;
+        }
         if (!element.isActive()) {
             return false;
         }
@@ -208,6 +224,9 @@ public final class HudRegistry {
 
     /** From the default bounds to the player's, or back when undoing. */
     private static void translate(HudElement element, int screenWidth, int screenHeight, boolean undo) {
+        if (element.isReplaced()) {
+            return;
+        }
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
         HudBounds bounds = HudLayout.getBounds(element, defaultBounds, screenWidth, screenHeight);
         float playerScale = HudLayout.getScale(element);

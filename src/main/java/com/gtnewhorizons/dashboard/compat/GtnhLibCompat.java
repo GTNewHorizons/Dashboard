@@ -52,8 +52,8 @@ public final class GtnhLibCompat {
     public static void register() {
         PreviewDrawing.setImitationInBounds(ABOVE_HOTBAR_TEXT, GtnhLibCompat::drawAboveHotbarText);
         PreviewDrawing.setImitation(TITLE, GtnhLibCompat::drawTitle);
-        HudRegistry.register(ABOVE_HOTBAR_TEXT);
-        HudRegistry.register(TITLE);
+        HudRegistry.registerFallback(ABOVE_HOTBAR_TEXT);
+        HudRegistry.registerFallback(TITLE);
     }
 
     /** Called by the mixins right before drawing. False means hidden, so the drawing should be skipped. */

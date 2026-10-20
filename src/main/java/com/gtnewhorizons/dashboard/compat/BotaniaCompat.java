@@ -150,7 +150,7 @@ public final class BotaniaCompat {
         PreviewDrawing.setImitationInBounds(CORPOREA_HINT, BotaniaCompat::drawCorporeaHintPreview);
         for (HudElement element : new HudElement[] { MANA_BAR, FLIGHT_BAR, BOSS_BAR, WAND_MODE, CORPOREA_HINT,
             CROSSHAIR_INFO }) {
-            HudRegistry.register(element);
+            HudRegistry.registerFallback(element);
         }
     }
 

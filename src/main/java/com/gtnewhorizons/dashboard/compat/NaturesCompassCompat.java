@@ -62,7 +62,7 @@ public final class NaturesCompassCompat {
             Dashboard.LOG.warn("Could not read the Nature's Compass text position, assuming the default", e);
         }
         PreviewDrawing.setImitationInBounds(BIOME_INFO, NaturesCompassCompat::drawSample);
-        HudRegistry.register(BIOME_INFO);
+        HudRegistry.registerFallback(BIOME_INFO);
     }
 
     /** Called by the mixin for every line. */

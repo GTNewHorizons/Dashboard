@@ -67,8 +67,8 @@ public final class BattlegearCompat {
         }
         PreviewDrawing.setImitationInBounds(SHIELD_BAR, BattlegearCompat::drawShieldBar);
         PreviewDrawing.setImitationInBounds(QUIVER, BattlegearCompat::drawQuiver);
-        HudRegistry.register(SHIELD_BAR);
-        HudRegistry.register(QUIVER);
+        HudRegistry.registerFallback(SHIELD_BAR);
+        HudRegistry.registerFallback(QUIVER);
     }
 
     /** Called by the mixin at the start of each bar's method. False means hidden, so the method should be skipped. */

@@ -50,7 +50,7 @@ public final class BogosorterCompat {
 
     public static void register() {
         PreviewDrawing.setImitationInBounds(USAGE_TICKER, BogosorterCompat::drawUsageTicker);
-        HudRegistry.register(USAGE_TICKER);
+        HudRegistry.registerFallback(USAGE_TICKER);
     }
 
     /** Called by the mixins right before drawing. False means hidden, so the drawing should be skipped. */

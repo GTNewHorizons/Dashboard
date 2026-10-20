@@ -85,7 +85,7 @@ public final class WailaCompat {
         } catch (ReflectiveOperationException | RuntimeException e) {
             Dashboard.LOG.warn("Could not read Waila's info box, its HUD editor size and preview are off", e);
         }
-        HudRegistry.register(INFO_BOX);
+        HudRegistry.registerFallback(INFO_BOX);
     }
 
     /** Found by its type, since mixins may rename the fields they add. Null without ChromaticTooltips Compat. */

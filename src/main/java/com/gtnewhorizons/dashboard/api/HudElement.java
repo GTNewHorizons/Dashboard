@@ -47,6 +47,7 @@ public final class HudElement {
     private String descriptionKey;
     private String[] descriptionKeyBindings;
     private long lastRenderTime;
+    private boolean replaced;
 
     /**
      * @param id             unique id used in the saved layout, like {@code "mymod:mana_bar"}
@@ -232,5 +233,14 @@ public final class HudElement {
 
     void markRendered() {
         lastRenderTime = System.currentTimeMillis();
+    }
+
+    /** True for a fallback whose mod registered the same element itself, see {@link HudRegistry#registerFallback}. */
+    boolean isReplaced() {
+        return replaced;
+    }
+
+    void markReplaced() {
+        replaced = true;
     }
 }

@@ -92,8 +92,8 @@ public final class AdventureBackpackCompat {
         }
         PreviewDrawing.setImitationInBounds(POTION_ICONS, AdventureBackpackCompat::drawPotionIconsPreview);
         PreviewDrawing.setImitationInBounds(TANKS, AdventureBackpackCompat::drawTanksPreview);
-        HudRegistry.register(POTION_ICONS);
-        HudRegistry.register(TANKS);
+        HudRegistry.registerFallback(POTION_ICONS);
+        HudRegistry.registerFallback(TANKS);
     }
 
     /** As many sample icons as fit the box, from the vanilla inventory texture like Adventure Backpack. */

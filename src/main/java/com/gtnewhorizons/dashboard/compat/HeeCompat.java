@@ -58,8 +58,8 @@ public final class HeeCompat {
     public static void register() {
         PreviewDrawing.setImitationInBounds(NOTIFICATIONS, HeeCompat::drawNoteSample);
         PreviewDrawing.setImitationInBounds(ENERGY_CLUSTER, HeeCompat::drawClusterSample);
-        HudRegistry.register(NOTIFICATIONS);
-        HudRegistry.register(ENERGY_CLUSTER);
+        HudRegistry.registerFallback(NOTIFICATIONS);
+        HudRegistry.registerFallback(ENERGY_CLUSTER);
     }
 
     /** Called by the mixin around each part. A hidden part is drawn invisibly, since the method can not be cut. */

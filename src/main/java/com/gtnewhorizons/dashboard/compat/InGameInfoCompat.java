@@ -65,7 +65,7 @@ public final class InGameInfoCompat {
                 (screenWidth, screenHeight) -> getAreaBounds(index, screenWidth, screenHeight))
                     .setActiveCheck(() -> lastFrameBounds[index] != null || currentFrameBounds[index] != null)
                     .setOwnSettings("dashboard.element.ingameinfo.own_settings");
-            HudRegistry.register(AREAS[area]);
+            HudRegistry.registerFallback(AREAS[area]);
         }
     }
 

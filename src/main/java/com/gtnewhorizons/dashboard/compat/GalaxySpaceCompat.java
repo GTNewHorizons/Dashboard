@@ -49,7 +49,7 @@ public final class GalaxySpaceCompat {
         } catch (ReflectiveOperationException e) {
             Dashboard.LOG.warn("Could not find the GalaxySpace pressure bar, its HUD editor preview is off", e);
         }
-        HudRegistry.register(PRESSURE);
+        HudRegistry.registerFallback(PRESSURE);
     }
 
     private static HudBounds getPressureBounds(int screenWidth, int screenHeight) {

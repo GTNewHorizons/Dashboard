@@ -125,9 +125,9 @@ public final class DraconicCompat {
             PreviewDrawing
                 .setImitationInBounds(MAGNET_ICON, bounds -> PreviewDrawing.drawItem(magnetStack, bounds.x, bounds.y));
         }
-        HudRegistry.register(INFO_BOX);
-        HudRegistry.register(ARMOR_HUD);
-        HudRegistry.register(MAGNET_ICON);
+        HudRegistry.registerFallback(INFO_BOX);
+        HudRegistry.registerFallback(ARMOR_HUD);
+        HudRegistry.registerFallback(MAGNET_ICON);
     }
 
     /** Called by the mixin each frame, since the box lines and armor values live in Draconic's HUD handler. */

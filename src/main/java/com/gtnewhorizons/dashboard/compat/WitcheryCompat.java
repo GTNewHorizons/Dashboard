@@ -118,7 +118,7 @@ public final class WitcheryCompat {
         PreviewDrawing.setImitationInBounds(BARK_BELT, WitcheryCompat::drawBark);
         for (HudElement element : new HudElement[] { BLOOD_METER, TARGET_BLOOD, INFUSION_ENERGY, CREATURE_POWER,
             INFUSED_BREW, BARK_BELT }) {
-            HudRegistry.register(element);
+            HudRegistry.registerFallback(element);
         }
     }
 

@@ -47,7 +47,7 @@ public final class GraviSuiteCompat {
             Dashboard.LOG.warn("Could not read the GraviSuite HUD position, assuming top left", e);
         }
         PreviewDrawing.setImitation(STATUS, GraviSuiteCompat::drawStatusPreview);
-        HudRegistry.register(STATUS);
+        HudRegistry.registerFallback(STATUS);
     }
 
     /** Right aligned in the right corners, like the real text. */

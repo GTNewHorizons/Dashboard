@@ -48,7 +48,7 @@ public final class InfernalMobsCompat {
 
     public static void register() {
         PreviewDrawing.setImitationInBounds(HEALTH_BAR, InfernalMobsCompat::drawSample);
-        HudRegistry.register(HEALTH_BAR);
+        HudRegistry.registerFallback(HEALTH_BAR);
     }
 
     /** Called by the mixin right before drawing. False means hidden, so the drawing should be skipped. */

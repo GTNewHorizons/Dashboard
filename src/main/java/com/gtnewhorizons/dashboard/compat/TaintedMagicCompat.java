@@ -64,8 +64,8 @@ public final class TaintedMagicCompat {
         }
         PreviewDrawing.setImitationInBounds(KATANA_CHARGE, TaintedMagicCompat::drawKatanaPreview);
         PreviewDrawing.setImitationInBounds(DISASSEMBLER_MODE, TaintedMagicCompat::drawDisassemblerPreview);
-        HudRegistry.register(KATANA_CHARGE);
-        HudRegistry.register(DISASSEMBLER_MODE);
+        HudRegistry.registerFallback(KATANA_CHARGE);
+        HudRegistry.registerFallback(DISASSEMBLER_MODE);
     }
 
     /** Called by the mixins right before the drawing shrinks itself. False means the player hid it. */

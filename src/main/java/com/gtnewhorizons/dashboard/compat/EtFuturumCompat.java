@@ -52,7 +52,7 @@ public final class EtFuturumCompat {
             Dashboard.LOG.warn("Could not read whether Et Futurum's subtitles are on, showing them in the editor", e);
         }
         PreviewDrawing.setImitationInBounds(SUBTITLES, EtFuturumCompat::drawSample);
-        HudRegistry.register(SUBTITLES);
+        HudRegistry.registerFallback(SUBTITLES);
     }
 
     /** Called by the mixin right before drawing. False means hidden, so the drawing should be skipped. */

@@ -65,8 +65,8 @@ public final class Ic2Compat {
         }
         PreviewDrawing.setImitationInBounds(ARMOR_CHARGE, Ic2Compat::drawArmorCharge);
         PreviewDrawing.setImitationInBounds(HELD_ITEM, Ic2Compat::drawHeldItem);
-        HudRegistry.register(ARMOR_CHARGE);
-        HudRegistry.register(HELD_ITEM);
+        HudRegistry.registerFallback(ARMOR_CHARGE);
+        HudRegistry.registerFallback(HELD_ITEM);
     }
 
     /** Called by the mixin around each part. A hidden part is drawn invisibly, since the method can not be cut. */

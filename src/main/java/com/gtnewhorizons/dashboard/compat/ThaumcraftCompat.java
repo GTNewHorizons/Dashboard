@@ -85,7 +85,7 @@ public final class ThaumcraftCompat {
         setPreviews();
         for (HudElement element : new HudElement[] { WAND_DIAL, WARP_METER, RUNIC_SHIELD, HOVER_HARNESS,
             NOTIFICATIONS }) {
-            HudRegistry.register(element);
+            HudRegistry.registerFallback(element);
         }
     }
 

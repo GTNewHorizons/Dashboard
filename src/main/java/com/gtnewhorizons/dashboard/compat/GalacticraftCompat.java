@@ -95,7 +95,7 @@ public final class GalacticraftCompat {
         setPreviews();
         for (HudElement element : new HudElement[] { OXYGEN, OXYGEN_WARNING, LAUNCH_COUNTDOWN, LANDER,
             ROCKET_ALTITUDE }) {
-            HudRegistry.register(element.setModId(Mods.GALACTICRAFT.getID()));
+            HudRegistry.registerFallback(element.setModId(Mods.GALACTICRAFT.getID()));
         }
     }
 

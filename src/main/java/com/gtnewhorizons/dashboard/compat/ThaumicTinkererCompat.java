@@ -96,7 +96,7 @@ public final class ThaumicTinkererCompat {
         PreviewDrawing.setImitationInBounds(DISLOCATION_FOCUS, ThaumicTinkererCompat::drawDislocationPreview);
         PreviewDrawing.setImitationInBounds(TOOL_MODE, ThaumicTinkererCompat::drawToolModePreview);
         for (HudElement element : new HudElement[] { DISLOCATION_FOCUS, TOOL_MODE, SOUL_HEARTS }) {
-            HudRegistry.register(element);
+            HudRegistry.registerFallback(element);
         }
     }
 
