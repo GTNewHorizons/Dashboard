@@ -35,7 +35,6 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     IC2("IC2", () -> Ic2Compat.register()),
     BATTLEGEAR("battlegear2", () -> BattlegearCompat.register()),
     NATURES_COMPASS("naturescompass", () -> NaturesCompassCompat.register()),
-    BOGOSORTER("bogosorter", () -> BogosorterCompat.register()),
     GTNHLIB("gtnhlib", () -> GtnhLibCompat.register()),
     INFERNAL_MOBS("InfernalMobs", () -> InfernalMobsCompat.register()),
     ET_FUTURUM("etfuturum", () -> EtFuturumCompat.register()),
