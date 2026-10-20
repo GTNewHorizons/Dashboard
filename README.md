@@ -85,7 +85,6 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
 - **Battlegear 2**: shield block bar and quiver slots
 - **Nature's Compass**: the biome search text
-<!-- need pr - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar) -->
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
@@ -93,6 +92,14 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 
 More mods are on the way.
+
+<!-- need pr
+### Mods that support Dashboard themselves
+
+These mods add their own Dashboard support, so their HUD can be moved as soon as both are installed:
+
+- **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
+-->
 
 ## Settings
 
