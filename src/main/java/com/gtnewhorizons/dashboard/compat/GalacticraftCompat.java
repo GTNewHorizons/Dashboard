@@ -40,7 +40,7 @@ public final class GalacticraftCompat {
     public static final HudElement OXYGEN = new HudElement(
         "galacticraft:oxygen",
         "dashboard.element.galacticraft.oxygen",
-        GalacticraftCompat::getOxygenBounds).setOwnSettings("dashboard.element.galacticraft.oxygen.own_settings");
+        GalacticraftCompat::getOxygenBounds);
 
     public static final HudElement OXYGEN_WARNING = new HudElement(
         "galacticraft:oxygen_warning",

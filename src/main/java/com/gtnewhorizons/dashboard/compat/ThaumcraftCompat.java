@@ -41,7 +41,7 @@ public final class ThaumcraftCompat {
     public static final HudElement WAND_DIAL = new HudElement(
         "thaumcraft:wand_dial",
         "dashboard.element.thaumcraft.wand_dial",
-        ThaumcraftCompat::getWandDialBounds).setOwnSettings("dashboard.element.thaumcraft.wand_dial.own_settings");
+        ThaumcraftCompat::getWandDialBounds);
 
     public static final HudElement WARP_METER = new HudElement(
         "thaumcraft:warp_meter",
@@ -67,8 +67,7 @@ public final class ThaumcraftCompat {
     public static final HudElement NOTIFICATIONS = new HudElement(
         "thaumcraft:notifications",
         "dashboard.element.thaumcraft.notifications",
-        ThaumcraftCompat::getNotificationsBounds)
-            .setOwnSettings("dashboard.element.thaumcraft.notifications.own_settings");
+        ThaumcraftCompat::getNotificationsBounds);
 
     private static ClientTickEventsFML tickEventsHandler;
     private static ItemStack sampleWand;

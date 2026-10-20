@@ -25,7 +25,7 @@ public final class GalaxySpaceCompat {
     public static final HudElement PRESSURE = new HudElement(
         "galaxyspace:pressure",
         "dashboard.element.galaxyspace.pressure",
-        GalaxySpaceCompat::getPressureBounds).setOwnSettings("dashboard.element.galaxyspace.pressure.own_settings");
+        GalaxySpaceCompat::getPressureBounds);
 
     private GalaxySpaceCompat() {}
 

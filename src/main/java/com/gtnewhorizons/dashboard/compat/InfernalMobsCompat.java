@@ -39,8 +39,7 @@ public final class InfernalMobsCompat {
             screenWidth / 2 - BAR_WIDTH / 2,
             NAME_TOP,
             BAR_WIDTH,
-            MODIFIERS_TOP + TEXT_HEIGHT - NAME_TOP))
-                .setDescription("dashboard.element.infernalmobs.health_bar.description");
+            MODIFIERS_TOP + TEXT_HEIGHT - NAME_TOP));
 
     private static final HudShift SHIFT = new HudShift();
 

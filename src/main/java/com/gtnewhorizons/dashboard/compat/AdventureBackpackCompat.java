@@ -43,14 +43,12 @@ public final class AdventureBackpackCompat {
     public static final HudElement POTION_ICONS = new HudElement(
         "adventurebackpack:potion_icons",
         "dashboard.element.adventurebackpack.potion_icons",
-        AdventureBackpackCompat::getPotionIconsBounds)
-            .setOwnSettings("dashboard.element.adventurebackpack.potion_icons.own_settings");
+        AdventureBackpackCompat::getPotionIconsBounds);
 
     public static final HudElement TANKS = new HudElement(
         "adventurebackpack:tanks",
         "dashboard.element.adventurebackpack.tanks",
-        AdventureBackpackCompat::getTanksBounds)
-            .setOwnSettings("dashboard.element.adventurebackpack.tanks.own_settings");
+        AdventureBackpackCompat::getTanksBounds);
 
     private static Fields.ClassFields<Object>.Field<Boolean> statusLeft;
     private static Fields.ClassFields<Object>.Field<Boolean> statusTop;

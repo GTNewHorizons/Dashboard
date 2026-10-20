@@ -38,12 +38,12 @@ public final class GtnhLibCompat {
             screenWidth / 2 - HOTBAR_WIDTH / 2,
             screenHeight - 70,
             HOTBAR_WIDTH,
-            TEXT_HEIGHT)).setDescription("dashboard.element.gtnhlib.above_hotbar_text.description");
+            TEXT_HEIGHT));
 
     public static final HudElement TITLE = new HudElement(
         "gtnhlib:title",
         "dashboard.element.gtnhlib.title",
-        GtnhLibCompat::getTitleBounds).setOwnSettings("dashboard.element.gtnhlib.title.own_settings");
+        GtnhLibCompat::getTitleBounds);
 
     private static final HudShift SHIFT = new HudShift();
 

@@ -39,8 +39,7 @@ public final class BattlegearCompat {
     public static final HudElement SHIELD_BAR = new HudElement(
         "battlegear2:shield_bar",
         "dashboard.element.battlegear2.shield_bar",
-        BattlegearCompat::getShieldBarBounds).setDescription("dashboard.element.battlegear2.shield_bar.description")
-            .setOwnSettings("dashboard.element.battlegear2.shield_bar.own_settings");
+        BattlegearCompat::getShieldBarBounds);
 
     /** One pixel wider and taller than the bar, for the selected slot's frame. */
     public static final HudElement QUIVER = new HudElement(
@@ -50,8 +49,7 @@ public final class BattlegearCompat {
             screenWidth / 2 + readOffset(quiverOffset, 0) - QUIVER_HALF_WIDTH - 1,
             readOffset(quiverOffset, 1) - 1,
             QUIVER_HALF_WIDTH * 2 + 2,
-            23)).setDescription("dashboard.element.battlegear2.quiver.description")
-                .setOwnSettings("dashboard.element.battlegear2.quiver.own_settings");
+            23));
 
     private static final HudShift SHIFT = new HudShift();
 

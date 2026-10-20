@@ -48,8 +48,7 @@ public final class ThaumicTinkererCompat {
     public static final HudElement DISLOCATION_FOCUS = new HudElement(
         "thaumictinkerer:dislocation_focus",
         "dashboard.element.thaumictinkerer.dislocation_focus",
-        ThaumicTinkererCompat::getDislocationBounds)
-            .setOwnSettings("dashboard.element.thaumictinkerer.dislocation_focus.own_settings");
+        ThaumicTinkererCompat::getDislocationBounds);
 
     public static final HudElement TOOL_MODE = new HudElement(
         "thaumictinkerer:tool_mode",
@@ -59,8 +58,7 @@ public final class ThaumicTinkererCompat {
     public static final HudElement SOUL_HEARTS = new HudElement(
         "thaumictinkerer:soul_hearts",
         "dashboard.element.thaumictinkerer.soul_hearts",
-        ThaumicTinkererCompat::getSoulHeartsBounds)
-            .setOwnSettings("dashboard.element.thaumictinkerer.soul_hearts.own_settings");
+        ThaumicTinkererCompat::getSoulHeartsBounds);
 
     private static Fields.ClassFields<Object>.Field<String> toolModeText;
     private static Fields.ClassFields<Object>.Field<Integer> soulHp;

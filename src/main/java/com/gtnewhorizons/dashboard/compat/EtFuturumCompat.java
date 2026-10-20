@@ -34,9 +34,7 @@ public final class EtFuturumCompat {
     public static final HudElement SUBTITLES = new HudElement(
         "etfuturum:subtitles",
         "dashboard.element.etfuturum.subtitles",
-        EtFuturumCompat::getBounds).setActiveCheck(EtFuturumCompat::areSubtitlesOn)
-            .setDescription("dashboard.element.etfuturum.subtitles.description")
-            .setOwnSettings("dashboard.element.etfuturum.subtitles.own_settings");
+        EtFuturumCompat::getBounds).setActiveCheck(EtFuturumCompat::areSubtitlesOn);
 
     private static final HudShift SHIFT = new HudShift();
     private static Fields.ClassFields<Object>.Field<Boolean> subtitlesOn;

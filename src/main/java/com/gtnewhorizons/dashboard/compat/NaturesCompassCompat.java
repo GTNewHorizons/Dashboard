@@ -42,8 +42,7 @@ public final class NaturesCompassCompat {
     public static final HudElement BIOME_INFO = new HudElement(
         "naturescompass:biome_info",
         "dashboard.element.naturescompass.biome_info",
-        NaturesCompassCompat::getBounds).setDescription("dashboard.element.naturescompass.biome_info.description")
-            .setOwnSettings("dashboard.element.naturescompass.biome_info.own_settings");
+        NaturesCompassCompat::getBounds);
 
     /** Plain reflection, since its type is the mod's own enum and GTNHLib's Fields wants the exact type. */
     private static Field overlaySide;

@@ -34,7 +34,7 @@ public final class GraviSuiteCompat {
     public static final HudElement STATUS = new HudElement(
         "gravisuite:status",
         "dashboard.element.gravisuite.status",
-        GraviSuiteCompat::getStatusBounds).setOwnSettings("dashboard.element.gravisuite.status.own_settings");
+        GraviSuiteCompat::getStatusBounds);
 
     private static Fields.ClassFields<Object>.Field<Integer> hudPosition;
 
