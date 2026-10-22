@@ -19,7 +19,7 @@ public final class HudEditorKeybind {
 
     public static final KeyBinding OPEN_EDITOR = new KeyBinding(
         "key.dashboard.open_editor",
-        Keyboard.KEY_K,
+        Keyboard.KEY_NONE,
         "key.categories.dashboard");
 
     public static final KeyBinding TOGGLE_IMAGES = new KeyBinding(

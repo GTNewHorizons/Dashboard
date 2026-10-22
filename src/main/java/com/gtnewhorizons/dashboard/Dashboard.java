@@ -14,6 +14,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
     version = Tags.VERSION,
     name = "Dashboard",
     acceptedMinecraftVersions = "[1.7.10]",
+    guiFactory = "com.gtnewhorizons.dashboard.client.DashboardGuiFactory",
     dependencies = "required-after:gtnhlib@[0.11.52,)")
 public class Dashboard {
 

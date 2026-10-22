@@ -17,7 +17,8 @@ Every other mod listed below is optional. Dashboard only adds its features for a
 
 ## The HUD Editor
 
-Press **K** to open the editor. You can change the key in **Controls**, under **Dashboard**.
+To open the editor, first bind **Open Dashboard HUD Editor** in **Controls**, under **Dashboard** (it has no key by default), then press that key.
+Without a key, open it while in a world through **Mod Options**, **Dashboard**, **Config**, then **Open HUD Editor**.
 
 Every part of the HUD gets its own box, even when it is not showing right now, so you can always find and grab it.
 

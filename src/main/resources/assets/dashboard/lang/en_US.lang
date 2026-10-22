@@ -354,6 +354,8 @@ dashboard.theme.vanilla=Vanilla
 
 # Config
 dashboard.config.editor=Editor
+dashboard.config.open_editor=Open HUD Editor
+dashboard.config.open_editor.tooltip=Opens the HUD editor, to move, resize and hide parts of the HUD\nOnly while in a world, since the editor shows the HUD
 dashboard.config.editor.tooltip=Settings of the HUD editor
 dashboard.config.editor.show_grid=Show Grid
 dashboard.config.editor.show_grid.tooltip=Show the grid in the HUD editor and snap elements to it
