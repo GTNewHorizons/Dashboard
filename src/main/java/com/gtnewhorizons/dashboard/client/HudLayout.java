@@ -155,6 +155,18 @@ public final class HudLayout {
         changed = true;
     }
 
+    /** Null when never changed, see {@link ElementOpacity}. */
+    public static Integer getOpacity(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null ? null : state.opacity;
+    }
+
+    public static void setOpacity(HudElement element, Integer percent) {
+        getOrCreateState(element).opacity = percent;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     /**
      * The GUI scale this element is drawn at. Whole GUI scales keep every texture pixel the same number of screen
      * pixels, so a resized element stays as sharp as the rest of the HUD.
@@ -262,7 +274,7 @@ public final class HudLayout {
         }
     }
 
-    /** Positions, sizes, image zoom and visibility. Looks are reset in the Customize screen. */
+    /** Positions, sizes, image zoom, background opacity and visibility. Looks are reset in the Customize screen. */
     public static void reset(Iterable<HudElement> elements) {
         for (HudElement element : elements) {
             HudElementState state = getStates().get(element.getId());
@@ -271,6 +283,7 @@ public final class HudLayout {
                 state.moved = false;
                 state.sizeStep = 0;
                 state.zoom = null;
+                state.opacity = null;
                 removeIfDefault(element);
             }
         }

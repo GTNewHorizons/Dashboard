@@ -45,7 +45,8 @@ public class GuiHudEditor extends GuiScreen {
     private static final int OUTSIDE_NAME_PADDING = 1;
     private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
         "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset",
-        "dashboard.editor.help_tooltip.resize", "dashboard.editor.help_tooltip.reset_size" };
+        "dashboard.editor.help_tooltip.resize", "dashboard.editor.help_tooltip.reset_size",
+        "dashboard.editor.help_tooltip.opacity" };
     private static final int HELP_ICON_SIZE = 12;
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
@@ -554,6 +555,12 @@ public class GuiHudEditor extends GuiScreen {
                 EnumChatFormatting.RED + StatCollector.translateToLocal("dashboard.editor.element_tooltip.hidden"));
         }
         lines.add(EnumChatFormatting.GRAY + getSizeText(element));
+        if (ElementOpacity.isAllowed(element)) {
+            lines.add(
+                EnumChatFormatting.GRAY + StatCollector.translateToLocalFormatted(
+                    "dashboard.editor.element_tooltip.background",
+                    ElementOpacity.getPercent(element)));
+        }
         if (!element.isCurrentlyShowing()) {
             lines.add(
                 EnumChatFormatting.GRAY
@@ -748,11 +755,17 @@ public class GuiHudEditor extends GuiScreen {
         }
     }
 
-    /** Alt+scroll resizes, plain scroll zooms an image. Also used in chat. */
+    /**
+     * Alt+scroll resizes, Ctrl+scroll changes the background opacity, plain scroll zooms an image. Also used in chat.
+     */
     static void scrollOver(HudElement element, HudBounds bounds, int mouseX, int mouseY, int wheel) {
         int steps = wheel > 0 ? 1 : -1;
         if (isAltKeyDown()) {
             resize(element, steps);
+        } else if (isCtrlKeyDown()) {
+            if (ElementOpacity.isAllowed(element)) {
+                ElementOpacity.change(element, steps);
+            }
         } else if (ImageElements.isImage(element)) {
             ImageElements.zoom(element, bounds, mouseX, mouseY, steps);
         }

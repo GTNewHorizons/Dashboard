@@ -29,6 +29,7 @@ Every part of the HUD gets its own box, even when it is not showing right now, s
 | Reset an element's position    | **Ctrl + click** the element                             |
 | Resize an element              | **Alt + scroll** over the element                        |
 | Reset an element's size        | **Alt + click** the element                              |
+| Make a background see-through  | **Ctrl + scroll** over the element (Inventory, Belt Hotbar) |
 | Zoom into an image             | **Scroll** over it, **middle-drag** to move around, **middle-click** to reset |
 | See the controls again         | Hover the **?** in the editor menu                       |
 
@@ -61,6 +62,10 @@ You can also drag the editor menu itself out of the way.
 - **Screen Overlays**: turn down the pumpkin, portal, fire and underwater overlays, the vignette, the sleep fade, the
   hurt shake, the nausea wobble and the night vision flicker.
 - **Rendering**: pick items that should look like an empty hand when held in first person.
+
+Dashboard also adds an **Inventory** element: your 27 inventory slots on a see-through background, so you can see
+what you carry without opening the inventory. It uses the inventory screen's look, so resource packs change it too.
+It is hidden by default, turn it on in the editor, and **Ctrl + scroll** over it to change how see-through it is.
 
 ## Supported Mods
 

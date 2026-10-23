@@ -17,6 +17,7 @@ import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.client.ElementOpacity;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.common.Loader;
@@ -73,6 +74,7 @@ public final class TinkersBeltHotbar {
             return;
         }
         baublesLoaded = Loader.isModLoaded("Baubles");
+        ElementOpacity.allow(BELT_HOTBAR, 30);
         PreviewDrawing.setImitationInBounds(BELT_HOTBAR, bounds -> draw(bounds, EMPTY_SLOTS));
         HudRegistry.register(BELT_HOTBAR);
     }
@@ -146,7 +148,7 @@ public final class TinkersBeltHotbar {
 
     /** Like the vanilla hotbar, without the selection, since its slots can not be selected. */
     private static void draw(HudBounds bounds, ItemStack[] items) {
-        PreviewDrawing.drawHotbarBackground(bounds.x, bounds.y);
+        PreviewDrawing.drawHotbarBackground(bounds.x, bounds.y, ElementOpacity.get(BELT_HOTBAR));
         PreviewDrawing.drawHotbarItems(bounds.x, bounds.y, items);
     }
 }

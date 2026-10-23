@@ -65,6 +65,13 @@ public final class PreviewDrawing {
         GUI.drawTexturedModalRect(x, y, u, v, width, height);
     }
 
+    /** Opacity from 0 for invisible to 1 for solid, with the bound texture's blending on. */
+    public static void drawTexture(int x, int y, int u, int v, int width, int height, float opacity) {
+        GL11.glColor4f(1, 1, 1, opacity);
+        drawTexture(x, y, u, v, width, height);
+        GL11.glColor4f(1, 1, 1, 1);
+    }
+
     /** Text with a shadow, its top left corner at x, y, drawn at the given size. */
     public static void drawScaledString(String text, float x, float y, float scale, int color) {
         GL11.glPushMatrix();
@@ -76,8 +83,12 @@ public final class PreviewDrawing {
 
     /** The vanilla hotbar without its selection. Leaves the hotbar texture bound, which also holds the selection. */
     public static void drawHotbarBackground(int x, int y) {
+        drawHotbarBackground(x, y, 1);
+    }
+
+    public static void drawHotbarBackground(int x, int y, float opacity) {
         bindTexture(HOTBAR_TEXTURE);
-        drawTexture(x, y, 0, 0, HOTBAR_WIDTH, HOTBAR_HEIGHT);
+        drawTexture(x, y, 0, 0, HOTBAR_WIDTH, HOTBAR_HEIGHT, opacity);
     }
 
     /** Items in hotbar slots from the left, null for an empty slot. */
