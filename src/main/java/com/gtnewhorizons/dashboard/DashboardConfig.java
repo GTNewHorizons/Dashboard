@@ -3,6 +3,7 @@ package com.gtnewhorizons.dashboard;
 import com.gtnewhorizon.gtnhlib.config.Config;
 import com.gtnewhorizons.dashboard.client.Crosshairs;
 import com.gtnewhorizons.dashboard.client.HotbarNumbers;
+import com.gtnewhorizons.dashboard.client.PickupFeed;
 import com.gtnewhorizons.dashboard.client.ScreenOverlays;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 
@@ -205,4 +206,16 @@ public class DashboardConfig {
     @Config.LangKey("dashboard.config.editor.night_vision_flicker")
     @Config.DefaultBoolean(true)
     public static boolean nightVisionFlicker;
+
+    @Config.Comment("How long each row of the item pickups shows, in seconds")
+    @Config.LangKey("dashboard.config.editor.pickup_feed_seconds")
+    @Config.DefaultInt(PickupFeed.DEFAULT_SECONDS)
+    @Config.RangeInt(min = 1, max = PickupFeed.MAX_SECONDS)
+    public static int pickupFeedSeconds;
+
+    @Config.Comment("How long each row of the item pickups takes to slide away, in milliseconds, 0 to just disappear")
+    @Config.LangKey("dashboard.config.editor.pickup_feed_slide_out")
+    @Config.DefaultInt(PickupFeed.DEFAULT_SLIDE_OUT_MILLIS)
+    @Config.RangeInt(min = 0, max = PickupFeed.MAX_SLIDE_OUT_MILLIS)
+    public static int pickupFeedSlideOutMillis;
 }

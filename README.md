@@ -15,6 +15,12 @@ more.
 
 Every other mod listed below is optional. Dashboard only adds its features for a mod when that mod is installed.
 
+### Recommended
+
+- [InGameInfoXML](https://github.com/GTNewHorizons/InGame-Info-XML): add your own text and info to the screen, like
+  coordinates, time, biome, light level or held item details, fully customizable. Together with Dashboard, you can
+  then move and resize each of its text areas, for a HUD that is completely your own.
+
 ## The HUD Editor
 
 To open the editor, first bind **Open Dashboard HUD Editor** in **Controls**, under **Dashboard** (it has no key by default), then press that key.
@@ -66,6 +72,9 @@ You can also drag the editor menu itself out of the way.
 Dashboard also adds an **Inventory** element: your 27 inventory slots on a see-through background, so you can see
 what you carry without opening the inventory. It uses the inventory screen's look, so resource packs change it too.
 It is hidden by default, turn it on in the editor, and **Ctrl + scroll** over it to change how see-through it is.
+
+There is also an **Item Pickups** element: the items you pick up show for a moment at the side of the screen, like
+`+12 Cobblestone`, and more of the same item adds to its row. It works on servers too, and is hidden by default.
 
 ## Supported Mods
 

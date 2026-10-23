@@ -24,6 +24,9 @@ public enum Mixins implements IMixins {
             .setPhase(Phase.EARLY)),
     BOSS_HEALTH(new MixinBuilder("Remember the boss for its health number").addClientMixins("MixinBossStatus")
         .setPhase(Phase.EARLY)),
+    PICKUP_FEED(
+        new MixinBuilder("Show picked up items in the pickup feed").addClientMixins("MixinNetHandlerPlayClient_Pickup")
+            .setPhase(Phase.EARLY)),
     SCREEN_OVERLAYS(new MixinBuilder("Change the screen overlays")
         .addClientMixins(
             "MixinGuiIngame_Overlays",

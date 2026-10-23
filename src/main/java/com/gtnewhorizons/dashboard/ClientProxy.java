@@ -10,6 +10,7 @@ import com.gtnewhorizons.dashboard.client.BarThemes;
 import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.ImageElements;
 import com.gtnewhorizons.dashboard.client.InventoryHud;
+import com.gtnewhorizons.dashboard.client.PickupFeed;
 import com.gtnewhorizons.dashboard.client.StatusEffects;
 import com.gtnewhorizons.dashboard.client.VanillaHudElements;
 import com.gtnewhorizons.dashboard.compat.Mods;
@@ -38,6 +39,7 @@ public class ClientProxy extends CommonProxy {
         BarNumbers.register();
         StatusEffects.register();
         InventoryHud.register();
+        PickupFeed.register();
         IReloadableResourceManager resources = (IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager();
         resources.registerReloadListener(BarThemes::load);

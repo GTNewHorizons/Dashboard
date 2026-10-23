@@ -84,6 +84,10 @@ dashboard.preview.scoreboard=Scores
 dashboard.element.inventory=Inventory
 dashboard.element.inventory.description=Your 27 inventory slots on a see-through background.\n§6Ctrl+scroll§7 to change how see-through it is.\nHidden by default.
 
+## Item Pickups (added by Dashboard)
+dashboard.element.pickup_feed=Item Pickups
+dashboard.element.pickup_feed.description=Shows the items you pick up for a moment, like §6+12 Cobblestone§7.\nMore of the same item adds to its row.\nHidden by default.
+
 ## Pictures (added by Dashboard)
 dashboard.element.image.pack=A picture from a resource pack\nHide or show all pictures with §6[%s]§7 (%s)\n§6Scroll§7 to zoom, §6middle-drag§7 to look around (in chat, just §6drag§7)
 dashboard.element.image.folder=A picture from config/dashboard/images\nHide or show all pictures with §6[%s]§7 (%s)\n§6Scroll§7 to zoom, §6middle-drag§7 to look around (in chat, just §6drag§7)
@@ -432,6 +436,10 @@ dashboard.config.editor.nausea_strength=Nausea Wobble
 dashboard.config.editor.nausea_strength.tooltip=How much the screen wobbles from nausea and portals, in percent
 dashboard.config.editor.night_vision_flicker=Night Vision Flicker
 dashboard.config.editor.night_vision_flicker.tooltip=Flash the screen while night vision runs out
+dashboard.config.editor.pickup_feed_seconds=Item Pickups Time
+dashboard.config.editor.pickup_feed_seconds.tooltip=How long each row of the item pickups shows, in seconds
+dashboard.config.editor.pickup_feed_slide_out=Item Pickups Slide Out
+dashboard.config.editor.pickup_feed_slide_out.tooltip=How long each row of the item pickups takes to slide away, in milliseconds, 0 to just disappear
 dashboard.config.editor.status_effect_sort_by_time=Sort Status Effects by Time
 dashboard.config.editor.status_effect_sort_by_time.tooltip=Sort status effects by time left instead of the order they were added
 dashboard.config.editor.status_effect_pulse_seconds.tooltip=Pulse status effects with this many seconds left, in steps of 5, 0 to never pulse
