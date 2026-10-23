@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
-import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.DashboardOtherConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -92,8 +92,8 @@ public final class PickupFeed {
             return;
         }
         long now = Minecraft.getSystemTime();
-        long showMillis = DashboardConfig.pickupFeedSeconds * 1000L;
-        int slideOutMillis = DashboardConfig.pickupFeedSlideOutMillis;
+        long showMillis = DashboardOtherConfig.pickupFeedSeconds * 1000L;
+        int slideOutMillis = DashboardOtherConfig.pickupFeedSlideOutMillis;
         ROWS.removeIf(row -> now - row.start >= showMillis + slideOutMillis);
         if (ROWS.isEmpty()) {
             return;

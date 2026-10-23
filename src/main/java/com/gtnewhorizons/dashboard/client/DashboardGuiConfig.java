@@ -10,6 +10,7 @@ import com.gtnewhorizon.gtnhlib.config.ConfigException;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.DashboardOtherConfig;
 
 import cpw.mods.fml.client.config.DummyConfigElement;
 import cpw.mods.fml.client.config.GuiConfig;
@@ -34,7 +35,8 @@ public class DashboardGuiConfig extends GuiConfig {
                 "open_editor",
                 "dashboard.config.open_editor",
                 OpenEditorEntry.class));
-        elements.addAll(ConfigurationManager.getConfigElementsMulti(true, DashboardConfig.class));
+        elements.addAll(
+            ConfigurationManager.getConfigElementsMulti(true, DashboardConfig.class, DashboardOtherConfig.class));
         return elements;
     }
 

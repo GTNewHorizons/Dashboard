@@ -363,10 +363,12 @@ dashboard.status_effects.pulse.seconds=%ss left
 dashboard.theme.vanilla=Vanilla
 
 # Config
-dashboard.config.editor=Editor
 dashboard.config.open_editor=Open HUD Editor
 dashboard.config.open_editor.tooltip=Opens the HUD editor, to move, resize and hide parts of the HUD\nOnly while in a world, since the editor shows the HUD
-dashboard.config.editor.tooltip=Settings of the HUD editor
+
+dashboard.config.editor=Editor and Customize
+dashboard.config.editor.tooltip=Settings you can also change in the HUD editor and its Customize screen
+
 dashboard.config.editor.show_grid=Show Grid
 dashboard.config.editor.show_grid.tooltip=Show the grid in the HUD editor and snap elements to it
 dashboard.config.editor.show_preview=Show Preview
@@ -375,8 +377,6 @@ dashboard.config.editor.show_labels=Show Labels
 dashboard.config.editor.show_labels.tooltip=Show the element names inside their boxes in the HUD editor
 dashboard.config.editor.show_positions=Show Positions
 dashboard.config.editor.show_positions.tooltip=Show the element position, measured from the middle of the screen, next to its box in the HUD editor
-dashboard.config.editor.show_images=Show Pictures
-dashboard.config.editor.show_images.tooltip=Show pictures from resource packs and the config/dashboard/images folder, toggled with a key
 dashboard.config.editor.shown_editor_mods=Mods Shown in the Editor
 dashboard.config.editor.shown_editor_mods.tooltip=Mod ids whose elements show in the HUD editor. Other mods are left out, to tidy it. They still show in game
 dashboard.config.editor.crosshair_style=Crosshair Style
@@ -436,10 +436,16 @@ dashboard.config.editor.nausea_strength=Nausea Wobble
 dashboard.config.editor.nausea_strength.tooltip=How much the screen wobbles from nausea and portals, in percent
 dashboard.config.editor.night_vision_flicker=Night Vision Flicker
 dashboard.config.editor.night_vision_flicker.tooltip=Flash the screen while night vision runs out
-dashboard.config.editor.pickup_feed_seconds=Item Pickups Time
-dashboard.config.editor.pickup_feed_seconds.tooltip=How long each row of the item pickups shows, in seconds
-dashboard.config.editor.pickup_feed_slide_out=Item Pickups Slide Out
-dashboard.config.editor.pickup_feed_slide_out.tooltip=How long each row of the item pickups takes to slide away, in milliseconds, 0 to just disappear
 dashboard.config.editor.status_effect_sort_by_time=Sort Status Effects by Time
 dashboard.config.editor.status_effect_sort_by_time.tooltip=Sort status effects by time left instead of the order they were added
 dashboard.config.editor.status_effect_pulse_seconds.tooltip=Pulse status effects with this many seconds left, in steps of 5, 0 to never pulse
+
+dashboard.config.other=Other
+dashboard.config.other.tooltip=Settings you can only change here
+
+dashboard.config.other.show_images=Show Pictures
+dashboard.config.other.show_images.tooltip=Show pictures from resource packs and the config/dashboard/images folder, toggled with a key
+dashboard.config.other.pickup_feed_seconds=Item Pickups Time
+dashboard.config.other.pickup_feed_seconds.tooltip=How long each row of the item pickups shows, in seconds
+dashboard.config.other.pickup_feed_slide_out=Item Pickups Slide Out
+dashboard.config.other.pickup_feed_slide_out.tooltip=How long each row of the item pickups takes to slide away, in milliseconds, 0 to just disappear

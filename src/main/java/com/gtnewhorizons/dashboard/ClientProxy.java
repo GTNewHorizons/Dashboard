@@ -26,6 +26,7 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
         try {
             ConfigurationManager.registerConfig(DashboardConfig.class);
+            ConfigurationManager.registerConfig(DashboardOtherConfig.class);
         } catch (ConfigException e) {
             Dashboard.LOG.error("Failed to load the Dashboard config, using defaults", e);
         }

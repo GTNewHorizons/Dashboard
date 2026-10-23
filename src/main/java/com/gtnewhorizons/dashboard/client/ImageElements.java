@@ -38,7 +38,7 @@ import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizon.gtnhlib.util.ResourceUtil;
 import com.gtnewhorizons.dashboard.Dashboard;
-import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.DashboardOtherConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -220,16 +220,17 @@ public final class ImageElements {
 
     /** Hides or shows every image at once, with a message above the hotbar. Saved, so it lasts. */
     public static void toggleShown() {
-        DashboardConfig.showImages = !DashboardConfig.showImages;
-        ConfigurationManager.save(DashboardConfig.class);
+        DashboardOtherConfig.showImages = !DashboardOtherConfig.showImages;
+        ConfigurationManager.save(DashboardOtherConfig.class);
         VanillaHudElements.showShadowedActionBarText(
             StatCollector.translateToLocal(
-                DashboardConfig.showImages ? "dashboard.message.images_shown" : "dashboard.message.images_hidden"));
+                DashboardOtherConfig.showImages ? "dashboard.message.images_shown"
+                    : "dashboard.message.images_hidden"));
     }
 
     /** The editor still shows them, so they can be arranged while toggled off. */
     private static boolean areShown() {
-        return DashboardConfig.showImages || HudRegistry.isLayoutScreenOpen();
+        return DashboardOtherConfig.showImages || HudRegistry.isLayoutScreenOpen();
     }
 
     public static boolean isImage(HudElement element) {
