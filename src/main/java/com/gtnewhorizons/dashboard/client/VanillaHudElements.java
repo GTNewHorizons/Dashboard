@@ -471,6 +471,11 @@ public final class VanillaHudElements {
      */
     private static void postSkippedEvent(RenderGameOverlayEvent.Pre event) {
         if (POSTED_WHEN_SKIPPED.contains(event.type)) {
+            if (event.type == ElementType.EXPERIENCE) {
+                // Forge's own state right before this Post event, which mods drawing there rely on
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glColor4f(1, 1, 1, 1);
+            }
             MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(event, event.type));
         }
     }
