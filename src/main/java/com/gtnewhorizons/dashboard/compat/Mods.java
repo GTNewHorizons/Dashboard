@@ -23,7 +23,6 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     GALACTICRAFT("GalacticraftCore", () -> GalacticraftCompat.register()),
     GALAXYSPACE("GalaxySpace", () -> GalaxySpaceCompat.register()),
     WAILA("Waila", () -> WailaCompat.register()),
-    ADVENTURE_BACKPACK("adventurebackpack", () -> AdventureBackpackCompat.register()),
     BOTANIA("Botania", () -> BotaniaCompat.register()),
     BACKHAND("backhand"),
     INGAMEINFO("InGameInfoXML", () -> InGameInfoCompat.register()),

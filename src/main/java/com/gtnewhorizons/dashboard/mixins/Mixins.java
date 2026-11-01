@@ -57,10 +57,6 @@ public enum Mixins implements IMixins {
         .addClientMixins("waila.MixinOverlayRenderer_Hud", "waila.MixinWailaTickHandler_Hud")
         .addRequiredMod(Mods.WAILA)
         .setPhase(Phase.LATE)),
-    ADVENTURE_BACKPACK_HUD(new MixinBuilder("Make the Adventure Backpack potion icons and tanks movable")
-        .addClientMixins("adventurebackpack.MixinGuiOverlay_Hud")
-        .addRequiredMod(Mods.ADVENTURE_BACKPACK)
-        .setPhase(Phase.LATE)),
     BOTANIA_HUD(
         new MixinBuilder("Make the Botania bars and texts movable").addClientMixins("botania.MixinHUDHandler_Hud")
             .addRequiredMod(Mods.BOTANIA)
