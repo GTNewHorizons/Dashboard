@@ -61,13 +61,6 @@ public enum Mixins implements IMixins {
         new MixinBuilder("Make the Botania bars and texts movable").addClientMixins("botania.MixinHUDHandler_Hud")
             .addRequiredMod(Mods.BOTANIA)
             .setPhase(Phase.LATE)),
-    INGAMEINFO_HUD(new MixinBuilder("Make the InGameInfoXML text areas movable")
-        .addClientMixins(
-            "ingameinfo.MixinInfoText_Hud",
-            "ingameinfo.MixinInGameInfoCore_Hud",
-            "ingameinfo.MixinTicker_Preview")
-        .addRequiredMod(Mods.INGAMEINFO)
-        .setPhase(Phase.LATE)),
     DRACONIC_HUD(new MixinBuilder("Make the Draconic Evolution info box, armor HUD and magnet icon movable")
         .addClientMixins("draconic.MixinHudHandler_Hud", "draconic.MixinItemDisplayManager_Hud")
         .addRequiredMod(Mods.DRACONIC)
