@@ -72,7 +72,6 @@ public final class VanillaHudElements {
     private static final Map<ElementType, StackedIconRow> STACKED_ROWS = new EnumMap<>(ElementType.class);
     private static final Set<ElementType> SHIFTED = EnumSet.noneOf(ElementType.class);
     private static final Set<ElementType> INVISIBLE = EnumSet.noneOf(ElementType.class);
-    private static final Set<ElementType> HIDDEN = EnumSet.noneOf(ElementType.class);
     private static final Map<HudElement, BarSlot> THEMED_BARS = new LinkedHashMap<>();
     private static final Random SHAKE = new Random();
     private static final ResourceLocation APPLECORE_ICONS = new ResourceLocation(
@@ -450,7 +449,6 @@ public final class VanillaHudElements {
         if (HudRegistry.beginRender(element, event.resolution)) {
             SHIFTED.add(event.type);
         } else {
-            HIDDEN.add(event.type);
             cancel(event);
             postSkippedEvent(event);
         }
@@ -464,42 +462,6 @@ public final class VanillaHudElements {
 
     public static boolean isShadowedActionBarText(String text) {
         return text.equals(shadowedActionBarText);
-    }
-
-    /**
-     * True if the element's Pre event was cancelled only because the player hid it. Lets mods that draw a separate
-     * element during this element's event (Backhand's off-hand slot during the hotbar's) keep drawing it.
-     */
-    public static boolean isHiddenByDashboard(ElementType type) {
-        return HIDDEN.contains(type);
-    }
-
-    /**
-     * For a separate element another mod draws during this element's event: undoes this element's move and
-     * invisibility, then moves the separate one.
-     *
-     * @return false if the separate element should not be drawn. Otherwise call {@link #endSeparateElement} after it.
-     */
-    public static boolean beginSeparateElement(ElementType type, HudElement separate, int screenWidth,
-        int screenHeight) {
-        if (!HudRegistry.shouldRender(separate)) {
-            return false;
-        }
-        GL11.glPushMatrix();
-        if (INVISIBLE.contains(type)) {
-            PreviewDrawing.setColorWrites(true);
-        } else if (SHIFTED.contains(type)) {
-            HudRegistry.undoTranslateToPosition(ELEMENTS.get(type), screenWidth, screenHeight);
-        }
-        HudRegistry.translateToPosition(separate, screenWidth, screenHeight);
-        return true;
-    }
-
-    public static void endSeparateElement(ElementType type) {
-        HudRegistry.endRender();
-        if (INVISIBLE.contains(type)) {
-            PreviewDrawing.setColorWrites(false);
-        }
     }
 
     /**
@@ -794,7 +756,6 @@ public final class VanillaHudElements {
             HudRegistry.endRender();
         }
         SHIFTED.clear();
-        HIDDEN.clear();
         if (!INVISIBLE.isEmpty()) {
             PreviewDrawing.setColorWrites(true);
             INVISIBLE.clear();

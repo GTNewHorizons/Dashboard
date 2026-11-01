@@ -25,7 +25,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     WAILA("Waila", () -> WailaCompat.register()),
     ADVENTURE_BACKPACK("adventurebackpack", () -> AdventureBackpackCompat.register()),
     BOTANIA("Botania", () -> BotaniaCompat.register()),
-    BACKHAND("backhand", () -> BackhandCompat.register()),
+    BACKHAND("backhand"),
     INGAMEINFO("InGameInfoXML", () -> InGameInfoCompat.register()),
     DRACONIC("DraconicEvolution", () -> DraconicCompat.register()),
     THAUMCRAFT("Thaumcraft", () -> ThaumcraftCompat.register()),

@@ -89,7 +89,6 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Waila**: the block info box (also when drawn by ChromaticTooltips)
 - **Adventure Backpack**: potion icons and tanks
 - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
-- **Backhand**: the off-hand slot, separate from the hotbar
 - **InGameInfoXML**: each text area (top left, top right, and so on)
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
@@ -115,6 +114,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 - **JourneyMap**: the minimap
+- **Backhand**: the off-hand slot, separate from the hotbar
 -->
 
 ## Settings

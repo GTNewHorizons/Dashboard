@@ -1,5 +1,7 @@
 package com.gtnewhorizons.dashboard.compat;
 
+import java.lang.reflect.Method;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -15,8 +17,10 @@ public final class TinkerCompat {
 
     /** Bows, crossbows, javelins and throwing knives, which draw their own crosshair. */
     private static final String RANGED_WEAPON = "tconstruct.library.weaponry.IWindup";
+    private static final String BACKHAND_UTILS = "xonin.backhand.api.core.BackhandUtils";
 
     private static Class<?> rangedWeapon;
+    private static Method getOffhandItem;
     private static boolean looked;
 
     private TinkerCompat() {}
@@ -32,11 +36,34 @@ public final class TinkerCompat {
             return false;
         }
         return isRangedWeapon(weaponClass, player.getCurrentEquippedItem())
-            || Mods.BACKHAND.isModLoaded() && isRangedWeapon(weaponClass, BackhandCompat.getOffhandItem(player));
+            || isRangedWeapon(weaponClass, getOffhandItem(player));
     }
 
     private static boolean isRangedWeapon(Class<?> weaponClass, ItemStack stack) {
         return stack != null && stack.getTagCompound() != null && weaponClass.isInstance(stack.getItem());
+    }
+
+    /** Null without Backhand or without an off-hand item. */
+    private static ItemStack getOffhandItem(EntityPlayer player) {
+        if (getOffhandItem == null) {
+            return null;
+        }
+        try {
+            return (ItemStack) getOffhandItem.invoke(null, player);
+        } catch (ReflectiveOperationException e) {
+            getOffhandItem = null;
+            Dashboard.LOG.warn("Could not read the Backhand off-hand item, its Tinkers crosshair is not checked", e);
+            return null;
+        }
+    }
+
+    private static void findOffhandItemMethod() {
+        try {
+            getOffhandItem = Class.forName(BACKHAND_UTILS)
+                .getMethod("getOffhandItem", EntityPlayer.class);
+        } catch (ReflectiveOperationException e) {
+            Dashboard.LOG.warn("Could not find the Backhand off-hand item, its Tinkers crosshair is not checked", e);
+        }
     }
 
     private static Class<?> getRangedWeaponClass() {
@@ -47,6 +74,9 @@ public final class TinkerCompat {
                     rangedWeapon = Class.forName(RANGED_WEAPON);
                 } catch (ClassNotFoundException e) {
                     Dashboard.LOG.warn("Tinkers' ranged weapons were not found, its crosshair setting does nothing");
+                }
+                if (Mods.BACKHAND.isModLoaded()) {
+                    findOffhandItemMethod();
                 }
             }
         }
