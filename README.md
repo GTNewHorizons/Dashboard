@@ -100,6 +100,9 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
+<!-- need pr
+- **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapHud API)
+-->
 
 More mods are on the way.
 
@@ -111,7 +114,6 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
-- **JourneyMap**: the minimap
 - **Backhand**: the off-hand slot, separate from the hotbar
 - **Adventure Backpack**: potion icons and tanks
 - **InGameInfoXML**: each text area (top left, top right, and so on)
