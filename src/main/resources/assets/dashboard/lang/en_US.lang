@@ -225,6 +225,10 @@ dashboard.element.hardcoreenderexpansion.notifications=Notes
 dashboard.element.hardcoreenderexpansion.energy_cluster=Energy Cluster Info
 dashboard.element.hardcoreenderexpansion.energy_cluster.description=Shows while looking at an Energy Cluster
 
+## JourneyMap
+dashboard.element.journeymap.minimap=Minimap
+dashboard.element.journeymap.minimap.own_settings=JourneyMap MiniMap Options > Position
+
 ## IndustrialCraft 2
 dashboard.element.ic2.armor_charge=Armor Charge
 dashboard.element.ic2.armor_charge.description=Shows while wearing a Nano or Quantum helmet with its HUD on\nSwitch the HUD mode with §6[%s]§7 (%s) + §6[%s]§7 (%s)

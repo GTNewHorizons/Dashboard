@@ -114,6 +114,7 @@ These mods add their own Dashboard support, so their HUD can be moved as soon as
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
+- **JourneyMap**: the minimap
 -->
 
 ## Settings
