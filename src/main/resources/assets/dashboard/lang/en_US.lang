@@ -41,6 +41,7 @@ dashboard.editor.help_tooltip.resize=§6Alt+scroll§r to resize the element
 dashboard.editor.help_tooltip.reset_size=§6Alt+click§r to reset size of the element
 dashboard.editor.help_tooltip.opacity=§6Ctrl+scroll§r to make the background see-through (some elements)
 dashboard.editor.help_tooltip.ingameinfo=InGameInfoXML text only shows up here after it was toggled on in game
+dashboard.editor.help_tooltip.journeymap=The JourneyMap minimap only shows up here while it is turned on in JourneyMap
 
 ## Element tooltip
 dashboard.editor.element_tooltip.hidden=Hidden

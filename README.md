@@ -107,9 +107,9 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 More mods are on the way.
 
 <!-- need pr
-### Mods that support Dashboard themselves
+### Mods using the Dashboard API
 
-These mods add their own Dashboard support, so their HUD can be moved as soon as both are installed:
+These mods use Dashboard's API to make their own HUD movable. This needs a recent version of both the mod and Dashboard:
 
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info

@@ -372,12 +372,21 @@ public class GuiHudEditor extends GuiScreen {
             for (String key : HELP_LINE_KEYS) {
                 lines.add(StatCollector.translateToLocal(key));
             }
-            // Its areas only show once their text was drawn, which is easy to miss
-            if (Mods.INGAMEINFO.isModLoaded()) {
+            // These only show under some conditions, which is easy to miss
+            boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
+            boolean journeyMap = HudRegistry.getElement("journeymap:minimap") != null;
+            if (inGameInfo || journeyMap) {
                 lines.add("");
+            }
+            if (inGameInfo) {
                 lines.add(
                     EnumChatFormatting.GRAY
                         + StatCollector.translateToLocal("dashboard.editor.help_tooltip.ingameinfo"));
+            }
+            if (journeyMap) {
+                lines.add(
+                    EnumChatFormatting.GRAY
+                        + StatCollector.translateToLocal("dashboard.editor.help_tooltip.journeymap"));
             }
         }
         for (ToggleButton button : toggleButtons) {
