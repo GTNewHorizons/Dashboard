@@ -20,7 +20,6 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     TINKERS("TConstruct", "tinker", () -> TinkersBeltHotbar.register()),
     APPLECORE("AppleCore"),
     GRAVISUITE("GraviSuite", () -> GraviSuiteCompat.register()),
-    GALACTICRAFT("GalacticraftCore", () -> GalacticraftCompat.register()),
     WAILA("Waila", () -> WailaCompat.register()),
     BOTANIA("Botania", () -> BotaniaCompat.register()),
     BACKHAND("backhand"),
