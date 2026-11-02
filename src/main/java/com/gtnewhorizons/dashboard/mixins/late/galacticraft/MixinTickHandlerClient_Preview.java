@@ -16,15 +16,12 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import cpw.mods.fml.common.gameevent.TickEvent;
 
 /**
- * Galacticraft and GalaxySpace only draw their overlays when no screen (or the chat) is open, so the HUD editor counts
- * as no screen here. That way players see the real elements while moving them. They draw at the end of the frame, so in
- * the editor the editor runs them instead.
+ * Galacticraft only draws its overlays when no screen (or the chat) is open, so the HUD editor counts as no screen
+ * here. That way players see the real elements while moving them. They draw at the end of the frame, so in the editor
+ * the editor runs them instead.
  */
 @Pseudo
-@Mixin(
-    targets = { "micdoodle8.mods.galacticraft.core.tick.TickHandlerClient",
-        "galaxyspace.core.handler.GSClientEventHandler" },
-    remap = false)
+@Mixin(targets = "micdoodle8.mods.galacticraft.core.tick.TickHandlerClient", remap = false)
 public abstract class MixinTickHandlerClient_Preview {
 
     @Shadow(remap = false)

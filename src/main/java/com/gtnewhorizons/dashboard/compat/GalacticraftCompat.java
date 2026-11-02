@@ -6,8 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
 
 import org.lwjgl.opengl.GL11;
 
@@ -71,27 +69,17 @@ public final class GalacticraftCompat {
     private static Fields.ClassFields<Object>.Field<Boolean> oxygenBottom;
     private static final HudShift OVERLAY_SHIFT = new HudShift();
 
-    private static Method noAtmosphericCombustionMethod;
-    private static int airlessDimension = Integer.MIN_VALUE;
-    private static boolean airless;
+    private GalacticraftCompat() {}
 
-    static {
-        // Here rather than in register(), so addons like GalaxySpace can use them in any load order
+    public static void register() {
         try {
             Fields.ClassFields<Object> config = ModFields
                 .of("micdoodle8.mods.galacticraft.core.util.ConfigManagerCore");
             oxygenLeft = ModFields.booleanField(config, "oxygenIndicatorLeft");
             oxygenBottom = ModFields.booleanField(config, "oxygenIndicatorBottom");
-            noAtmosphericCombustionMethod = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil")
-                .getMethod("noAtmosphericCombustion", WorldProvider.class);
         } catch (ReflectiveOperationException e) {
             Dashboard.LOG.warn("Could not read the Galacticraft HUD settings, assuming the top right corner", e);
         }
-    }
-
-    private GalacticraftCompat() {}
-
-    public static void register() {
         setPreviews();
         for (HudElement element : new HudElement[] { OXYGEN, OXYGEN_WARNING, LAUNCH_COUNTDOWN, LANDER,
             ROCKET_ALTITUDE }) {
@@ -238,32 +226,11 @@ public final class GalacticraftCompat {
         return new HudBounds(x, y, OXYGEN_WIDTH, OXYGEN_HEIGHT);
     }
 
-    /** Galacticraft's {@code oxygenIndicatorLeft} config, also used by addons for their gauges. */
-    public static boolean isIndicatorOnLeft() {
+    private static boolean isIndicatorOnLeft() {
         return ModFields.readBoolean(oxygenLeft, false);
     }
 
-    /** Galacticraft's {@code oxygenIndicatorBottom} config, also used by addons for their gauges. */
-    public static boolean isIndicatorAtBottom() {
+    private static boolean isIndicatorAtBottom() {
         return ModFields.readBoolean(oxygenBottom, false);
-    }
-
-    /** True on planets without breathable air, where Galacticraft shows the oxygen gauge. */
-    public static boolean isCurrentWorldAirless() {
-        World world = Minecraft.getMinecraft().theWorld;
-        if (world == null || noAtmosphericCombustionMethod == null) {
-            return false;
-        }
-        // Asked again only after changing dimension, since the answer belongs to the dimension
-        int dimension = world.provider.dimensionId;
-        if (dimension != airlessDimension) {
-            airlessDimension = dimension;
-            try {
-                airless = (boolean) noAtmosphericCombustionMethod.invoke(null, world.provider);
-            } catch (ReflectiveOperationException e) {
-                airless = false;
-            }
-        }
-        return airless;
     }
 }
