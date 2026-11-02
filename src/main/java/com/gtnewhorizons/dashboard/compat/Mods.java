@@ -23,7 +23,6 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     BACKHAND("backhand"),
     INGAMEINFO("InGameInfoXML"),
     JOURNEYMAP("journeymap", () -> JourneyMapCompat.register()),
-    DRACONIC("DraconicEvolution", () -> DraconicCompat.register()),
     THAUMCRAFT("Thaumcraft", () -> ThaumcraftCompat.register()),
     THAUMIC_TINKERER("ThaumicTinkerer", () -> ThaumicTinkererCompat.register()),
     TAINTED_MAGIC("TaintedMagic", () -> TaintedMagicCompat.register()),

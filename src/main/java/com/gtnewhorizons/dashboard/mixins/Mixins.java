@@ -39,10 +39,6 @@ public enum Mixins implements IMixins {
         .addClientMixins("gravisuite.MixinClientTickHandler_Hud")
         .addRequiredMod(Mods.GRAVISUITE)
         .setPhase(Phase.LATE)),
-    DRACONIC_HUD(new MixinBuilder("Make the Draconic Evolution info box, armor HUD and magnet icon movable")
-        .addClientMixins("draconic.MixinHudHandler_Hud", "draconic.MixinItemDisplayManager_Hud")
-        .addRequiredMod(Mods.DRACONIC)
-        .setPhase(Phase.LATE)),
     THAUMCRAFT_HUD(new MixinBuilder("Make the Thaumcraft HUD movable")
         .addClientMixins(
             "thaumcraft.MixinClientTickEventsFML_Hud",
