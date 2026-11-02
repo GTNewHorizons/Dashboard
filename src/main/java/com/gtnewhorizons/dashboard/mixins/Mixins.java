@@ -101,10 +101,6 @@ public enum Mixins implements IMixins {
     GTNHLIB_HUD(new MixinBuilder("Make the GTNHLib text above the hotbar and titles movable")
         .addClientMixins("gtnhlib.MixinAboveHotbarHUD_Hud", "gtnhlib.MixinTitleRenderer_Hud")
         .setPhase(Phase.LATE)),
-    INFERNAL_MOBS_HUD(new MixinBuilder("Make the Infernal Mobs health bar movable")
-        .addClientMixins("infernalmobs.MixinInfernalMobsClient_Hud")
-        .addRequiredMod(Mods.INFERNAL_MOBS)
-        .setPhase(Phase.LATE)),
     SERVER_UTILITIES_HUD(new MixinBuilder("Move ServerUtilities notifications with the text above the hotbar")
         .addClientMixins("serverutilities.MixinNotificationWidget_Hud")
         .addRequiredMod(Mods.SERVER_UTILITIES)

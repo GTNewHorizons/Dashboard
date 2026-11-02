@@ -98,7 +98,6 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Battlegear 2**: shield block bar and quiver slots
 - **Nature's Compass**: the biome search text
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
-- **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 <!-- need pr
 - **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapRenderEvent)
@@ -117,6 +116,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Backhand**: the off-hand slot, separate from the hotbar
 - **Adventure Backpack**: potion icons and tanks
 - **InGameInfoXML**: each text area (top left, top right, and so on)
+- **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 -->
 
 ## Settings
