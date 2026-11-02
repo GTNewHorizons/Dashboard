@@ -101,7 +101,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 <!-- need pr
-- **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapHud API)
+- **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapRenderEvent)
 -->
 
 More mods are on the way.
