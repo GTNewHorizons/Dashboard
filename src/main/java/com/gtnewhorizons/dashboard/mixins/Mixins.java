@@ -39,10 +39,6 @@ public enum Mixins implements IMixins {
         .addClientMixins("gravisuite.MixinClientTickHandler_Hud")
         .addRequiredMod(Mods.GRAVISUITE)
         .setPhase(Phase.LATE)),
-    WAILA_HUD(new MixinBuilder("Make the Waila info box movable")
-        .addClientMixins("waila.MixinOverlayRenderer_Hud", "waila.MixinWailaTickHandler_Hud")
-        .addRequiredMod(Mods.WAILA)
-        .setPhase(Phase.LATE)),
     BOTANIA_HUD(
         new MixinBuilder("Make the Botania bars and texts movable").addClientMixins("botania.MixinHUDHandler_Hud")
             .addRequiredMod(Mods.BOTANIA)
