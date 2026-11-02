@@ -148,6 +148,11 @@ A resource pack can change how Dashboard looks and add to it, all from `assets/d
 The [Texture Guide](src/main/resources/assets/dashboard/textures/gui/TextureGuide.md) explains each one: file names,
 sheet layouts and every setting.
 
+## For Mod Developers
+
+Mods can make their own HUD movable, resizable and hideable in the editor, without depending on Dashboard. The
+[API guide](docs/API.md) explains how.
+
 ## License
 
 [![License](https://img.shields.io/badge/License-LGPL--3.0-yellow.svg?style=flat-square)](LICENSE)
