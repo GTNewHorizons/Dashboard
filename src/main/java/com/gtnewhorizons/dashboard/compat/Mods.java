@@ -24,7 +24,6 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     INGAMEINFO("InGameInfoXML"),
     JOURNEYMAP("journeymap", () -> JourneyMapCompat.register()),
     THAUMCRAFT("Thaumcraft", () -> ThaumcraftCompat.register()),
-    TAINTED_MAGIC("TaintedMagic", () -> TaintedMagicCompat.register()),
     WITCHERY("witchery", () -> WitcheryCompat.register()),
     IC2("IC2", () -> Ic2Compat.register()),
     NATURES_COMPASS("naturescompass", () -> NaturesCompassCompat.register()),
