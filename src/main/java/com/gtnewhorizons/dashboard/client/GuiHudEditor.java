@@ -277,6 +277,7 @@ public class GuiHudEditor extends GuiScreen {
         }
         if (DashboardConfig.showPreview) {
             drawPreviews();
+            GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         }
 
         drawElementBoxes(highlighted);
