@@ -83,13 +83,15 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **AppleCore**: saturation and exhaustion on the food bar
 - **GraviSuite**: status text
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
+<!-- TODO: bump version
+- **JourneyMap**: the minimap (needs JourneyMap {version} or newer)
+-->
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
 - **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar. Dashboard also adds a
   **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
 - **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
   infused brew and bark belt charges (the vampire power bar moves with the hotbar)
 <!-- need pr
-- **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapRenderEvent)
 - **Overloaded Armor Bar**: its armor bar moves, resizes and hides like the vanilla one
 -->
 
