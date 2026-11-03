@@ -14,8 +14,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * Some mods (like Witchery and Nature's Compass) draw their HUD in a render tick handler at the end of the frame, which
- * is after every screen, so it would cover the HUD editor. While the editor is open, their handler is skipped there and
+ * Some mods (like Witchery) draw their HUD in a render tick handler at the end of the frame, which is after every
+ * screen, so it would cover the HUD editor. While the editor is open, their handler is skipped there and
  * run by the editor instead, before it draws its boxes. The whole handler runs, since some also do other work there.
  */
 @SideOnly(Side.CLIENT)

@@ -53,10 +53,6 @@ public enum Mixins implements IMixins {
     IC2_HUD(new MixinBuilder("Make the IC2 helmet HUD movable").addClientMixins("ic2.MixinGuiOverlayer_Hud")
         .addRequiredMod(Mods.IC2)
         .setPhase(Phase.LATE)),
-    NATURES_COMPASS_HUD(new MixinBuilder("Make the Nature's Compass biome search text movable")
-        .addClientMixins("naturescompass.MixinRenderTickHandler_Hud")
-        .addRequiredMod(Mods.NATURES_COMPASS)
-        .setPhase(Phase.LATE)),
     GTNHLIB_HUD(new MixinBuilder("Make the GTNHLib text above the hotbar and titles movable")
         .addClientMixins("gtnhlib.MixinAboveHotbarHUD_Hud", "gtnhlib.MixinTitleRenderer_Hud")
         .setPhase(Phase.LATE)),

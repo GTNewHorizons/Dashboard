@@ -35,10 +35,6 @@ final class ModFields {
         return require(fields.getField(Fields.LookupType.DECLARED, name, type), name);
     }
 
-    static int readInt(Fields.ClassFields<Object>.Field<Integer> field) {
-        return readInt(field, 0);
-    }
-
     static int readInt(Fields.ClassFields<Object>.Field<Integer> field, int fallback) {
         return field == null ? fallback : field.getValue(null);
     }
