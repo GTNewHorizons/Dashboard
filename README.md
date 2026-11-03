@@ -89,7 +89,6 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 - **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
   infused brew and bark belt charges (the vampire power bar moves with the hotbar)
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
-- **Battlegear 2**: shield block bar and quiver slots
 - **Nature's Compass**: the biome search text
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
@@ -117,6 +116,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
 - **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
+- **Battlegear 2**: shield block bar and quiver slots
 -->
 
 ## Settings
