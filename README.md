@@ -82,9 +82,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 
 - **AppleCore**: saturation and exhaustion on the food bar
 - **GraviSuite**: status text
-- **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
-- **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
 - **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar. Dashboard also adds a
   **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
@@ -110,10 +108,12 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 - **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
 - **GalaxySpace**: the atmospheric pressure bar
+- **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **InGameInfoXML**: each text area (top left, top right, and so on)
 - **Nature's Compass**: the biome search text
+- **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
 - **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
 - **Waila**: the block info box (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)

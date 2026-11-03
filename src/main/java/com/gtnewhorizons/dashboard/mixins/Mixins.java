@@ -52,13 +52,6 @@ public enum Mixins implements IMixins {
         .setPhase(Phase.LATE)),
     IC2_HUD(new MixinBuilder("Make the IC2 helmet HUD movable").addClientMixins("ic2.MixinGuiOverlayer_Hud")
         .addRequiredMod(Mods.IC2)
-        .setPhase(Phase.LATE)),
-    GTNHLIB_HUD(new MixinBuilder("Make the GTNHLib text above the hotbar and titles movable")
-        .addClientMixins("gtnhlib.MixinAboveHotbarHUD_Hud", "gtnhlib.MixinTitleRenderer_Hud")
-        .setPhase(Phase.LATE)),
-    SERVER_UTILITIES_HUD(new MixinBuilder("Move ServerUtilities notifications with the text above the hotbar")
-        .addClientMixins("serverutilities.MixinNotificationWidget_Hud")
-        .addRequiredMod(Mods.SERVER_UTILITIES)
         .setPhase(Phase.LATE));
 
     private final MixinBuilder builder;
