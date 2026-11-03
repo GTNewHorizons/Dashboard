@@ -81,16 +81,16 @@ There is also an **Item Pickups** element: the items you pick up show for a mome
 Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 
 - **AppleCore**: saturation and exhaustion on the food bar
-- **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar. Dashboard also adds a
-  **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
 - **GraviSuite**: status text
-- **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
-- **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
-  infused brew and bark belt charges (the vampire power bar moves with the hotbar)
+- **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
 - **Nature's Compass**: the biome search text
-- **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
+- **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
+- **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar. Dashboard also adds a
+  **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
+- **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
+  infused brew and bark belt charges (the vampire power bar moves with the hotbar)
 <!-- need pr
 - **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapRenderEvent)
 -->
@@ -102,21 +102,21 @@ More mods are on the way.
 
 These mods use Dashboard's API to make their own HUD movable. This needs a recent version of both the mod and Dashboard:
 
-- **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
-- **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
-- **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
-- **Backhand**: the off-hand slot, separate from the hotbar
 - **Adventure Backpack**: potion icons and tanks
-- **InGameInfoXML**: each text area (top left, top right, and so on)
-- **Infernal Mobs**: the elite mob health bar, with its name and modifiers
-- **GalaxySpace**: the atmospheric pressure bar
-- **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
-- **Waila**: the block info box (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)
+- **Backhand**: the off-hand slot, separate from the hotbar
+- **Battlegear 2**: shield block bar and quiver slots
+- **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
-- **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
-- **Battlegear 2**: shield block bar and quiver slots
+- **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
+- **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
+- **GalaxySpace**: the atmospheric pressure bar
+- **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
+- **Infernal Mobs**: the elite mob health bar, with its name and modifiers
+- **InGameInfoXML**: each text area (top left, top right, and so on)
 - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
+- **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
+- **Waila**: the block info box (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)
 -->
 
 ## Settings
