@@ -85,7 +85,6 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
   **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
 - **GraviSuite**: status text
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
-- **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
 - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
 - **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
   infused brew and bark belt charges (the vampire power bar moves with the hotbar)
@@ -117,6 +116,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Waila**: the block info box (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)
 - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
+- **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
 -->
 
 ## Settings

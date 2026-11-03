@@ -46,13 +46,6 @@ public enum Mixins implements IMixins {
             "thaumcraft.ClientTickEventsFMLInvoker")
         .addRequiredMod(Mods.THAUMCRAFT)
         .setPhase(Phase.LATE)),
-    THAUMIC_TINKERER_HUD(new MixinBuilder("Make the Thaumic Tinkerer HUD movable")
-        .addClientMixins(
-            "thaumictinkerer.MixinHUDHandler_Hud",
-            "thaumictinkerer.MixinToolModeHUDHandler_Hud",
-            "thaumictinkerer.MixinSoulHeartClientHandler_Hud")
-        .addRequiredMod(Mods.THAUMIC_TINKERER)
-        .setPhase(Phase.LATE)),
     TAINTED_MAGIC_HUD(new MixinBuilder("Make the Tainted Magic Katana charge and Disassembler mode movable")
         .addClientMixins("taintedmagic.MixinItemKatana_Hud", "taintedmagic.MixinItemThaumicDisassembler_Hud")
         .addRequiredMod(Mods.TAINTED_MAGIC)
