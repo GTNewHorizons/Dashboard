@@ -202,6 +202,10 @@ dashboard.element.naturescompass.biome_info=Biome Search Info
 dashboard.element.naturescompass.biome_info.description=Shows while holding a Nature's Compass
 dashboard.element.naturescompass.biome_info.own_settings=Nature's Compass config > overlaySide / lineOffset
 
+## Random Things
+dashboard.element.randomthings.notification=Notification
+dashboard.element.randomthings.notification.description=Sent by the Notification Interface or /rt notify
+
 ## Bogosorter
 dashboard.element.bogosorter.usage_ticker=Usage Ticker
 dashboard.element.bogosorter.usage_ticker.description=Pops up for a moment when the held item or armor changes count\nThe hotbar swap column (§6hold Alt§7) moves with the hotbar

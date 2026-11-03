@@ -115,6 +115,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **InGameInfoXML**: each text area (top left, top right, and so on)
 - **Nature's Compass**: the biome search text
+- **Random Things**: the notification card
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
 - **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
