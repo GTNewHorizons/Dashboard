@@ -109,6 +109,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 - **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
 - **GalaxySpace**: the atmospheric pressure bar
+- **GregTech**: the Power Goggles HUD
 - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers

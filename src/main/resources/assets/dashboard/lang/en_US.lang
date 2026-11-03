@@ -206,6 +206,10 @@ dashboard.element.naturescompass.biome_info.own_settings=Nature's Compass config
 dashboard.element.bogosorter.usage_ticker=Usage Ticker
 dashboard.element.bogosorter.usage_ticker.description=Pops up for a moment when the held item or armor changes count\nThe hotbar swap column (§6hold Alt§7) moves with the hotbar
 
+## GregTech
+dashboard.element.gregtech.power_goggles=Power Goggles
+dashboard.element.gregtech.power_goggles.own_settings=Power Goggles config, opened with §6[%s]
+
 ## GTNHLib (+ServerUtilities)
 dashboard.element.gtnhlib.above_hotbar_text=Text Above Hotbar
 dashboard.element.gtnhlib.above_hotbar_text.description=Short messages GTNH mods show above the hotbar\nServerUtilities notifications move with it
