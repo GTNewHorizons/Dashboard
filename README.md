@@ -90,6 +90,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
   infused brew and bark belt charges (the vampire power bar moves with the hotbar)
 <!-- need pr
 - **JourneyMap**: the minimap (needs a JourneyMap version with its MiniMapRenderEvent)
+- **Overloaded Armor Bar**: its armor bar moves, resizes and hides like the vanilla one
 -->
 
 More mods are on the way.
