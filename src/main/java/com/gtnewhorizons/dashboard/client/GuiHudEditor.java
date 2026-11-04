@@ -375,8 +375,9 @@ public class GuiHudEditor extends GuiScreen {
             }
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
-            boolean journeyMap = HudRegistry.getElement("journeymap:minimap") != null;
-            if (inGameInfo || journeyMap) {
+            // TODO: JourneyMap release with MiniMapRenderEvent
+            // boolean journeyMap = HudRegistry.getElement("journeymap:minimap") != null;
+            if (inGameInfo /* || journeyMap */) {
                 lines.add("");
             }
             if (inGameInfo) {
@@ -384,11 +385,11 @@ public class GuiHudEditor extends GuiScreen {
                     EnumChatFormatting.GRAY
                         + StatCollector.translateToLocal("dashboard.editor.help_tooltip.ingameinfo"));
             }
-            if (journeyMap) {
-                lines.add(
-                    EnumChatFormatting.GRAY
-                        + StatCollector.translateToLocal("dashboard.editor.help_tooltip.journeymap"));
-            }
+            // if (journeyMap) {
+            // lines.add(
+            // EnumChatFormatting.GRAY
+            // + StatCollector.translateToLocal("dashboard.editor.help_tooltip.journeymap"));
+            // }
         }
         for (ToggleButton button : toggleButtons) {
             if (button.mousePressed(mc, mouseX, mouseY)) {

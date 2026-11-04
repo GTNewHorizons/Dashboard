@@ -22,7 +22,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     GRAVISUITE("GraviSuite", () -> GraviSuiteCompat.register()),
     BACKHAND("backhand"),
     INGAMEINFO("InGameInfoXML"),
-    JOURNEYMAP("journeymap", () -> JourneyMapCompat.register()),
+    // JOURNEYMAP("journeymap", () -> JourneyMapCompat.register()), // TODO: JourneyMap release with MiniMapRenderEvent
     THAUMCRAFT("Thaumcraft", () -> ThaumcraftCompat.register()),
     WITCHERY("witchery", () -> WitcheryCompat.register()),
     IC2("IC2", () -> Ic2Compat.register()),
