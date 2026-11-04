@@ -43,10 +43,10 @@ public class GuiHudEditor extends GuiScreen {
     private static final int CENTER_MARK_LENGTH = 3;
     private static final float POSITION_TEXT_SCALE = 0.75f;
     private static final int OUTSIDE_NAME_PADDING = 1;
-    private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.move",
-        "dashboard.editor.help_tooltip.toggle", "dashboard.editor.help_tooltip.reset",
-        "dashboard.editor.help_tooltip.resize", "dashboard.editor.help_tooltip.reset_size",
-        "dashboard.editor.help_tooltip.opacity" };
+    private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.title",
+        "dashboard.editor.help_tooltip.move", "dashboard.editor.help_tooltip.toggle",
+        "dashboard.editor.help_tooltip.reset", "dashboard.editor.help_tooltip.resize",
+        "dashboard.editor.help_tooltip.reset_size", "dashboard.editor.help_tooltip.opacity" };
     private static final int HELP_ICON_SIZE = 12;
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
