@@ -167,6 +167,17 @@ public final class HudLayout {
         changed = true;
     }
 
+    public static boolean isLocked(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.locked;
+    }
+
+    public static void setLocked(HudElement element, boolean locked) {
+        getOrCreateState(element).locked = locked;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     /**
      * The GUI scale this element is drawn at. Whole GUI scales keep every texture pixel the same number of screen
      * pixels, so a resized element stays as sharp as the rest of the HUD.

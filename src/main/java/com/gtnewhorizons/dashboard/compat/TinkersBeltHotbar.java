@@ -18,6 +18,7 @@ import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.client.ElementOpacity;
+import com.gtnewhorizons.dashboard.client.HudEditorKeybind;
 import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.common.Loader;
@@ -42,7 +43,10 @@ public final class TinkersBeltHotbar {
         "dashboard:tinkers_belt_hotbar",
         "dashboard.element.tinkers.belt_hotbar",
         TinkersBeltHotbar::getDefaultBounds).setHiddenByDefault()
-            .setDescription("dashboard.element.tinkers.belt_hotbar.description", "key.tbelt")
+            .setDescription(
+                "dashboard.element.tinkers.belt_hotbar.description",
+                "key.tbelt",
+                HudEditorKeybind.OPACITY_MODIFIER.getKeyDescription())
             .setModNameAddon("Tinkers' Construct");
 
     private static Field armorExtended;
