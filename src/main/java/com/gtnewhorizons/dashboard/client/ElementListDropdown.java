@@ -33,12 +33,12 @@ final class ElementListDropdown extends ScrollingDropdown {
         super(font);
     }
 
-    /** Only mods ticked in the Mods list, like the editor itself. */
+    /** The same elements as the editor shows. */
     @Override
     void onOpen() {
         List<HudElement> elements = new ArrayList<>();
         for (HudElement element : HudRegistry.getElements()) {
-            if (EditorModFilter.isShown(element)) {
+            if (EditorModFilter.isInEditor(element)) {
                 elements.add(element);
             }
         }

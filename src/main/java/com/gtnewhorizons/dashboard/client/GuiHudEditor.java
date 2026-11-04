@@ -684,7 +684,7 @@ public class GuiHudEditor extends GuiScreen {
     private void updateBoxes() {
         boxes.clear();
         for (HudElement element : HudRegistry.getElements()) {
-            if (!element.isActive() || !EditorModFilter.isShown(element)) {
+            if (!EditorModFilter.isInEditor(element)) {
                 continue;
             }
             boxes.add(

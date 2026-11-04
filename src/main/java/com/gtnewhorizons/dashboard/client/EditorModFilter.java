@@ -44,6 +44,11 @@ public final class EditorModFilter {
         return isShown(getModKey(element));
     }
 
+    /** Its mod is ticked and it is turned on, like a bar number turned on in Customize. */
+    static boolean isInEditor(HudElement element) {
+        return element.isActive() && isShown(element);
+    }
+
     static boolean isShown(String modKey) {
         return getShown().contains(modKey);
     }
