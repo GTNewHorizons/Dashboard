@@ -3,6 +3,7 @@ package com.gtnewhorizons.dashboard.client;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -27,10 +28,13 @@ final class ElementListDropdown extends ScrollingDropdown {
 
     /** A mod heading where the element is null. */
     private final List<Row> rows = new ArrayList<>();
+    private final Consumer<HudElement> grab;
     private int width;
 
-    ElementListDropdown(FontRenderer font) {
+    /** Grab is called with the element left-clicked in the list, to pick it up. */
+    ElementListDropdown(FontRenderer font, Consumer<HudElement> grab) {
         super(font);
+        this.grab = grab;
     }
 
     /** The element on the row under the mouse, null over headings or outside the list. */
@@ -106,8 +110,21 @@ final class ElementListDropdown extends ScrollingDropdown {
         }
     }
 
+    /** Left-click picks the element up, right-click shows or hides it, like on its box. Locked ones stay. */
     @Override
-    void clickRow(int row) {}
+    void clickRow(int row, int mouseButton) {
+        HudElement element = rows.get(row).element;
+        if (HudLayout.isLocked(element)) {
+            return;
+        }
+        if (mouseButton == 0) {
+            close();
+            grab.accept(element);
+        } else if (mouseButton == 1) {
+            HudLayout.setVisible(element, !HudLayout.isVisible(element));
+            GuiHelpers.playClickSound();
+        }
+    }
 
     private static final class Row {
 

@@ -43,7 +43,7 @@ abstract class ScrollingDropdown {
 
     abstract void drawRow(int row, int rowX, int rowY, boolean hovered);
 
-    abstract void clickRow(int row);
+    abstract void clickRow(int row, int mouseButton);
 
     /** Rows that can not be hovered or clicked, like headings. */
     boolean isClickable(int row) {
@@ -136,7 +136,7 @@ abstract class ScrollingDropdown {
     /**
      * True if the click was on the list. Clicking the scrollbar grabs its handle, or moves it to the click first.
      */
-    boolean click(int mouseX, int mouseY) {
+    boolean click(int mouseX, int mouseY, int mouseButton) {
         if (!contains(mouseX, mouseY)) {
             return false;
         }
@@ -149,7 +149,7 @@ abstract class ScrollingDropdown {
         }
         int row = getRowAt(mouseX, mouseY);
         if (row >= 0) {
-            clickRow(row);
+            clickRow(row, mouseButton);
         }
         return true;
     }

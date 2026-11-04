@@ -68,9 +68,9 @@ final class ModFilterDropdown extends ScrollingDropdown {
         font.drawStringWithShadow(entry.name, rowX + Icons.SMALL_SIZE + BOX_GAP, textY, textColor);
     }
 
-    /** Ticks or unticks the mod, Ctrl+click all the others. */
+    /** Ticks or unticks the mod, Ctrl+click all the others. Any mouse button. */
     @Override
-    void clickRow(int row) {
+    void clickRow(int row, int mouseButton) {
         String key = entries.get(row).key;
         if (GuiScreen.isCtrlKeyDown()) {
             setOthersOpposite(key);

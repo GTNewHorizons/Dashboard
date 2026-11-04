@@ -70,6 +70,7 @@ public class GuiHudEditor extends GuiScreen {
     private int menuWidth;
     private int menuHeight;
     private HudElement draggedElement;
+    private boolean carryingElement;
     private int grabOffsetX;
     private int grabOffsetY;
     /** How far the menu was dragged from its default spot. Not saved. */
@@ -107,7 +108,7 @@ public class GuiHudEditor extends GuiScreen {
         actionButtons.add(modsButton);
         buttonRows.add(actionButtons);
         modFilter = new ModFilterDropdown(fontRendererObj);
-        elementList = new ElementListDropdown(fontRendererObj);
+        elementList = new ElementListDropdown(fontRendererObj, this::carry);
 
         for (List<GuiButton> row : buttonRows) {
             buttonList.addAll(row);
@@ -267,7 +268,7 @@ public class GuiHudEditor extends GuiScreen {
             imagePan.update(mouseX, mouseY, width, height);
         }
         if (draggedElement != null) {
-            if (Mouse.isButtonDown(0)) {
+            if (carryingElement || Mouse.isButtonDown(0)) {
                 dragTo(mouseX, mouseY);
             } else {
                 draggedElement = null;
@@ -729,7 +730,12 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (modFilter.click(mouseX, mouseY) || elementList.click(mouseX, mouseY)) {
+        if (carryingElement) {
+            carryingElement = false;
+            draggedElement = null;
+            return;
+        }
+        if (modFilter.click(mouseX, mouseY, mouseButton) || elementList.click(mouseX, mouseY, mouseButton)) {
             return;
         }
         // A click anywhere else closes the lists, except on their own button, which toggles them
@@ -770,6 +776,15 @@ public class GuiHudEditor extends GuiScreen {
         } else if (mouseButton == 2 && ImageElements.isImage(element)) {
             imagePan.start(element, ImagePan.MIDDLE_BUTTON, mouseX, mouseY);
         }
+    }
+
+    /** Held by its middle, since it may be far from the mouse. */
+    private void carry(HudElement element) {
+        HudBounds bounds = HudLayout.getBounds(element, width, height);
+        draggedElement = element;
+        carryingElement = true;
+        grabOffsetX = bounds.width / 2;
+        grabOffsetY = bounds.height / 2;
     }
 
     private void dragTo(int mouseX, int mouseY) {
@@ -866,7 +881,9 @@ public class GuiHudEditor extends GuiScreen {
         super.mouseMovedOrUp(mouseX, mouseY, state);
         // -1 means the mouse only moved, otherwise it is the released button
         if (state == 0) {
-            draggedElement = null;
+            if (!carryingElement) {
+                draggedElement = null;
+            }
             draggingMenu = false;
         }
     }
