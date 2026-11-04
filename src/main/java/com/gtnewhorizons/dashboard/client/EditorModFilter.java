@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
+import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.HudElement;
 
@@ -19,6 +20,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public final class EditorModFilter {
 
+    private static final String MINECRAFT = "minecraft";
     private static final Set<String> SHOWN = new HashSet<>();
     private static String[] parsedList;
 
@@ -30,8 +32,21 @@ public final class EditorModFilter {
             .toLowerCase(Locale.ROOT);
     }
 
+    /** Minecraft and Dashboard first in the editor's lists, then the rest. */
+    static int getModRank(String modKey) {
+        if (modKey.equals(MINECRAFT)) {
+            return 0;
+        }
+        return modKey.equals(Dashboard.MODID) ? 1 : 2;
+    }
+
     public static boolean isShown(HudElement element) {
         return isShown(getModKey(element));
+    }
+
+    /** Its mod is ticked and it is turned on, like a bar number turned on in Customize. */
+    static boolean isInEditor(HudElement element) {
+        return element.isActive() && isShown(element);
     }
 
     static boolean isShown(String modKey) {

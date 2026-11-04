@@ -41,6 +41,11 @@ public final class HudEditorKeybind {
         Keyboard.KEY_L,
         "key.categories.dashboard_editor");
 
+    public static final KeyBinding HIDE_MENU = new KeyBinding(
+        "key.dashboard.hide_menu",
+        Keyboard.KEY_D,
+        "key.categories.dashboard_editor");
+
     public static final KeyBinding SIZE_MODIFIER = new KeyBinding(
         "key.dashboard.size_modifier",
         Keyboard.KEY_LMENU,
@@ -63,6 +68,7 @@ public final class HudEditorKeybind {
         ClientRegistry.registerKeyBinding(TOGGLE_IMAGES);
         ClientRegistry.registerKeyBinding(RESET);
         ClientRegistry.registerKeyBinding(LOCK);
+        ClientRegistry.registerKeyBinding(HIDE_MENU);
         ClientRegistry.registerKeyBinding(SIZE_MODIFIER);
         ClientRegistry.registerKeyBinding(OPACITY_MODIFIER);
         ClientRegistry.registerKeyBinding(FREE_MOVE_MODIFIER);

@@ -5,9 +5,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
@@ -36,6 +38,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_PREVIEW = 5;
     private static final int BUTTON_CUSTOMIZE = 6;
     private static final int BUTTON_MODS = 7;
+    private static final int BUTTON_ELEMENTS = 8;
     private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS };
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
@@ -44,6 +47,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final float POSITION_TEXT_SCALE = 0.75f;
     private static final int OUTSIDE_NAME_PADDING = 1;
     private static final int HELP_ICON_SIZE = 12;
+    private static final int HELP_CLICKS_TO_GIVE_UP = 10;
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
     private static final int MENU_PADDING = 6;
@@ -61,18 +65,24 @@ public class GuiHudEditor extends GuiScreen {
     private final List<ElementBox> boxes = new ArrayList<>();
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
+    private GuiButton customizeButton;
     private GuiButton modsButton;
     private ModFilterDropdown modFilter;
+    private GuiButton elementsButton;
+    private ElementListDropdown elementList;
     private String title;
     private int menuWidth;
     private int menuHeight;
     private HudElement draggedElement;
+    private boolean carryingElement;
     private int grabOffsetX;
     private int grabOffsetY;
     /** How far the menu was dragged from its default spot. Not saved. */
     private int menuOffsetX;
     private int menuOffsetY;
     private boolean draggingMenu;
+    private boolean menuHidden;
+    private int helpClicks;
     private int menuGrabOffsetX;
     private int menuGrabOffsetY;
     private final ImagePan imagePan = new ImagePan();
@@ -93,12 +103,19 @@ public class GuiHudEditor extends GuiScreen {
         List<GuiButton> actionButtons = new ArrayList<>();
         actionButtons.add(createButton(BUTTON_DONE, StatCollector.translateToLocal("dashboard.editor.button.done")));
         actionButtons.add(createButton(BUTTON_RESET, StatCollector.translateToLocal("dashboard.editor.button.reset")));
-        actionButtons
-            .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
+        customizeButton = createButton(
+            BUTTON_CUSTOMIZE,
+            StatCollector.translateToLocal("dashboard.editor.button.customize"));
+        actionButtons.add(customizeButton);
+        elementsButton = createButton(
+            BUTTON_ELEMENTS,
+            StatCollector.translateToLocal("dashboard.editor.button.elements"));
+        actionButtons.add(elementsButton);
         modsButton = createButton(BUTTON_MODS, StatCollector.translateToLocal("dashboard.editor.button.mods"));
         actionButtons.add(modsButton);
         buttonRows.add(actionButtons);
         modFilter = new ModFilterDropdown(fontRendererObj);
+        elementList = new ElementListDropdown(fontRendererObj, this::carry);
 
         for (List<GuiButton> row : buttonRows) {
             buttonList.addAll(row);
@@ -108,6 +125,23 @@ public class GuiHudEditor extends GuiScreen {
         menuHeight = calculateMenuHeight();
         updateToggleStates();
         positionButtons();
+        setMenuHidden(menuHidden);
+    }
+
+    private void setMenuHidden(boolean hidden) {
+        menuHidden = hidden;
+        draggingMenu = false;
+        modFilter.close();
+        elementList.close();
+        for (Object button : buttonList) {
+            ((GuiButton) button).visible = !hidden;
+        }
+    }
+
+    /** The menu and its lists, which take clicks and scrolling before the elements under them. */
+    private boolean isOverMenu(int mouseX, int mouseY) {
+        return !menuHidden && (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)
+            || elementList.contains(mouseX, mouseY));
     }
 
     private GuiButton createButton(int id, String text) {
@@ -241,7 +275,7 @@ public class GuiHudEditor extends GuiScreen {
             imagePan.update(mouseX, mouseY, width, height);
         }
         if (draggedElement != null) {
-            if (Mouse.isButtonDown(0)) {
+            if (carryingElement || Mouse.isButtonDown(0)) {
                 dragTo(mouseX, mouseY);
             } else {
                 draggedElement = null;
@@ -260,13 +294,18 @@ public class GuiHudEditor extends GuiScreen {
             modFilter.placeAt(modsButton, width, height);
             modFilter.updateHandleDrag(mouseY);
         }
-        boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY)
-            || modFilter.contains(mouseX, mouseY);
+        if (elementList.isOpen()) {
+            elementList.placeAt(elementsButton, width, height);
+            elementList.updateHandleDrag(mouseY);
+        }
+        boolean overMenu = draggingMenu || isOverMenu(mouseX, mouseY);
         HudElement highlighted = draggedElement;
         if (highlighted == null && !overMenu) {
             ElementBox hovered = findBoxAt(mouseX, mouseY);
             highlighted = hovered != null ? hovered.element : null;
         }
+        // Only the box lights up, its tooltip would cover the list
+        HudElement hoveredInList = elementList.getElementAt(mouseX, mouseY);
 
         FrameEndHud.drawInEditor(partialTicks);
         if (DashboardConfig.showGrid) {
@@ -277,12 +316,17 @@ public class GuiHudEditor extends GuiScreen {
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         }
 
-        drawElementBoxes(highlighted);
-        drawMenuPanel(mouseX, mouseY);
+        drawElementBoxes(hoveredInList != null ? hoveredInList : highlighted);
+        if (!menuHidden) {
+            drawMenuPanel(mouseX, mouseY);
+        }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (modFilter.isOpen()) {
             modFilter.draw(mouseX, mouseY);
+        }
+        if (elementList.isOpen()) {
+            elementList.draw(mouseX, mouseY);
         }
 
         if (highlighted != null && draggedElement == null) {
@@ -365,13 +409,13 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     /** The first line is the title. The keys are the ones bound in Controls, so the text follows rebinding. */
-    private static void addHelpLines(List<String> lines) {
+    private void addHelpLines(List<String> lines) {
         String reset = HudEditorKeybind.getKeyName(HudEditorKeybind.RESET);
         String size = HudEditorKeybind.getKeyName(HudEditorKeybind.SIZE_MODIFIER);
         String opacity = HudEditorKeybind.getKeyName(HudEditorKeybind.OPACITY_MODIFIER);
         String freeMove = HudEditorKeybind.getKeyName(HudEditorKeybind.FREE_MOVE_MODIFIER);
-        lines.add(StatCollector.translateToLocal("dashboard.editor.help_tooltip.title"));
-        lines.add(noteLine("point"));
+        lines.add(translate(getHelpTitleKey()));
+        lines.add(noteLine("help_tooltip.point"));
         lines.add(helpLine("move", freeMove));
         lines.add(helpLine("nudge"));
         lines.add(helpLine("toggle"));
@@ -383,22 +427,39 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
     }
 
-    /** One control in the bullet list. */
-    private static String helpLine(String name, Object... keys) {
-        return EnumChatFormatting.GRAY + " - "
-            + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
+    private String getHelpTitleKey() {
+        if (helpClicks >= 7) return "help_tooltip.title_7";
+        if (helpClicks >= 5) return "help_tooltip.title_5";
+        if (helpClicks >= 3) return "help_tooltip.title_3";
+        return "help_tooltip.title";
     }
 
-    private static String noteLine(String name) {
-        return EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.help_tooltip." + name);
+    /** One control in the help tooltip's bullet list. */
+    private static String helpLine(String name, Object... keys) {
+        return EnumChatFormatting.GRAY + " - " + translate("help_tooltip." + name, keys);
+    }
+
+    /** A gray line under a tooltip's first line. */
+    private static String noteLine(String key, Object... keys) {
+        return EnumChatFormatting.GRAY + translate(key, keys);
+    }
+
+    /** For consistency. */
+    private static String translate(String key, Object... keys) {
+        return StatCollector.translateToLocalFormatted("dashboard.editor." + key, keys);
     }
 
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
         List<String> lines = new ArrayList<>();
-        if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
+        if (!menuHidden && getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
+            if (helpClicks >= HELP_CLICKS_TO_GIVE_UP) {
+                lines.add(translate("help_tooltip.give_up"));
+                return lines;
+            }
             addHelpLines(lines);
             lines.add("");
-            lines.add(noteLine("change_keys"));
+            lines.add(noteLine("help_tooltip.menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
+            lines.add(noteLine("help_tooltip.change_keys"));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
             // TODO: JourneyMap release with MiniMapRenderEvent
@@ -407,10 +468,10 @@ public class GuiHudEditor extends GuiScreen {
                 lines.add("");
             }
             if (inGameInfo) {
-                lines.add(noteLine("ingameinfo"));
+                lines.add(noteLine("help_tooltip.ingameinfo"));
             }
             // if (journeyMap) {
-            // lines.add(noteLine("journeymap"));
+            // lines.add(noteLine("help_tooltip.journeymap"));
             // }
         }
         for (ToggleButton button : toggleButtons) {
@@ -418,10 +479,21 @@ public class GuiHudEditor extends GuiScreen {
                 lines.add(getToggleStateText(button.id));
             }
         }
+        if (customizeButton.mousePressed(mc, mouseX, mouseY)) {
+            lines.add(translate("customize_tooltip"));
+            lines.add(noteLine("customize_tooltip.bars"));
+            lines.add(noteLine("customize_tooltip.sections"));
+        }
+        if (!elementList.isOpen() && elementsButton.mousePressed(mc, mouseX, mouseY)) {
+            lines.add(translate("elements_tooltip"));
+            lines.add(noteLine("elements_tooltip.hover"));
+            lines.add(noteLine("elements_tooltip.grab"));
+            lines.add(noteLine("elements_tooltip.toggle"));
+        }
         if (!modFilter.isOpen() && modsButton.mousePressed(mc, mouseX, mouseY)) {
-            lines.add(StatCollector.translateToLocal("dashboard.editor.mods_tooltip"));
-            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.game"));
-            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.ctrl"));
+            lines.add(translate("mods_tooltip"));
+            lines.add(noteLine("mods_tooltip.game"));
+            lines.add(noteLine("mods_tooltip.ctrl"));
         }
         return lines;
     }
@@ -648,7 +720,7 @@ public class GuiHudEditor extends GuiScreen {
     private void updateBoxes() {
         boxes.clear();
         for (HudElement element : HudRegistry.getElements()) {
-            if (!element.isActive() || !EditorModFilter.isShown(element)) {
+            if (!EditorModFilter.isInEditor(element)) {
                 continue;
             }
             boxes.add(
@@ -691,12 +763,20 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (modFilter.click(mouseX, mouseY)) {
+        if (carryingElement) {
+            carryingElement = false;
+            draggedElement = null;
             return;
         }
-        // A click anywhere else closes the list, except on the Mods button, which toggles it
+        if (modFilter.click(mouseX, mouseY, mouseButton) || elementList.click(mouseX, mouseY, mouseButton)) {
+            return;
+        }
+        // A click anywhere else closes the lists, except on their own button, which toggles them
         if (!modsButton.mousePressed(mc, mouseX, mouseY)) {
             modFilter.close();
+        }
+        if (!elementsButton.mousePressed(mc, mouseX, mouseY)) {
+            elementList.close();
         }
         if (isOverButton(mouseX, mouseY)) {
             super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -704,7 +784,11 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         HudBounds menu = getMenuBounds();
-        if (menu.contains(mouseX, mouseY)) {
+        if (!menuHidden && mouseButton == 0 && getHelpIconBounds(menu).contains(mouseX, mouseY)) {
+            clickHelp();
+            return;
+        }
+        if (!menuHidden && menu.contains(mouseX, mouseY)) {
             if (mouseButton == 0) {
                 draggingMenu = true;
                 menuGrabOffsetX = mouseX - menu.x;
@@ -729,6 +813,24 @@ public class GuiHudEditor extends GuiScreen {
         } else if (mouseButton == 2 && ImageElements.isImage(element)) {
             imagePan.start(element, ImagePan.MIDDLE_BUTTON, mouseX, mouseY);
         }
+    }
+
+    /** Angernoisemaker machine 3000, patent pending */
+    private void clickHelp() {
+        // Gives up for as many clicks as it took, then starts over
+        helpClicks = (helpClicks + 1) % (HELP_CLICKS_TO_GIVE_UP * 2);
+        float pitch = Math.min(2, 0.8f + helpClicks * 0.12f);
+        mc.getSoundHandler()
+            .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("mob.villager.idle"), pitch));
+    }
+
+    /** Held by its middle, since it may be far from the mouse. */
+    private void carry(HudElement element) {
+        HudBounds bounds = HudLayout.getBounds(element, width, height);
+        draggedElement = element;
+        carryingElement = true;
+        grabOffsetX = bounds.width / 2;
+        grabOffsetY = bounds.height / 2;
     }
 
     private void dragTo(int mouseX, int mouseY) {
@@ -782,7 +884,11 @@ public class GuiHudEditor extends GuiScreen {
             modFilter.scroll(wheel > 0 ? -1 : 1);
             return;
         }
-        if (getMenuBounds().contains(mouseX, mouseY)) {
+        if (elementList.contains(mouseX, mouseY)) {
+            elementList.scroll(wheel > 0 ? -1 : 1);
+            return;
+        }
+        if (isOverMenu(mouseX, mouseY)) {
             return;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
@@ -821,13 +927,24 @@ public class GuiHudEditor extends GuiScreen {
         super.mouseMovedOrUp(mouseX, mouseY, state);
         // -1 means the mouse only moved, otherwise it is the released button
         if (state == 0) {
-            draggedElement = null;
+            if (!carryingElement) {
+                draggedElement = null;
+            }
             draggingMenu = false;
         }
     }
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
+        // Esc closes the open list instead of the editor, and while typing in its search box every key goes there
+        if (elementList.isOpen() && keyCode == Keyboard.KEY_ESCAPE) {
+            elementList.close();
+            return;
+        }
+        if (elementList.isTyping()) {
+            elementList.keyTyped(typedChar, keyCode);
+            return;
+        }
         int editorKey = HudEditorKeybind.OPEN_EDITOR.getKeyCode();
         if (editorKey != 0 && keyCode == editorKey) {
             mc.displayGuiScreen(null);
@@ -862,6 +979,11 @@ public class GuiHudEditor extends GuiScreen {
             }
             return;
         }
+        int hideKey = HudEditorKeybind.HIDE_MENU.getKeyCode();
+        if (hideKey != 0 && keyCode == hideKey && !Keyboard.isRepeatEvent()) {
+            setMenuHidden(!menuHidden);
+            return;
+        }
         super.keyTyped(typedChar, keyCode);
     }
 
@@ -869,7 +991,7 @@ public class GuiHudEditor extends GuiScreen {
     private HudElement findElementUnderMouse() {
         int mouseX = Mouse.getX() * width / mc.displayWidth;
         int mouseY = height - Mouse.getY() * height / mc.displayHeight - 1;
-        if (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)) {
+        if (isOverMenu(mouseX, mouseY)) {
             return null;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
@@ -898,6 +1020,7 @@ public class GuiHudEditor extends GuiScreen {
             case BUTTON_RESET -> resetShownMods();
             case BUTTON_CUSTOMIZE -> mc.displayGuiScreen(new GuiBarCustomize(this));
             case BUTTON_MODS -> modFilter.toggle();
+            case BUTTON_ELEMENTS -> elementList.toggle();
             case BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}
         }
@@ -912,6 +1035,11 @@ public class GuiHudEditor extends GuiScreen {
             }
         }
         HudLayout.reset(shown);
+    }
+
+    @Override
+    public void updateScreen() {
+        elementList.updateCursor();
     }
 
     @Override
