@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -688,12 +687,14 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         HudElement element = box.element;
-        if (mouseButton == 0 && isAltKeyDown()) {
+        if (mouseButton == 0 && HudEditorKeybind.isHeld(HudEditorKeybind.SIZE_MODIFIER)) {
             HudLayout.setSizeStep(element, 0);
             GuiHelpers.playClickSound();
-        } else if (mouseButton == 0 && isCtrlKeyDown()) {
-            HudLayout.resetPosition(element);
-            GuiHelpers.playClickSound();
+        } else if (mouseButton == 0 && HudEditorKeybind.isHeld(HudEditorKeybind.OPACITY_MODIFIER)) {
+            if (ElementOpacity.isAllowed(element)) {
+                ElementOpacity.reset(element);
+                GuiHelpers.playClickSound();
+            }
         } else if (mouseButton == 0) {
             draggedElement = element;
             grabOffsetX = mouseX - box.bounds.x;
@@ -710,7 +711,7 @@ public class GuiHudEditor extends GuiScreen {
         HudBounds bounds = HudLayout.getBounds(draggedElement, width, height);
         int x = mouseX - grabOffsetX;
         int y = mouseY - grabOffsetY;
-        if (!isShiftKeyDown()) {
+        if (!HudEditorKeybind.isHeld(HudEditorKeybind.FREE_MOVE_MODIFIER)) {
             x = snap(x, bounds.width, width);
             y = snap(y, bounds.height, height);
         }
@@ -767,13 +768,14 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     /**
-     * Alt+scroll resizes, Ctrl+scroll changes the background opacity, plain scroll zooms an image. Also used in chat.
+     * Resize key + scroll resizes, see-through key + scroll changes the background opacity, plain scroll zooms an
+     * image. Also used in chat.
      */
     static void scrollOver(HudElement element, HudBounds bounds, int mouseX, int mouseY, int wheel) {
         int steps = wheel > 0 ? 1 : -1;
-        if (isAltKeyDown()) {
+        if (HudEditorKeybind.isHeld(HudEditorKeybind.SIZE_MODIFIER)) {
             resize(element, steps);
-        } else if (isCtrlKeyDown()) {
+        } else if (HudEditorKeybind.isHeld(HudEditorKeybind.OPACITY_MODIFIER)) {
             if (ElementOpacity.isAllowed(element)) {
                 ElementOpacity.change(element, steps);
             }
@@ -788,10 +790,6 @@ public class GuiHudEditor extends GuiScreen {
             return;
         }
         HudLayout.setSizeStep(element, HudLayout.getSizeStep(element) + change);
-    }
-
-    private static boolean isAltKeyDown() {
-        return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
     }
 
     @Override
@@ -811,7 +809,25 @@ public class GuiHudEditor extends GuiScreen {
             mc.displayGuiScreen(null);
             return;
         }
+        int resetKey = HudEditorKeybind.RESET_POSITION.getKeyCode();
+        if (resetKey != 0 && keyCode == resetKey && draggedElement == null) {
+            resetPositionUnderMouse();
+            return;
+        }
         super.keyTyped(typedChar, keyCode);
+    }
+
+    private void resetPositionUnderMouse() {
+        int mouseX = Mouse.getX() * width / mc.displayWidth;
+        int mouseY = height - Mouse.getY() * height / mc.displayHeight - 1;
+        if (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)) {
+            return;
+        }
+        ElementBox box = findBoxAt(mouseX, mouseY);
+        if (box != null) {
+            HudLayout.resetPosition(box.element);
+            GuiHelpers.playClickSound();
+        }
     }
 
     @Override

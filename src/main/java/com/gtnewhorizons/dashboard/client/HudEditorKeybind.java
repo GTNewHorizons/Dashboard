@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 
@@ -56,6 +57,15 @@ public final class HudEditorKeybind {
         ClientRegistry.registerKeyBinding(SIZE_MODIFIER);
         ClientRegistry.registerKeyBinding(OPACITY_MODIFIER);
         ClientRegistry.registerKeyBinding(FREE_MOVE_MODIFIER);
+    }
+
+    /** Reads the key itself, since key bindings do not update while a screen is open. Mouse buttons are below 0. */
+    static boolean isHeld(KeyBinding binding) {
+        int keyCode = binding.getKeyCode();
+        if (keyCode < 0) {
+            return Mouse.isButtonDown(keyCode + 100);
+        }
+        return keyCode != Keyboard.KEY_NONE && Keyboard.isKeyDown(keyCode);
     }
 
     @SubscribeEvent

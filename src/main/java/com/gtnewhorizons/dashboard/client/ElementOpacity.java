@@ -11,8 +11,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * A see-through background for elements that allow it, changed with Ctrl+scroll in the editor and saved with the
- * layout. The element's own drawing reads it with {@link #get}.
+ * A see-through background for elements that allow it, changed with the see-through key + scroll in the editor and
+ * saved with the layout. The element's own drawing reads it with {@link #get}.
  */
 @SideOnly(Side.CLIENT)
 public final class ElementOpacity {
@@ -45,5 +45,9 @@ public final class ElementOpacity {
     static void change(HudElement element, int steps) {
         int percent = MathHelper.clamp_int(getPercent(element) + steps * STEP, 0, MAX_PERCENT);
         HudLayout.setOpacity(element, percent == DEFAULT_PERCENTS.get(element) ? null : percent);
+    }
+
+    static void reset(HudElement element) {
+        HudLayout.setOpacity(element, null);
     }
 }
