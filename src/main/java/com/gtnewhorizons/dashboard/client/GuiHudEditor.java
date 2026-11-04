@@ -62,6 +62,7 @@ public class GuiHudEditor extends GuiScreen {
     private final List<ElementBox> boxes = new ArrayList<>();
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
+    private GuiButton customizeButton;
     private GuiButton modsButton;
     private ModFilterDropdown modFilter;
     private GuiButton elementsButton;
@@ -98,8 +99,10 @@ public class GuiHudEditor extends GuiScreen {
         List<GuiButton> actionButtons = new ArrayList<>();
         actionButtons.add(createButton(BUTTON_DONE, StatCollector.translateToLocal("dashboard.editor.button.done")));
         actionButtons.add(createButton(BUTTON_RESET, StatCollector.translateToLocal("dashboard.editor.button.reset")));
-        actionButtons
-            .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
+        customizeButton = createButton(
+            BUTTON_CUSTOMIZE,
+            StatCollector.translateToLocal("dashboard.editor.button.customize"));
+        actionButtons.add(customizeButton);
         elementsButton = createButton(
             BUTTON_ELEMENTS,
             StatCollector.translateToLocal("dashboard.editor.button.elements"));
@@ -407,8 +410,8 @@ public class GuiHudEditor extends GuiScreen {
         String size = HudEditorKeybind.getKeyName(HudEditorKeybind.SIZE_MODIFIER);
         String opacity = HudEditorKeybind.getKeyName(HudEditorKeybind.OPACITY_MODIFIER);
         String freeMove = HudEditorKeybind.getKeyName(HudEditorKeybind.FREE_MOVE_MODIFIER);
-        lines.add(StatCollector.translateToLocal("dashboard.editor.help_tooltip.title"));
-        lines.add(noteLine("point"));
+        lines.add(translate("help_tooltip.title"));
+        lines.add(noteLine("help_tooltip.point"));
         lines.add(helpLine("move", freeMove));
         lines.add(helpLine("nudge"));
         lines.add(helpLine("toggle"));
@@ -420,15 +423,19 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
     }
 
-    /** One control in the bullet list. */
+    /** One control in the help tooltip's bullet list. */
     private static String helpLine(String name, Object... keys) {
-        return EnumChatFormatting.GRAY + " - "
-            + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
+        return EnumChatFormatting.GRAY + " - " + translate("help_tooltip." + name, keys);
     }
 
-    private static String noteLine(String name, Object... keys) {
-        return EnumChatFormatting.GRAY
-            + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
+    /** A gray line under a tooltip's first line. */
+    private static String noteLine(String key, Object... keys) {
+        return EnumChatFormatting.GRAY + translate(key, keys);
+    }
+
+    /** For consistency. */
+    private static String translate(String key, Object... keys) {
+        return StatCollector.translateToLocalFormatted("dashboard.editor." + key, keys);
     }
 
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
@@ -436,8 +443,8 @@ public class GuiHudEditor extends GuiScreen {
         if (!menuHidden && getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
             addHelpLines(lines);
             lines.add("");
-            lines.add(noteLine("menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
-            lines.add(noteLine("change_keys"));
+            lines.add(noteLine("help_tooltip.menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
+            lines.add(noteLine("help_tooltip.change_keys"));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
             // TODO: JourneyMap release with MiniMapRenderEvent
@@ -446,10 +453,10 @@ public class GuiHudEditor extends GuiScreen {
                 lines.add("");
             }
             if (inGameInfo) {
-                lines.add(noteLine("ingameinfo"));
+                lines.add(noteLine("help_tooltip.ingameinfo"));
             }
             // if (journeyMap) {
-            // lines.add(noteLine("journeymap"));
+            // lines.add(noteLine("help_tooltip.journeymap"));
             // }
         }
         for (ToggleButton button : toggleButtons) {
@@ -457,10 +464,21 @@ public class GuiHudEditor extends GuiScreen {
                 lines.add(getToggleStateText(button.id));
             }
         }
+        if (customizeButton.mousePressed(mc, mouseX, mouseY)) {
+            lines.add(translate("customize_tooltip"));
+            lines.add(noteLine("customize_tooltip.bars"));
+            lines.add(noteLine("customize_tooltip.sections"));
+        }
+        if (!elementList.isOpen() && elementsButton.mousePressed(mc, mouseX, mouseY)) {
+            lines.add(translate("elements_tooltip"));
+            lines.add(noteLine("elements_tooltip.hover"));
+            lines.add(noteLine("elements_tooltip.grab"));
+            lines.add(noteLine("elements_tooltip.toggle"));
+        }
         if (!modFilter.isOpen() && modsButton.mousePressed(mc, mouseX, mouseY)) {
-            lines.add(StatCollector.translateToLocal("dashboard.editor.mods_tooltip"));
-            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.game"));
-            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.mods_tooltip.ctrl"));
+            lines.add(translate("mods_tooltip"));
+            lines.add(noteLine("mods_tooltip.game"));
+            lines.add(noteLine("mods_tooltip.ctrl"));
         }
         return lines;
     }
