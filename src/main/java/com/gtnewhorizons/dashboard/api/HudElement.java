@@ -7,6 +7,8 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.StatCollector;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 
@@ -224,7 +226,7 @@ public final class HudElement {
         for (KeyBinding key : Minecraft.getMinecraft().gameSettings.keyBindings) {
             if (key.getKeyDescription()
                 .equals(keyBinding) && key.getKeyCode() != 0) {
-                return GameSettings.getKeyDisplayString(key.getKeyCode());
+                return WordUtils.capitalizeFully(GameSettings.getKeyDisplayString(key.getKeyCode()));
             }
         }
         return StatCollector.translateToLocal("dashboard.editor.element_tooltip.key_not_set");
