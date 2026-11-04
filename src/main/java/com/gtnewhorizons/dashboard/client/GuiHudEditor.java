@@ -687,15 +687,7 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         HudElement element = box.element;
-        if (mouseButton == 0 && HudEditorKeybind.isHeld(HudEditorKeybind.SIZE_MODIFIER)) {
-            HudLayout.setSizeStep(element, 0);
-            GuiHelpers.playClickSound();
-        } else if (mouseButton == 0 && HudEditorKeybind.isHeld(HudEditorKeybind.OPACITY_MODIFIER)) {
-            if (ElementOpacity.isAllowed(element)) {
-                ElementOpacity.reset(element);
-                GuiHelpers.playClickSound();
-            }
-        } else if (mouseButton == 0) {
+        if (mouseButton == 0) {
             draggedElement = element;
             grabOffsetX = mouseX - box.bounds.x;
             grabOffsetY = mouseY - box.bounds.y;
@@ -809,25 +801,37 @@ public class GuiHudEditor extends GuiScreen {
             mc.displayGuiScreen(null);
             return;
         }
-        int resetKey = HudEditorKeybind.RESET_POSITION.getKeyCode();
+        int resetKey = HudEditorKeybind.RESET.getKeyCode();
         if (resetKey != 0 && keyCode == resetKey && draggedElement == null) {
-            resetPositionUnderMouse();
+            resetUnderMouse();
             return;
         }
         super.keyTyped(typedChar, keyCode);
     }
 
-    private void resetPositionUnderMouse() {
+    /** The size, the see-through background, or without a modifier key the position. */
+    private void resetUnderMouse() {
         int mouseX = Mouse.getX() * width / mc.displayWidth;
         int mouseY = height - Mouse.getY() * height / mc.displayHeight - 1;
         if (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)) {
             return;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
-        if (box != null) {
-            HudLayout.resetPosition(box.element);
-            GuiHelpers.playClickSound();
+        if (box == null) {
+            return;
         }
+        HudElement element = box.element;
+        if (HudEditorKeybind.isHeld(HudEditorKeybind.SIZE_MODIFIER)) {
+            HudLayout.setSizeStep(element, 0);
+        } else if (HudEditorKeybind.isHeld(HudEditorKeybind.OPACITY_MODIFIER)) {
+            if (!ElementOpacity.isAllowed(element)) {
+                return;
+            }
+            ElementOpacity.reset(element);
+        } else {
+            HudLayout.resetPosition(element);
+        }
+        GuiHelpers.playClickSound();
     }
 
     @Override
