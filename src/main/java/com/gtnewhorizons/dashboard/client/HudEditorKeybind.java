@@ -1,8 +1,11 @@
 package com.gtnewhorizons.dashboard.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.StatCollector;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -57,6 +60,14 @@ public final class HudEditorKeybind {
         ClientRegistry.registerKeyBinding(SIZE_MODIFIER);
         ClientRegistry.registerKeyBinding(OPACITY_MODIFIER);
         ClientRegistry.registerKeyBinding(FREE_MOVE_MODIFIER);
+    }
+
+    static String getKeyName(KeyBinding binding) {
+        int keyCode = binding.getKeyCode();
+        if (keyCode == Keyboard.KEY_NONE) {
+            return StatCollector.translateToLocal("dashboard.editor.element_tooltip.key_not_set");
+        }
+        return WordUtils.capitalizeFully(GameSettings.getKeyDisplayString(keyCode));
     }
 
     /** Reads the key itself, since key bindings do not update while a screen is open. Mouse buttons are below 0. */

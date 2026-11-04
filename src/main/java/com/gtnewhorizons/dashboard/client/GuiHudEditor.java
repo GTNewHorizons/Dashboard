@@ -42,10 +42,6 @@ public class GuiHudEditor extends GuiScreen {
     private static final int CENTER_MARK_LENGTH = 3;
     private static final float POSITION_TEXT_SCALE = 0.75f;
     private static final int OUTSIDE_NAME_PADDING = 1;
-    private static final String[] HELP_LINE_KEYS = { "dashboard.editor.help_tooltip.title",
-        "dashboard.editor.help_tooltip.move", "dashboard.editor.help_tooltip.toggle",
-        "dashboard.editor.help_tooltip.reset", "dashboard.editor.help_tooltip.resize",
-        "dashboard.editor.help_tooltip.reset_size", "dashboard.editor.help_tooltip.opacity" };
     private static final int HELP_ICON_SIZE = 12;
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
@@ -366,12 +362,33 @@ public class GuiHudEditor extends GuiScreen {
             HELP_ICON_SIZE);
     }
 
+    /** The first line is the title. The keys are the ones bound in Controls, so the text follows rebinding. */
+    private static void addHelpLines(List<String> lines) {
+        String reset = HudEditorKeybind.getKeyName(HudEditorKeybind.RESET);
+        String size = HudEditorKeybind.getKeyName(HudEditorKeybind.SIZE_MODIFIER);
+        String opacity = HudEditorKeybind.getKeyName(HudEditorKeybind.OPACITY_MODIFIER);
+        String freeMove = HudEditorKeybind.getKeyName(HudEditorKeybind.FREE_MOVE_MODIFIER);
+        lines.add(StatCollector.translateToLocal("dashboard.editor.help_tooltip.title"));
+        lines.add(helpLine("move", freeMove));
+        lines.add(helpLine("toggle"));
+        lines.add(helpLine("reset", reset));
+        lines.add(helpLine("resize", size));
+        lines.add(helpLine("reset_size", size, reset));
+        lines.add(helpLine("opacity", opacity));
+        lines.add(helpLine("reset_opacity", opacity, reset));
+    }
+
+    private static String helpLine(String name, Object... keys) {
+        return EnumChatFormatting.GRAY
+            + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
+    }
+
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
         List<String> lines = new ArrayList<>();
         if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
-            for (String key : HELP_LINE_KEYS) {
-                lines.add(StatCollector.translateToLocal(key));
-            }
+            addHelpLines(lines);
+            lines.add("");
+            lines.add(helpLine("change_keys"));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
             // TODO: JourneyMap release with MiniMapRenderEvent
@@ -380,14 +397,10 @@ public class GuiHudEditor extends GuiScreen {
                 lines.add("");
             }
             if (inGameInfo) {
-                lines.add(
-                    EnumChatFormatting.GRAY
-                        + StatCollector.translateToLocal("dashboard.editor.help_tooltip.ingameinfo"));
+                lines.add(helpLine("ingameinfo"));
             }
             // if (journeyMap) {
-            // lines.add(
-            // EnumChatFormatting.GRAY
-            // + StatCollector.translateToLocal("dashboard.editor.help_tooltip.journeymap"));
+            // lines.add(helpLine("journeymap"));
             // }
         }
         for (ToggleButton button : toggleButtons) {

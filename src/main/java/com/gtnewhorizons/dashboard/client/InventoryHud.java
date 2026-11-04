@@ -45,7 +45,10 @@ public final class InventoryHud {
             screenWidth / 2 - WIDTH / 2,
             screenHeight / 2 + BELOW_MIDDLE - HEIGHT / 2,
             WIDTH,
-            HEIGHT)).setHiddenByDefault();
+            HEIGHT)).setHiddenByDefault()
+                .setDescription(
+                    "dashboard.element.inventory.description",
+                    HudEditorKeybind.OPACITY_MODIFIER.getKeyDescription());
 
     private InventoryHud() {}
 
