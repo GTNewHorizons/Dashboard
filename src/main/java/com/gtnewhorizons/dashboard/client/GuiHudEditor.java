@@ -36,6 +36,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final int BUTTON_PREVIEW = 5;
     private static final int BUTTON_CUSTOMIZE = 6;
     private static final int BUTTON_MODS = 7;
+    private static final int BUTTON_ELEMENTS = 8;
     private static final int[] TOGGLE_BUTTON_IDS = { BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS };
     private static final int BUTTON_GAP = 3;
     private static final int BUTTON_TEXT_PADDING = 12;
@@ -73,6 +74,7 @@ public class GuiHudEditor extends GuiScreen {
     private int menuOffsetX;
     private int menuOffsetY;
     private boolean draggingMenu;
+    private boolean menuHidden;
     private int menuGrabOffsetX;
     private int menuGrabOffsetY;
     private final ImagePan imagePan = new ImagePan();
@@ -95,6 +97,8 @@ public class GuiHudEditor extends GuiScreen {
         actionButtons.add(createButton(BUTTON_RESET, StatCollector.translateToLocal("dashboard.editor.button.reset")));
         actionButtons
             .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
+        actionButtons
+            .add(createButton(BUTTON_ELEMENTS, StatCollector.translateToLocal("dashboard.editor.button.elements")));
         modsButton = createButton(BUTTON_MODS, StatCollector.translateToLocal("dashboard.editor.button.mods"));
         actionButtons.add(modsButton);
         buttonRows.add(actionButtons);
@@ -108,6 +112,21 @@ public class GuiHudEditor extends GuiScreen {
         menuHeight = calculateMenuHeight();
         updateToggleStates();
         positionButtons();
+        setMenuHidden(menuHidden);
+    }
+
+    private void setMenuHidden(boolean hidden) {
+        menuHidden = hidden;
+        draggingMenu = false;
+        modFilter.close();
+        for (Object button : buttonList) {
+            ((GuiButton) button).visible = !hidden;
+        }
+    }
+
+    /** The menu and the Mods list, which take clicks and scrolling before the elements under them. */
+    private boolean isOverMenu(int mouseX, int mouseY) {
+        return !menuHidden && (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY));
     }
 
     private GuiButton createButton(int id, String text) {
@@ -260,8 +279,7 @@ public class GuiHudEditor extends GuiScreen {
             modFilter.placeAt(modsButton, width, height);
             modFilter.updateHandleDrag(mouseY);
         }
-        boolean overMenu = draggingMenu || getMenuBounds().contains(mouseX, mouseY)
-            || modFilter.contains(mouseX, mouseY);
+        boolean overMenu = draggingMenu || isOverMenu(mouseX, mouseY);
         HudElement highlighted = draggedElement;
         if (highlighted == null && !overMenu) {
             ElementBox hovered = findBoxAt(mouseX, mouseY);
@@ -278,7 +296,9 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         drawElementBoxes(highlighted);
-        drawMenuPanel(mouseX, mouseY);
+        if (!menuHidden) {
+            drawMenuPanel(mouseX, mouseY);
+        }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (modFilter.isOpen()) {
@@ -389,15 +409,17 @@ public class GuiHudEditor extends GuiScreen {
             + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
     }
 
-    private static String noteLine(String name) {
-        return EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.help_tooltip." + name);
+    private static String noteLine(String name, Object... keys) {
+        return EnumChatFormatting.GRAY
+            + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
     }
 
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
         List<String> lines = new ArrayList<>();
-        if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
+        if (!menuHidden && getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
             addHelpLines(lines);
             lines.add("");
+            lines.add(noteLine("menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
             lines.add(noteLine("change_keys"));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
@@ -704,7 +726,7 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         HudBounds menu = getMenuBounds();
-        if (menu.contains(mouseX, mouseY)) {
+        if (!menuHidden && menu.contains(mouseX, mouseY)) {
             if (mouseButton == 0) {
                 draggingMenu = true;
                 menuGrabOffsetX = mouseX - menu.x;
@@ -782,7 +804,7 @@ public class GuiHudEditor extends GuiScreen {
             modFilter.scroll(wheel > 0 ? -1 : 1);
             return;
         }
-        if (getMenuBounds().contains(mouseX, mouseY)) {
+        if (isOverMenu(mouseX, mouseY)) {
             return;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
@@ -862,6 +884,11 @@ public class GuiHudEditor extends GuiScreen {
             }
             return;
         }
+        int hideKey = HudEditorKeybind.HIDE_MENU.getKeyCode();
+        if (hideKey != 0 && keyCode == hideKey && !Keyboard.isRepeatEvent()) {
+            setMenuHidden(!menuHidden);
+            return;
+        }
         super.keyTyped(typedChar, keyCode);
     }
 
@@ -869,7 +896,7 @@ public class GuiHudEditor extends GuiScreen {
     private HudElement findElementUnderMouse() {
         int mouseX = Mouse.getX() * width / mc.displayWidth;
         int mouseY = height - Mouse.getY() * height / mc.displayHeight - 1;
-        if (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)) {
+        if (isOverMenu(mouseX, mouseY)) {
             return null;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
