@@ -908,6 +908,15 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
+        // Esc closes the open list instead of the editor, and while typing in its search box every key goes there
+        if (elementList.isOpen() && keyCode == Keyboard.KEY_ESCAPE) {
+            elementList.close();
+            return;
+        }
+        if (elementList.isTyping()) {
+            elementList.keyTyped(typedChar, keyCode);
+            return;
+        }
         int editorKey = HudEditorKeybind.OPEN_EDITOR.getKeyCode();
         if (editorKey != 0 && keyCode == editorKey) {
             mc.displayGuiScreen(null);
@@ -998,6 +1007,11 @@ public class GuiHudEditor extends GuiScreen {
             }
         }
         HudLayout.reset(shown);
+    }
+
+    @Override
+    public void updateScreen() {
+        elementList.updateCursor();
     }
 
     @Override

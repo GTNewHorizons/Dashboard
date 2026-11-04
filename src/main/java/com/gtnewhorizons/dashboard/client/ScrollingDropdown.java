@@ -53,6 +53,16 @@ abstract class ScrollingDropdown {
     /** Called before the list opens, to fill it with what is there now. */
     void onOpen() {}
 
+    /** Room above the rows for {@link #drawTop}, like a search box. */
+    int getTopHeight() {
+        return 0;
+    }
+
+    void drawTop(int topX, int topY) {}
+
+    /** Every click inside the list, before the rows and scrollbar get it. */
+    void clickTop(int mouseX, int mouseY, int mouseButton) {}
+
     boolean isOpen() {
         return open;
     }
@@ -73,7 +83,7 @@ abstract class ScrollingDropdown {
 
     /** Under the button, or above it when there is no room below. Long lists scroll. */
     void placeAt(GuiButton button, int screenWidth, int screenHeight) {
-        int rowsThatFit = Math.max(1, (screenHeight - PADDING * 2) / ROW_HEIGHT);
+        int rowsThatFit = Math.max(1, (screenHeight - PADDING * 2 - getTopHeight()) / ROW_HEIGHT);
         visibleRows = Math.min(getRowCount(), Math.min(rowsThatFit, MAX_VISIBLE_ROWS));
         firstRow = Math.max(0, Math.min(firstRow, getRowCount() - visibleRows));
         int height = getHeight();
@@ -89,9 +99,10 @@ abstract class ScrollingDropdown {
 
     void draw(int mouseX, int mouseY) {
         Gui.drawRect(x, y, x + getWidth(), y + getHeight(), ColorUtils.menuBackground.getColor());
+        drawTop(x + PADDING, y + PADDING);
         int hovered = getRowAt(mouseX, mouseY);
         for (int row = firstRow; row < firstRow + visibleRows; row++) {
-            int rowY = y + PADDING + (row - firstRow) * ROW_HEIGHT;
+            int rowY = getRowsTop() + (row - firstRow) * ROW_HEIGHT;
             if (row == hovered) {
                 Gui.drawRect(x, rowY, x + getRowsWidth(), rowY + ROW_HEIGHT, ColorUtils.sectionHeader.getColor());
             }
@@ -140,6 +151,7 @@ abstract class ScrollingDropdown {
         if (!contains(mouseX, mouseY)) {
             return false;
         }
+        clickTop(mouseX, mouseY, mouseButton);
         if (hasScrollbar() && mouseX >= x + getRowsWidth()) {
             HudBounds handle = getHandleBounds();
             handleGrabOffset = handle.contains(mouseX, mouseY) ? mouseY - handle.y : handle.height / 2;
@@ -154,6 +166,10 @@ abstract class ScrollingDropdown {
         return true;
     }
 
+    void scrollToTop() {
+        firstRow = 0;
+    }
+
     void scroll(int rows) {
         firstRow = Math.max(0, Math.min(firstRow + rows, getRowCount() - visibleRows));
     }
@@ -163,13 +179,17 @@ abstract class ScrollingDropdown {
         if (!contains(mouseX, mouseY) || mouseX >= x + getRowsWidth()) {
             return -1;
         }
-        int offset = mouseY - y - PADDING;
+        int offset = mouseY - getRowsTop();
         int row = firstRow + offset / ROW_HEIGHT;
         return offset >= 0 && row < firstRow + visibleRows && isClickable(row) ? row : -1;
     }
 
+    private int getRowsTop() {
+        return y + PADDING + getTopHeight();
+    }
+
     private int getHeight() {
-        return PADDING * 2 + visibleRows * ROW_HEIGHT;
+        return PADDING * 2 + getTopHeight() + visibleRows * ROW_HEIGHT;
     }
 
     /** Only when the list does not fit, so short lists stay as narrow as before. */
@@ -183,7 +203,7 @@ abstract class ScrollingDropdown {
 
     /** Next to the rows, as tall as them. */
     private HudBounds getTrackBounds() {
-        return new HudBounds(x + getRowsWidth(), y + PADDING, SCROLLBAR_WIDTH, visibleRows * ROW_HEIGHT);
+        return new HudBounds(x + getRowsWidth(), getRowsTop(), SCROLLBAR_WIDTH, visibleRows * ROW_HEIGHT);
     }
 
     /** As big as the part of the list in view, and as far down as the list is scrolled. */
