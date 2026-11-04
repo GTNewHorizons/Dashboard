@@ -371,6 +371,7 @@ public class GuiHudEditor extends GuiScreen {
         String opacity = HudEditorKeybind.getKeyName(HudEditorKeybind.OPACITY_MODIFIER);
         String freeMove = HudEditorKeybind.getKeyName(HudEditorKeybind.FREE_MOVE_MODIFIER);
         lines.add(StatCollector.translateToLocal("dashboard.editor.help_tooltip.title"));
+        lines.add(noteLine("point"));
         lines.add(helpLine("move", freeMove));
         lines.add(helpLine("nudge"));
         lines.add(helpLine("toggle"));
@@ -382,9 +383,14 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
     }
 
+    /** One control in the bullet list. */
     private static String helpLine(String name, Object... keys) {
-        return EnumChatFormatting.GRAY
+        return EnumChatFormatting.GRAY + " - "
             + StatCollector.translateToLocalFormatted("dashboard.editor.help_tooltip." + name, keys);
+    }
+
+    private static String noteLine(String name) {
+        return EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.editor.help_tooltip." + name);
     }
 
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
@@ -392,7 +398,7 @@ public class GuiHudEditor extends GuiScreen {
         if (getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
             addHelpLines(lines);
             lines.add("");
-            lines.add(helpLine("change_keys"));
+            lines.add(noteLine("change_keys"));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
             // TODO: JourneyMap release with MiniMapRenderEvent
@@ -401,10 +407,10 @@ public class GuiHudEditor extends GuiScreen {
                 lines.add("");
             }
             if (inGameInfo) {
-                lines.add(helpLine("ingameinfo"));
+                lines.add(noteLine("ingameinfo"));
             }
             // if (journeyMap) {
-            // lines.add(helpLine("journeymap"));
+            // lines.add(noteLine("journeymap"));
             // }
         }
         for (ToggleButton button : toggleButtons) {

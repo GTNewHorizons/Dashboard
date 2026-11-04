@@ -42,15 +42,16 @@ dashboard.editor.button.positions.off=Position: OFF
 
 ## Help tooltip
 dashboard.editor.help_tooltip.title=Controls
+dashboard.editor.help_tooltip.point=Hover over an element, then:
 dashboard.editor.help_tooltip.move=§6Drag§7 to move (hold §6[%s]§7 to stop snapping)
-dashboard.editor.help_tooltip.nudge=§6Arrow keys§7 to move the element by 1 pixel
-dashboard.editor.help_tooltip.toggle=§6Right-click§7 to toggle visibility of the element
-dashboard.editor.help_tooltip.reset=§6[%s]§7 to reset position of the element
-dashboard.editor.help_tooltip.resize=§6[%s]+scroll§7 to resize the element
-dashboard.editor.help_tooltip.reset_size=§6[%s]+[%s]§7 to reset size of the element
+dashboard.editor.help_tooltip.nudge=§6Arrow keys§7 to move by 1 pixel
+dashboard.editor.help_tooltip.toggle=§6Right-click§7 to show or hide
+dashboard.editor.help_tooltip.reset=§6[%s]§7 to reset the position
+dashboard.editor.help_tooltip.resize=§6[%s]+scroll§7 to resize
+dashboard.editor.help_tooltip.reset_size=§6[%s]+[%s]§7 to reset the size
 dashboard.editor.help_tooltip.opacity=§6[%s]+scroll§7 to make the background see-through (some elements)
 dashboard.editor.help_tooltip.reset_opacity=§6[%s]+[%s]§7 to reset the see-through background
-dashboard.editor.help_tooltip.lock=§6[%s]§7 to lock the element, so it can not be changed by accident
+dashboard.editor.help_tooltip.lock=§6[%s]§7 to lock, so it can not be changed by accident
 dashboard.editor.help_tooltip.change_keys=Change some of these keys in Options > Controls > Dashboard Editor
 dashboard.editor.help_tooltip.ingameinfo=InGameInfoXML text only shows up here after it was toggled on in game
 dashboard.editor.help_tooltip.journeymap=The JourneyMap minimap only shows up here while it is turned on in JourneyMap
