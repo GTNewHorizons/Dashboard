@@ -5,6 +5,12 @@ key.categories.dashboard=Dashboard
 key.dashboard.open_editor=Open Dashboard HUD Editor
 key.dashboard.toggle_images=Show/Hide Pictures
 
+key.categories.dashboard_editor=Dashboard Editor
+key.dashboard.reset_position=Reset Position
+key.dashboard.size_modifier=Resize (hold)
+key.dashboard.opacity_modifier=See-through (hold)
+key.dashboard.free_move_modifier=Move Without Snapping (hold)
+
 # Messages
 dashboard.message.images_shown=Pictures shown
 dashboard.message.images_hidden=Pictures hidden
