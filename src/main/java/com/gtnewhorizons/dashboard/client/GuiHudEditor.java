@@ -5,9 +5,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
@@ -45,6 +47,7 @@ public class GuiHudEditor extends GuiScreen {
     private static final float POSITION_TEXT_SCALE = 0.75f;
     private static final int OUTSIDE_NAME_PADDING = 1;
     private static final int HELP_ICON_SIZE = 12;
+    private static final int HELP_CLICKS_TO_GIVE_UP = 10;
     private static final int TITLE_ROW_HEIGHT = HELP_ICON_SIZE;
     private static final int TITLE_ROW_GAP = 4;
     private static final int MENU_PADDING = 6;
@@ -79,6 +82,7 @@ public class GuiHudEditor extends GuiScreen {
     private int menuOffsetY;
     private boolean draggingMenu;
     private boolean menuHidden;
+    private int helpClicks;
     private int menuGrabOffsetX;
     private int menuGrabOffsetY;
     private final ImagePan imagePan = new ImagePan();
@@ -405,12 +409,12 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     /** The first line is the title. The keys are the ones bound in Controls, so the text follows rebinding. */
-    private static void addHelpLines(List<String> lines) {
+    private void addHelpLines(List<String> lines) {
         String reset = HudEditorKeybind.getKeyName(HudEditorKeybind.RESET);
         String size = HudEditorKeybind.getKeyName(HudEditorKeybind.SIZE_MODIFIER);
         String opacity = HudEditorKeybind.getKeyName(HudEditorKeybind.OPACITY_MODIFIER);
         String freeMove = HudEditorKeybind.getKeyName(HudEditorKeybind.FREE_MOVE_MODIFIER);
-        lines.add(translate("help_tooltip.title"));
+        lines.add(translate(getHelpTitleKey()));
         lines.add(noteLine("help_tooltip.point"));
         lines.add(helpLine("move", freeMove));
         lines.add(helpLine("nudge"));
@@ -421,6 +425,13 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("opacity", opacity));
         lines.add(helpLine("reset_opacity", opacity, reset));
         lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
+    }
+
+    private String getHelpTitleKey() {
+        if (helpClicks >= 7) return "help_tooltip.title_7";
+        if (helpClicks >= 5) return "help_tooltip.title_5";
+        if (helpClicks >= 3) return "help_tooltip.title_3";
+        return "help_tooltip.title";
     }
 
     /** One control in the help tooltip's bullet list. */
@@ -441,6 +452,10 @@ public class GuiHudEditor extends GuiScreen {
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
         List<String> lines = new ArrayList<>();
         if (!menuHidden && getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
+            if (helpClicks >= HELP_CLICKS_TO_GIVE_UP) {
+                lines.add(translate("help_tooltip.give_up"));
+                return lines;
+            }
             addHelpLines(lines);
             lines.add("");
             lines.add(noteLine("help_tooltip.menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
@@ -769,6 +784,10 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         HudBounds menu = getMenuBounds();
+        if (!menuHidden && mouseButton == 0 && getHelpIconBounds(menu).contains(mouseX, mouseY)) {
+            clickHelp();
+            return;
+        }
         if (!menuHidden && menu.contains(mouseX, mouseY)) {
             if (mouseButton == 0) {
                 draggingMenu = true;
@@ -794,6 +813,15 @@ public class GuiHudEditor extends GuiScreen {
         } else if (mouseButton == 2 && ImageElements.isImage(element)) {
             imagePan.start(element, ImagePan.MIDDLE_BUTTON, mouseX, mouseY);
         }
+    }
+
+    /** Angernoisemaker machine 3000, patent pending */
+    private void clickHelp() {
+        // Gives up for as many clicks as it took, then starts over
+        helpClicks = (helpClicks + 1) % (HELP_CLICKS_TO_GIVE_UP * 2);
+        float pitch = Math.min(2, 0.8f + helpClicks * 0.12f);
+        mc.getSoundHandler()
+            .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("mob.villager.idle"), pitch));
     }
 
     /** Held by its middle, since it may be far from the mouse. */

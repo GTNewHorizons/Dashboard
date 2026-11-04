@@ -52,6 +52,10 @@ dashboard.editor.button.positions.off=Position: OFF
 
 ## Help tooltip
 dashboard.editor.help_tooltip.title=Controls
+dashboard.editor.help_tooltip.title_3=Still need help?
+dashboard.editor.help_tooltip.title_5=Have you tried turning it off and on again?
+dashboard.editor.help_tooltip.title_7=The help is the same as 5 seconds ago
+dashboard.editor.help_tooltip.give_up=Okay, you're on your own now
 dashboard.editor.help_tooltip.point=Hover over an element, then:
 dashboard.editor.help_tooltip.move=§6Drag§7 to move (hold §6[%s]§7 to stop snapping)
 dashboard.editor.help_tooltip.nudge=§6Arrow keys§7 to move by 1 pixel
