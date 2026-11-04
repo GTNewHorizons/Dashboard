@@ -296,6 +296,8 @@ public class GuiHudEditor extends GuiScreen {
             ElementBox hovered = findBoxAt(mouseX, mouseY);
             highlighted = hovered != null ? hovered.element : null;
         }
+        // Only the box lights up, its tooltip would cover the list
+        HudElement hoveredInList = elementList.getElementAt(mouseX, mouseY);
 
         FrameEndHud.drawInEditor(partialTicks);
         if (DashboardConfig.showGrid) {
@@ -306,7 +308,7 @@ public class GuiHudEditor extends GuiScreen {
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         }
 
-        drawElementBoxes(highlighted);
+        drawElementBoxes(hoveredInList != null ? hoveredInList : highlighted);
         if (!menuHidden) {
             drawMenuPanel(mouseX, mouseY);
         }

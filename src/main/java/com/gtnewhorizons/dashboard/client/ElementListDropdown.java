@@ -33,6 +33,12 @@ final class ElementListDropdown extends ScrollingDropdown {
         super(font);
     }
 
+    /** The element on the row under the mouse, null over headings or outside the list. */
+    HudElement getElementAt(int mouseX, int mouseY) {
+        int row = getRowAt(mouseX, mouseY);
+        return row >= 0 ? rows.get(row).element : null;
+    }
+
     /** The same elements as the editor shows. */
     @Override
     void onOpen() {
