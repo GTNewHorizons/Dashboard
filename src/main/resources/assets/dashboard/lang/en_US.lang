@@ -43,6 +43,7 @@ dashboard.editor.button.positions.off=Position: OFF
 ## Help tooltip
 dashboard.editor.help_tooltip.title=Controls
 dashboard.editor.help_tooltip.move=§6Drag§7 to move (hold §6[%s]§7 to stop snapping)
+dashboard.editor.help_tooltip.nudge=§6Arrow keys§7 to move the element by 1 pixel
 dashboard.editor.help_tooltip.toggle=§6Right-click§7 to toggle visibility of the element
 dashboard.editor.help_tooltip.reset=§6[%s]§7 to reset position of the element
 dashboard.editor.help_tooltip.resize=§6[%s]+scroll§7 to resize the element

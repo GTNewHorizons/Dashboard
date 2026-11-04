@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -78,6 +79,7 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     public void initGui() {
+        Keyboard.enableRepeatEvents(true);
         buttonList.clear();
         buttonRows.clear();
         toggleButtons.clear();
@@ -370,6 +372,7 @@ public class GuiHudEditor extends GuiScreen {
         String freeMove = HudEditorKeybind.getKeyName(HudEditorKeybind.FREE_MOVE_MODIFIER);
         lines.add(StatCollector.translateToLocal("dashboard.editor.help_tooltip.title"));
         lines.add(helpLine("move", freeMove));
+        lines.add(helpLine("nudge"));
         lines.add(helpLine("toggle"));
         lines.add(helpLine("reset", reset));
         lines.add(helpLine("resize", size));
@@ -826,7 +829,9 @@ public class GuiHudEditor extends GuiScreen {
         }
         int resetKey = HudEditorKeybind.RESET.getKeyCode();
         int lockKey = HudEditorKeybind.LOCK.getKeyCode();
-        if (draggedElement == null && keyCode != 0 && (keyCode == resetKey || keyCode == lockKey)) {
+        if (draggedElement == null && keyCode != 0
+            && (keyCode == resetKey || keyCode == lockKey)
+            && !Keyboard.isRepeatEvent()) {
             HudElement element = findElementUnderMouse();
             if (element == null) {
                 return;
@@ -838,6 +843,16 @@ public class GuiHudEditor extends GuiScreen {
             } else {
                 HudLayout.setLocked(element, !HudLayout.isLocked(element));
                 GuiHelpers.playClickSound();
+            }
+            return;
+        }
+        int nudgeX = keyCode == Keyboard.KEY_LEFT ? -1 : keyCode == Keyboard.KEY_RIGHT ? 1 : 0;
+        int nudgeY = keyCode == Keyboard.KEY_UP ? -1 : keyCode == Keyboard.KEY_DOWN ? 1 : 0;
+        if (draggedElement == null && (nudgeX != 0 || nudgeY != 0)) {
+            HudElement element = findElementUnderMouse();
+            if (element != null && !HudLayout.isLocked(element)) {
+                HudBounds bounds = HudLayout.getBounds(element, width, height);
+                HudLayout.moveTo(element, bounds.x + nudgeX, bounds.y + nudgeY, width, height);
             }
             return;
         }
@@ -895,6 +910,7 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     public void onGuiClosed() {
+        Keyboard.enableRepeatEvents(false);
         HudLayout.save();
     }
 
