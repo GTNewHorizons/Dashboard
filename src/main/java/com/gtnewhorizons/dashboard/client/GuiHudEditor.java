@@ -64,6 +64,8 @@ public class GuiHudEditor extends GuiScreen {
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
     private GuiButton modsButton;
     private ModFilterDropdown modFilter;
+    private GuiButton elementsButton;
+    private ElementListDropdown elementList;
     private String title;
     private int menuWidth;
     private int menuHeight;
@@ -97,12 +99,15 @@ public class GuiHudEditor extends GuiScreen {
         actionButtons.add(createButton(BUTTON_RESET, StatCollector.translateToLocal("dashboard.editor.button.reset")));
         actionButtons
             .add(createButton(BUTTON_CUSTOMIZE, StatCollector.translateToLocal("dashboard.editor.button.customize")));
-        actionButtons
-            .add(createButton(BUTTON_ELEMENTS, StatCollector.translateToLocal("dashboard.editor.button.elements")));
+        elementsButton = createButton(
+            BUTTON_ELEMENTS,
+            StatCollector.translateToLocal("dashboard.editor.button.elements"));
+        actionButtons.add(elementsButton);
         modsButton = createButton(BUTTON_MODS, StatCollector.translateToLocal("dashboard.editor.button.mods"));
         actionButtons.add(modsButton);
         buttonRows.add(actionButtons);
         modFilter = new ModFilterDropdown(fontRendererObj);
+        elementList = new ElementListDropdown(fontRendererObj);
 
         for (List<GuiButton> row : buttonRows) {
             buttonList.addAll(row);
@@ -119,14 +124,16 @@ public class GuiHudEditor extends GuiScreen {
         menuHidden = hidden;
         draggingMenu = false;
         modFilter.close();
+        elementList.close();
         for (Object button : buttonList) {
             ((GuiButton) button).visible = !hidden;
         }
     }
 
-    /** The menu and the Mods list, which take clicks and scrolling before the elements under them. */
+    /** The menu and its lists, which take clicks and scrolling before the elements under them. */
     private boolean isOverMenu(int mouseX, int mouseY) {
-        return !menuHidden && (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY));
+        return !menuHidden && (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)
+            || elementList.contains(mouseX, mouseY));
     }
 
     private GuiButton createButton(int id, String text) {
@@ -279,6 +286,10 @@ public class GuiHudEditor extends GuiScreen {
             modFilter.placeAt(modsButton, width, height);
             modFilter.updateHandleDrag(mouseY);
         }
+        if (elementList.isOpen()) {
+            elementList.placeAt(elementsButton, width, height);
+            elementList.updateHandleDrag(mouseY);
+        }
         boolean overMenu = draggingMenu || isOverMenu(mouseX, mouseY);
         HudElement highlighted = draggedElement;
         if (highlighted == null && !overMenu) {
@@ -303,6 +314,9 @@ public class GuiHudEditor extends GuiScreen {
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (modFilter.isOpen()) {
             modFilter.draw(mouseX, mouseY);
+        }
+        if (elementList.isOpen()) {
+            elementList.draw(mouseX, mouseY);
         }
 
         if (highlighted != null && draggedElement == null) {
@@ -713,12 +727,15 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (modFilter.click(mouseX, mouseY)) {
+        if (modFilter.click(mouseX, mouseY) || elementList.click(mouseX, mouseY)) {
             return;
         }
-        // A click anywhere else closes the list, except on the Mods button, which toggles it
+        // A click anywhere else closes the lists, except on their own button, which toggles them
         if (!modsButton.mousePressed(mc, mouseX, mouseY)) {
             modFilter.close();
+        }
+        if (!elementsButton.mousePressed(mc, mouseX, mouseY)) {
+            elementList.close();
         }
         if (isOverButton(mouseX, mouseY)) {
             super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -802,6 +819,10 @@ public class GuiHudEditor extends GuiScreen {
         int mouseY = GuiHelpers.getEventMouseY(height);
         if (modFilter.contains(mouseX, mouseY)) {
             modFilter.scroll(wheel > 0 ? -1 : 1);
+            return;
+        }
+        if (elementList.contains(mouseX, mouseY)) {
+            elementList.scroll(wheel > 0 ? -1 : 1);
             return;
         }
         if (isOverMenu(mouseX, mouseY)) {
@@ -925,6 +946,7 @@ public class GuiHudEditor extends GuiScreen {
             case BUTTON_RESET -> resetShownMods();
             case BUTTON_CUSTOMIZE -> mc.displayGuiScreen(new GuiBarCustomize(this));
             case BUTTON_MODS -> modFilter.toggle();
+            case BUTTON_ELEMENTS -> elementList.toggle();
             case BUTTON_GRID, BUTTON_PREVIEW, BUTTON_LABELS, BUTTON_POSITIONS -> toggle(button.id);
             default -> {}
         }
