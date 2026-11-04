@@ -376,6 +376,7 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("reset_size", size, reset));
         lines.add(helpLine("opacity", opacity));
         lines.add(helpLine("reset_opacity", opacity, reset));
+        lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
     }
 
     private static String helpLine(String name, Object... keys) {
@@ -473,6 +474,9 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
         drawOutline(bounds, borderColor);
         drawCenterMark(bounds, borderColor);
+        if (HudLayout.isLocked(element)) {
+            Icons.drawSmall(Icons.SMALL_LOCK, bounds.getRight() - Icons.SMALL_SIZE, bounds.y, ColorUtils.text);
+        }
         if (DashboardConfig.showPositions) {
             drawPosition(bounds);
         }
@@ -576,6 +580,12 @@ public class GuiHudEditor extends GuiScreen {
         if (!HudLayout.isVisible(element)) {
             lines.add(
                 EnumChatFormatting.RED + StatCollector.translateToLocal("dashboard.editor.element_tooltip.hidden"));
+        }
+        if (HudLayout.isLocked(element)) {
+            lines.add(
+                EnumChatFormatting.GRAY + StatCollector.translateToLocalFormatted(
+                    "dashboard.editor.element_tooltip.locked",
+                    HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
         }
         lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (ElementOpacity.isAllowed(element)) {
@@ -695,7 +705,7 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         ElementBox box = findBoxAt(mouseX, mouseY);
-        if (box == null) {
+        if (box == null || HudLayout.isLocked(box.element)) {
             return;
         }
 
@@ -767,7 +777,7 @@ public class GuiHudEditor extends GuiScreen {
             return;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
-        if (box != null) {
+        if (box != null && !HudLayout.isLocked(box.element)) {
             scrollOver(box.element, box.bounds, mouseX, mouseY, wheel);
         }
     }
@@ -815,25 +825,38 @@ public class GuiHudEditor extends GuiScreen {
             return;
         }
         int resetKey = HudEditorKeybind.RESET.getKeyCode();
-        if (resetKey != 0 && keyCode == resetKey && draggedElement == null) {
-            resetUnderMouse();
+        int lockKey = HudEditorKeybind.LOCK.getKeyCode();
+        if (draggedElement == null && keyCode != 0 && (keyCode == resetKey || keyCode == lockKey)) {
+            HudElement element = findElementUnderMouse();
+            if (element == null) {
+                return;
+            }
+            if (keyCode == resetKey) {
+                if (!HudLayout.isLocked(element)) {
+                    reset(element);
+                }
+            } else {
+                HudLayout.setLocked(element, !HudLayout.isLocked(element));
+                GuiHelpers.playClickSound();
+            }
             return;
         }
         super.keyTyped(typedChar, keyCode);
     }
 
-    /** The size, the see-through background, or without a modifier key the position. */
-    private void resetUnderMouse() {
+    /** For key presses, which come without a mouse position. Null over the menu or empty space. */
+    private HudElement findElementUnderMouse() {
         int mouseX = Mouse.getX() * width / mc.displayWidth;
         int mouseY = height - Mouse.getY() * height / mc.displayHeight - 1;
         if (getMenuBounds().contains(mouseX, mouseY) || modFilter.contains(mouseX, mouseY)) {
-            return;
+            return null;
         }
         ElementBox box = findBoxAt(mouseX, mouseY);
-        if (box == null) {
-            return;
-        }
-        HudElement element = box.element;
+        return box != null ? box.element : null;
+    }
+
+    /** The size, the see-through background, or without a modifier key the position. */
+    private static void reset(HudElement element) {
         if (HudEditorKeybind.isHeld(HudEditorKeybind.SIZE_MODIFIER)) {
             HudLayout.setSizeStep(element, 0);
         } else if (HudEditorKeybind.isHeld(HudEditorKeybind.OPACITY_MODIFIER)) {
@@ -859,11 +882,11 @@ public class GuiHudEditor extends GuiScreen {
         }
     }
 
-    /** Mods left out of the editor are left alone, so hidden ones can not be reset by accident. */
+    /** Locked elements and mods left out of the editor are left alone, so they can not be reset by accident. */
     private static void resetShownMods() {
         List<HudElement> shown = new ArrayList<>();
         for (HudElement element : HudRegistry.getElements()) {
-            if (EditorModFilter.isShown(element)) {
+            if (EditorModFilter.isShown(element) && !HudLayout.isLocked(element)) {
                 shown.add(element);
             }
         }

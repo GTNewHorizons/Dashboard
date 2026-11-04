@@ -28,6 +28,7 @@ public final class Icons {
 
     public static final int SMALL_TICK_BOX = 0;
     public static final int SMALL_TICK_BOX_TICKED = 1;
+    public static final int SMALL_LOCK = 2;
 
     public static final int SMALL_SIZE = 12;
     private static final int CELL_SIZE = 16;

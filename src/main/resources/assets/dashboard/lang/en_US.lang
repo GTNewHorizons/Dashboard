@@ -7,6 +7,7 @@ key.dashboard.toggle_images=Show/Hide Pictures
 
 key.categories.dashboard_editor=Dashboard Editor
 key.dashboard.reset=Reset
+key.dashboard.lock=Lock
 key.dashboard.size_modifier=Resize (hold)
 key.dashboard.opacity_modifier=See-through (hold)
 key.dashboard.free_move_modifier=Move Without Snapping (hold)
@@ -48,12 +49,14 @@ dashboard.editor.help_tooltip.resize=§6[%s]+scroll§7 to resize the element
 dashboard.editor.help_tooltip.reset_size=§6[%s]+[%s]§7 to reset size of the element
 dashboard.editor.help_tooltip.opacity=§6[%s]+scroll§7 to make the background see-through (some elements)
 dashboard.editor.help_tooltip.reset_opacity=§6[%s]+[%s]§7 to reset the see-through background
+dashboard.editor.help_tooltip.lock=§6[%s]§7 to lock the element, so it can not be changed by accident
 dashboard.editor.help_tooltip.change_keys=Change some of these keys in Options > Controls > Dashboard Editor
 dashboard.editor.help_tooltip.ingameinfo=InGameInfoXML text only shows up here after it was toggled on in game
 dashboard.editor.help_tooltip.journeymap=The JourneyMap minimap only shows up here while it is turned on in JourneyMap
 
 ## Element tooltip
 dashboard.editor.element_tooltip.hidden=Hidden
+dashboard.editor.element_tooltip.locked=§cLocked, press §6[%s]§c to unlock
 dashboard.editor.element_tooltip.not_showing=Not showing right now
 dashboard.editor.element_tooltip.size=Size: %s (drawn at %s)
 dashboard.editor.element_tooltip.size_smallest=Size: %s (drawn at %s, smallest)

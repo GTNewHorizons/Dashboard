@@ -32,6 +32,7 @@ public class HudElementState {
     public float viewX;
     public float viewY;
     public Integer opacity;
+    public boolean locked;
 
     boolean isDefault() {
         return visible == null && !moved
@@ -42,6 +43,7 @@ public class HudElementState {
             && numberDecimals == null
             && sizeStep == 0
             && zoom == null
-            && opacity == null;
+            && opacity == null
+            && !locked;
     }
 }
