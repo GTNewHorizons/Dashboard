@@ -36,6 +36,7 @@ public final class HudLayout {
 
     public static final int MAX_SIZE_STEP = 5;
     public static final int LAYOUT_COUNT = 3;
+    private static final int MAX_ATTACH_DEPTH = 16;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
         .create();
@@ -230,9 +231,16 @@ public final class HudLayout {
 
     /** Where the element should be drawn and how big, kept fully on screen. */
     public static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight) {
+        return getBounds(element, defaultBounds, screenWidth, screenHeight, 0);
+    }
+
+    /** Depth counts the attached elements followed so far, so a loop in an edited file can not go on forever. */
+    private static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight,
+        int depth) {
         HudElementState state = getStates().get(element.getId());
         float scale = getScale(element);
-        boolean moved = state != null && state.moved;
+        HudElement parent = depth < MAX_ATTACH_DEPTH ? getAttachedTo(element) : null;
+        boolean moved = state != null && state.moved && (state.attachedTo == null || parent != null);
         if (!moved && scale == 1) {
             return defaultBounds;
         }
@@ -241,7 +249,16 @@ public final class HudLayout {
 
         int x;
         int y;
-        if (moved) {
+        if (moved && parent != null) {
+            HudBounds parentBounds = getBounds(
+                parent,
+                parent.getDefaultBounds(screenWidth, screenHeight),
+                screenWidth,
+                screenHeight,
+                depth + 1);
+            x = parentBounds.x + state.offsetX;
+            y = parentBounds.y + state.offsetY;
+        } else if (moved) {
             x = anchorPosition(state.anchorX, width, screenWidth) + state.offsetX;
             y = anchorPosition(state.anchorY, height, screenHeight) + state.offsetY;
         } else {
@@ -271,11 +288,19 @@ public final class HudLayout {
 
         HudElementState state = getOrCreateState(element);
         state.moved = true;
+        changed = true;
+        HudElement parent = getAttachedTo(element);
+        if (parent != null) {
+            HudBounds parentBounds = getBounds(parent, screenWidth, screenHeight);
+            state.offsetX = x - parentBounds.x;
+            state.offsetY = y - parentBounds.y;
+            return;
+        }
+        state.attachedTo = null;
         state.anchorX = closestAnchor(x + width / 2, screenWidth);
         state.anchorY = closestAnchor(y + height / 2, screenHeight);
         state.offsetX = x - anchorPosition(state.anchorX, width, screenWidth);
         state.offsetY = y - anchorPosition(state.anchorY, height, screenHeight);
-        changed = true;
     }
 
     public static boolean isMoved(HudElement element) {
@@ -283,11 +308,48 @@ public final class HudLayout {
         return state != null && state.moved;
     }
 
-    /** Moves the element back to its default position. A hidden element stays hidden. */
+    /** Null when not attached, or when the element it is attached to is not loaded, like after removing its mod. */
+    public static HudElement getAttachedTo(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.attachedTo == null ? null : HudRegistry.getElement(state.attachedTo);
+    }
+
+    /**
+     * Makes the element follow the other one, staying where it is now. False for itself, or for an element that
+     * already follows this one, since they would follow each other in a circle.
+     */
+    public static boolean attach(HudElement element, HudElement attachTo, int screenWidth, int screenHeight) {
+        HudElement parent = attachTo;
+        for (int depth = 0; parent != null && depth < MAX_ATTACH_DEPTH; depth++) {
+            if (parent == element) {
+                return false;
+            }
+            parent = getAttachedTo(parent);
+        }
+        HudBounds bounds = getBounds(element, screenWidth, screenHeight);
+        HudBounds parentBounds = getBounds(attachTo, screenWidth, screenHeight);
+        HudElementState state = getOrCreateState(element);
+        state.attachedTo = attachTo.getId();
+        state.moved = true;
+        state.offsetX = bounds.x - parentBounds.x;
+        state.offsetY = bounds.y - parentBounds.y;
+        changed = true;
+        return true;
+    }
+
+    /** Stops following, staying where it is now. */
+    public static void detach(HudElement element, int screenWidth, int screenHeight) {
+        HudBounds bounds = getBounds(element, screenWidth, screenHeight);
+        getOrCreateState(element).attachedTo = null;
+        moveTo(element, bounds.x, bounds.y, screenWidth, screenHeight);
+    }
+
+    /** Moves the element back to its default position, which also stops it following another one. Hidden stays. */
     public static void resetPosition(HudElement element) {
         HudElementState state = getStates().get(element.getId());
         if (state != null) {
             state.moved = false;
+            state.attachedTo = null;
             removeIfDefault(element);
             changed = true;
         }
@@ -300,6 +362,7 @@ public final class HudLayout {
             if (state != null) {
                 state.visible = null;
                 state.moved = false;
+                state.attachedTo = null;
                 state.sizeStep = 0;
                 state.zoom = null;
                 state.opacity = null;

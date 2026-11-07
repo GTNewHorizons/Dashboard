@@ -13,6 +13,9 @@ package com.gtnewhorizons.dashboard.client;
  * <p>
  * The offset is the distance from that anchor, so the element stays near the same edge when the
  * window size or GUI scale changes.
+ * <p>
+ * An element attached to another one has that one's id in attachedTo, and its offset is the distance from that
+ * element's top left corner instead, so it follows it around.
  */
 public class HudElementState {
 
@@ -33,9 +36,11 @@ public class HudElementState {
     public float viewY;
     public Integer opacity;
     public boolean locked;
+    public String attachedTo;
 
     boolean isDefault() {
         return visible == null && !moved
+            && attachedTo == null
             && theme == null
             && !flipped
             && !numberOn
