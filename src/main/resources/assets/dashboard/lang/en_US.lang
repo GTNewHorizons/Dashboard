@@ -4,6 +4,7 @@
 key.categories.dashboard=Dashboard
 key.dashboard.open_editor=Open Dashboard HUD Editor
 key.dashboard.toggle_images=Show/Hide Pictures
+key.dashboard.next_layout=Next HUD Layout
 
 key.categories.dashboard_editor=Dashboard Editor
 key.dashboard.reset=Reset
@@ -16,6 +17,7 @@ key.dashboard.free_move_modifier=Move Without Snapping (hold)
 # Messages
 dashboard.message.images_shown=Pictures shown
 dashboard.message.images_hidden=Pictures hidden
+dashboard.message.layout=HUD layout %s
 
 # Editor gui
 dashboard.editor.title=Dashboard HUD Editor

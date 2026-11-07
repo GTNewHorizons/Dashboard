@@ -12,10 +12,12 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.StatCollector;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardOtherConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
@@ -310,6 +312,15 @@ public final class HudLayout {
     /** From 1 to {@link #LAYOUT_COUNT}. */
     public static int getActiveLayout() {
         return MathHelper.clamp_int(DashboardOtherConfig.activeLayout, 1, LAYOUT_COUNT);
+    }
+
+    /** Cycles to the next layout. */
+    public static void switchToNextLayout() {
+        DashboardOtherConfig.activeLayout = getActiveLayout() % LAYOUT_COUNT + 1;
+        ConfigurationManager.save(DashboardOtherConfig.class);
+        getStates();
+        VanillaHudElements.showShadowedActionBarText(
+            StatCollector.translateToLocalFormatted("dashboard.message.layout", getActiveLayout()));
     }
 
     /** Called whenever an editor screen closes, so it only writes when something changed. */

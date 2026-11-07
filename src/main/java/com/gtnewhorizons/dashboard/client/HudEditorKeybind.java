@@ -31,6 +31,11 @@ public final class HudEditorKeybind {
         Keyboard.KEY_NONE,
         "key.categories.dashboard");
 
+    public static final KeyBinding NEXT_LAYOUT = new KeyBinding(
+        "key.dashboard.next_layout",
+        Keyboard.KEY_NONE,
+        "key.categories.dashboard");
+
     public static final KeyBinding RESET = new KeyBinding(
         "key.dashboard.reset",
         Keyboard.KEY_R,
@@ -66,6 +71,7 @@ public final class HudEditorKeybind {
     public static void register() {
         ClientRegistry.registerKeyBinding(OPEN_EDITOR);
         ClientRegistry.registerKeyBinding(TOGGLE_IMAGES);
+        ClientRegistry.registerKeyBinding(NEXT_LAYOUT);
         ClientRegistry.registerKeyBinding(RESET);
         ClientRegistry.registerKeyBinding(LOCK);
         ClientRegistry.registerKeyBinding(HIDE_MENU);
@@ -99,6 +105,9 @@ public final class HudEditorKeybind {
         }
         if (TOGGLE_IMAGES.isPressed() && mc.currentScreen == null) {
             ImageElements.toggleShown();
+        }
+        if (NEXT_LAYOUT.isPressed() && mc.currentScreen == null) {
+            HudLayout.switchToNextLayout();
         }
     }
 }
