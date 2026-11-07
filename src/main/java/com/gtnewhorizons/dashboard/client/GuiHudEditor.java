@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -449,6 +450,19 @@ public class GuiHudEditor extends GuiScreen {
         return StatCollector.translateToLocalFormatted("dashboard.editor." + key, keys);
     }
 
+    /** Turns the empty lines into a line across the tooltip. Dashes, since Angelica skips empty spaces. */
+    private void fillSeparators(List<String> lines) {
+        int width = 0;
+        for (String line : lines) {
+            width = Math.max(width, fontRendererObj.getStringWidth(line));
+        }
+        char[] dashes = new char[width / Math.max(1, fontRendererObj.getCharWidth('-'))];
+        Arrays.fill(dashes, '-');
+        String separator = EnumChatFormatting.DARK_GRAY.toString() + EnumChatFormatting.STRIKETHROUGH
+            + new String(dashes);
+        lines.replaceAll(line -> line.isEmpty() ? separator : line);
+    }
+
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
         List<String> lines = new ArrayList<>();
         if (!menuHidden && getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
@@ -479,6 +493,7 @@ public class GuiHudEditor extends GuiScreen {
             // if (journeyMap) {
             // lines.add(noteLine("help_tooltip.journeymap"));
             // }
+            fillSeparators(lines);
         }
         for (ToggleButton button : toggleButtons) {
             if (button.mousePressed(mc, mouseX, mouseY)) {
