@@ -12,11 +12,14 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.StatCollector;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.Dashboard;
+import com.gtnewhorizons.dashboard.DashboardOtherConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -24,17 +27,22 @@ import com.gtnewhorizons.dashboard.api.HudRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** What the player changed per HUD element (place, size, look), saved to config/dashboard/hud_layout.json. */
+/**
+ * What the player changed per HUD element (place, size, look). There are three layouts to switch between, saved to
+ * config/dashboard/hud_layout.json, hud_layout_2.json and hud_layout_3.json.
+ */
 @SideOnly(Side.CLIENT)
 public final class HudLayout {
 
     public static final int MAX_SIZE_STEP = 5;
+    public static final int LAYOUT_COUNT = 3;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
         .create();
     private static final Type STATES_TYPE = new TypeToken<LinkedHashMap<String, HudElementState>>() {}.getType();
 
     private static Map<String, HudElementState> states;
+    private static int loadedLayout;
     private static boolean changed;
     private static int scaleDisplayWidth = -1;
     private static int scaleDisplayHeight;
@@ -301,19 +309,38 @@ public final class HudLayout {
         changed = true;
     }
 
+    /** From 1 to {@link #LAYOUT_COUNT}. */
+    public static int getActiveLayout() {
+        return MathHelper.clamp_int(DashboardOtherConfig.activeLayout, 1, LAYOUT_COUNT);
+    }
+
+    /** Cycles to the next layout. */
+    public static void switchToNextLayout() {
+        DashboardOtherConfig.activeLayout = getActiveLayout() % LAYOUT_COUNT + 1;
+        ConfigurationManager.save(DashboardOtherConfig.class);
+        getStates();
+        VanillaHudElements.showShadowedActionBarText(
+            StatCollector.translateToLocalFormatted("dashboard.message.layout", getActiveLayout()));
+    }
+
     /** Called whenever an editor screen closes, so it only writes when something changed. */
     public static void save() {
         if (!changed) {
             return;
         }
         HudRegistry.notifyLayoutChanged();
-        File file = getFile();
+        write();
+    }
+
+    /** To the file of the layout that is loaded, which is not the active one while switching. */
+    private static void write() {
+        File file = getFile(loadedLayout);
         try {
             Files.createDirectories(
                 file.getParentFile()
                     .toPath());
             try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
-                GSON.toJson(getStates(), STATES_TYPE, writer);
+                GSON.toJson(states, STATES_TYPE, writer);
             }
             changed = false;
         } catch (Exception e) {
@@ -321,15 +348,26 @@ public final class HudLayout {
         }
     }
 
+    /** Loads the active layout, saving the one before it first when the player switched. */
     private static Map<String, HudElementState> getStates() {
-        if (states == null) {
+        int layout = getActiveLayout();
+        if (states == null || layout != loadedLayout) {
+            boolean switched = states != null;
+            if (changed) {
+                write();
+            }
+            changed = false;
+            loadedLayout = layout;
             states = load();
+            if (switched) {
+                HudRegistry.notifyLayoutChanged();
+            }
         }
         return states;
     }
 
     private static Map<String, HudElementState> load() {
-        File file = getFile();
+        File file = getFile(loadedLayout);
         if (file.isFile()) {
             try (Reader reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
                 Map<String, HudElementState> loaded = GSON.fromJson(reader, STATES_TYPE);
@@ -343,8 +381,10 @@ public final class HudLayout {
         return new LinkedHashMap<>();
     }
 
-    private static File getFile() {
-        return new File(Minecraft.getMinecraft().mcDataDir, "config/dashboard/hud_layout.json");
+    /** The first layout keeps the name it had before there were more. */
+    private static File getFile(int layout) {
+        String name = layout == 1 ? "hud_layout.json" : "hud_layout_" + layout + ".json";
+        return new File(Minecraft.getMinecraft().mcDataDir, "config/dashboard/" + name);
     }
 
     private static HudElementState getOrCreateState(HudElement element) {

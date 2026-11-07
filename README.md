@@ -57,6 +57,14 @@ is used instead, until you reset it.
 
 You can also drag the editor menu itself out of the way.
 
+### Layouts
+
+Dashboard keeps three separate layouts. Each remembers its own
+element positions, sizes, hidden elements, bar themes and bar numbers. To switch, bind **Next HUD Layout** in
+**Controls**, under **Dashboard**, then press it in game. The editor always changes the layout you are on, and its **?**
+tooltip tells you which one that is. The crosshair, hotbar, status effect, screen overlay and held item settings from
+Customize are shared by all three.
+
 ## Customize
 
 - **Bars**: change how health, food, armor, air, XP and other bars look, pick a theme, flip which way they fill, and

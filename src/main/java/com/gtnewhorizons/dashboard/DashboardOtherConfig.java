@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
+import com.gtnewhorizons.dashboard.client.HudLayout;
 import com.gtnewhorizons.dashboard.client.PickupFeed;
 
 /** Settings that can only be changed in the config, unlike the ones in {@link DashboardConfig}. */
@@ -24,4 +25,10 @@ public class DashboardOtherConfig {
     @Config.DefaultInt(PickupFeed.DEFAULT_SLIDE_OUT_MILLIS)
     @Config.RangeInt(min = 0, max = PickupFeed.MAX_SLIDE_OUT_MILLIS)
     public static int pickupFeedSlideOutMillis;
+
+    @Config.Comment("Which of the HUD layouts is used. Each one remembers its own element positions, sizes and looks")
+    @Config.LangKey("dashboard.config.other.active_layout")
+    @Config.DefaultInt(1)
+    @Config.RangeInt(min = 1, max = HudLayout.LAYOUT_COUNT)
+    public static int activeLayout;
 }

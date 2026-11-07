@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /** The HUD editor: a box per element, so players can see and grab elements even while they are not showing. */
 @SideOnly(Side.CLIENT)
@@ -449,6 +451,26 @@ public class GuiHudEditor extends GuiScreen {
         return StatCollector.translateToLocalFormatted("dashboard.editor." + key, keys);
     }
 
+    /** Turns the empty lines into a line across the tooltip. Dashes, since Angelica skips empty spaces. */
+    private void fillSeparators(List<String> lines) {
+        int width = 0;
+        IntArrayList emptyLines = new IntArrayList(Math.max(3, lines.size() / 8));
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            width = Math.max(width, fontRendererObj.getStringWidth(line));
+            if (line.isEmpty()) {
+                emptyLines.add(i);
+            }
+        }
+        char[] dashes = new char[width / Math.max(1, fontRendererObj.getCharWidth('-'))];
+        Arrays.fill(dashes, '-');
+        String separator = EnumChatFormatting.DARK_GRAY.toString() + EnumChatFormatting.STRIKETHROUGH
+            + new String(dashes);
+        for (int i = 0; i < emptyLines.size(); i++) {
+            lines.set(emptyLines.getInt(i), separator);
+        }
+    }
+
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
         List<String> lines = new ArrayList<>();
         if (!menuHidden && getHelpIconBounds(getMenuBounds()).contains(mouseX, mouseY)) {
@@ -460,6 +482,12 @@ public class GuiHudEditor extends GuiScreen {
             lines.add("");
             lines.add(noteLine("help_tooltip.menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
             lines.add(noteLine("help_tooltip.change_keys"));
+            lines.add(
+                noteLine(
+                    "help_tooltip.layout",
+                    HudLayout.getActiveLayout(),
+                    HudLayout.LAYOUT_COUNT,
+                    HudEditorKeybind.getKeyName(HudEditorKeybind.NEXT_LAYOUT)));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
             // TODO: JourneyMap release with MiniMapRenderEvent
@@ -473,6 +501,7 @@ public class GuiHudEditor extends GuiScreen {
             // if (journeyMap) {
             // lines.add(noteLine("help_tooltip.journeymap"));
             // }
+            fillSeparators(lines);
         }
         for (ToggleButton button : toggleButtons) {
             if (button.mousePressed(mc, mouseX, mouseY)) {
