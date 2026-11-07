@@ -595,9 +595,7 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
         drawOutline(bounds, borderColor);
         drawCenterMark(bounds, borderColor);
-        if (HudLayout.isLocked(element)) {
-            Icons.drawSmall(Icons.SMALL_LOCK, bounds.getRight() - Icons.SMALL_SIZE, bounds.y, ColorUtils.text);
-        }
+        drawStateIcons(element, bounds.getRight(), bounds.y);
         if (DashboardConfig.showPositions) {
             drawPosition(bounds);
         }
@@ -685,6 +683,18 @@ public class GuiHudEditor extends GuiScreen {
             y + OUTSIDE_NAME_PADDING,
             scale,
             ColorUtils.text.getColor());
+    }
+
+    /** Lock and attach icons, ending at the right edge, the lock rightmost. Also used by the Elements list. */
+    static void drawStateIcons(HudElement element, int right, int y) {
+        int x = right - Icons.SMALL_SIZE;
+        if (HudLayout.isLocked(element)) {
+            Icons.drawSmall(Icons.SMALL_LOCK, x, y, ColorUtils.text);
+            x -= Icons.SMALL_SIZE;
+        }
+        if (HudLayout.getAttachedTo(element) != null) {
+            Icons.drawSmall(Icons.SMALL_ATTACH, x, y, ColorUtils.text);
+        }
     }
 
     /** To the element this one follows, and from the ones following it. */
