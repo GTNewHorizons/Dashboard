@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ public final class HudLayout {
 
     public static final int MAX_SIZE_STEP = 5;
     public static final int LAYOUT_COUNT = 3;
+    private static final int MAX_ATTACH_DEPTH = 16;
+    private static final Map<String, String> DEFAULT_ATTACHMENTS = new HashMap<>();
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
         .create();
@@ -230,10 +233,17 @@ public final class HudLayout {
 
     /** Where the element should be drawn and how big, kept fully on screen. */
     public static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight) {
+        return getBounds(element, defaultBounds, screenWidth, screenHeight, 0);
+    }
+
+    /** Depth counts the attached elements followed so far, so a loop in an edited file can not go on forever. */
+    private static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight,
+        int depth) {
         HudElementState state = getStates().get(element.getId());
         float scale = getScale(element);
-        boolean moved = state != null && state.moved;
-        if (!moved && scale == 1) {
+        HudElement parent = depth < MAX_ATTACH_DEPTH ? getAttachedTo(element) : null;
+        boolean moved = state != null && state.moved && (state.attachedTo == null || parent != null);
+        if (!moved && parent == null && scale == 1) {
             return defaultBounds;
         }
         int width = Math.round(defaultBounds.width * scale);
@@ -241,7 +251,13 @@ public final class HudLayout {
 
         int x;
         int y;
-        if (moved) {
+        if (parent != null) {
+            HudBounds parentDefault = parent.getDefaultBounds(screenWidth, screenHeight);
+            HudBounds parentBounds = getBounds(parent, parentDefault, screenWidth, screenHeight, depth + 1);
+            // Not moved yet, so it keeps its default distance from the element it follows by default
+            x = parentBounds.x + (moved ? state.offsetX : defaultBounds.x - parentDefault.x);
+            y = parentBounds.y + (moved ? state.offsetY : defaultBounds.y - parentDefault.y);
+        } else if (moved) {
             x = anchorPosition(state.anchorX, width, screenWidth) + state.offsetX;
             y = anchorPosition(state.anchorY, height, screenHeight) + state.offsetY;
         } else {
@@ -271,11 +287,20 @@ public final class HudLayout {
 
         HudElementState state = getOrCreateState(element);
         state.moved = true;
+        changed = true;
+        HudElement parent = getAttachedTo(element);
+        if (parent != null) {
+            HudBounds parentBounds = getBounds(parent, screenWidth, screenHeight);
+            state.attachedTo = parent.getId();
+            state.offsetX = x - parentBounds.x;
+            state.offsetY = y - parentBounds.y;
+            return;
+        }
+        state.attachedTo = null;
         state.anchorX = closestAnchor(x + width / 2, screenWidth);
         state.anchorY = closestAnchor(y + height / 2, screenHeight);
         state.offsetX = x - anchorPosition(state.anchorX, width, screenWidth);
         state.offsetY = y - anchorPosition(state.anchorY, height, screenHeight);
-        changed = true;
     }
 
     public static boolean isMoved(HudElement element) {
@@ -283,11 +308,71 @@ public final class HudLayout {
         return state != null && state.moved;
     }
 
-    /** Moves the element back to its default position. A hidden element stays hidden. */
+    /**
+     * Null when not attached, or when the element it is attached to is not loaded, like after removing its mod.
+     * Elements attached by default count until the player detaches them.
+     */
+    public static HudElement getAttachedTo(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        String id;
+        if (state != null && state.attachedTo != null) {
+            id = state.attachedTo;
+        } else if (state != null && state.detached) {
+            return null;
+        } else {
+            id = DEFAULT_ATTACHMENTS.get(element.getId());
+        }
+        return id == null ? null : HudRegistry.getElement(id);
+    }
+
+    /** Follows the other element until the player detaches it, like the XP level number and the XP bar. */
+    static void attachByDefault(HudElement element, HudElement attachTo) {
+        DEFAULT_ATTACHMENTS.put(element.getId(), attachTo.getId());
+    }
+
+    /**
+     * Makes the element follow the other one, staying where it is now. False for itself, or for an element that
+     * already follows this one, since they would follow each other in a circle.
+     */
+    public static boolean attach(HudElement element, HudElement attachTo, int screenWidth, int screenHeight) {
+        HudElement parent = attachTo;
+        for (int depth = 0; parent != null && depth < MAX_ATTACH_DEPTH; depth++) {
+            if (parent == element) {
+                return false;
+            }
+            parent = getAttachedTo(parent);
+        }
+        HudBounds bounds = getBounds(element, screenWidth, screenHeight);
+        HudBounds parentBounds = getBounds(attachTo, screenWidth, screenHeight);
+        HudElementState state = getOrCreateState(element);
+        state.attachedTo = attachTo.getId();
+        state.detached = false;
+        state.moved = true;
+        state.offsetX = bounds.x - parentBounds.x;
+        state.offsetY = bounds.y - parentBounds.y;
+        changed = true;
+        return true;
+    }
+
+    /** Stops following, staying where it is now. Remembered, so an element attached by default stays loose. */
+    public static void detach(HudElement element, int screenWidth, int screenHeight) {
+        HudBounds bounds = getBounds(element, screenWidth, screenHeight);
+        HudElementState state = getOrCreateState(element);
+        state.attachedTo = null;
+        state.detached = DEFAULT_ATTACHMENTS.containsKey(element.getId());
+        moveTo(element, bounds.x, bounds.y, screenWidth, screenHeight);
+    }
+
+    /**
+     * Moves the element back to its default position, which also puts its attachment back to the default one. Hidden
+     * stays.
+     */
     public static void resetPosition(HudElement element) {
         HudElementState state = getStates().get(element.getId());
         if (state != null) {
             state.moved = false;
+            state.attachedTo = null;
+            state.detached = false;
             removeIfDefault(element);
             changed = true;
         }
@@ -300,6 +385,8 @@ public final class HudLayout {
             if (state != null) {
                 state.visible = null;
                 state.moved = false;
+                state.attachedTo = null;
+                state.detached = false;
                 state.sizeStep = 0;
                 state.zoom = null;
                 state.opacity = null;

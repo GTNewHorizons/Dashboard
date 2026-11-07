@@ -23,7 +23,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 final class ElementListDropdown extends ScrollingDropdown {
 
     private static final int INDENT = 6;
-    private static final int LOCK_GAP = 3;
+    private static final int ICON_GAP = 3;
 
     private static final Comparator<HudElement> ORDER = Comparator
         .comparingInt((HudElement element) -> EditorModFilter.getModRank(EditorModFilter.getModKey(element)))
@@ -84,7 +84,7 @@ final class ElementListDropdown extends ScrollingDropdown {
             }
         }
         elements.sort(ORDER);
-        width = Math.max(MIN_WIDTH, PADDING * 2 + textWidth + LOCK_GAP + Icons.SMALL_SIZE);
+        width = Math.max(MIN_WIDTH, PADDING * 2 + textWidth + ICON_GAP + Icons.SMALL_SIZE * 2);
         search.width = width - PADDING * 2;
         search.setText("");
         search.setFocused(false);
@@ -183,13 +183,7 @@ final class ElementListDropdown extends ScrollingDropdown {
         int textColor = HudLayout.isVisible(entry.element) ? ColorUtils.text.getColor()
             : ColorUtils.textState.getColor();
         font.drawStringWithShadow(entry.text, rowX + INDENT, textY, textColor);
-        if (HudLayout.isLocked(entry.element)) {
-            Icons.drawSmall(
-                Icons.SMALL_LOCK,
-                rowX - PADDING + width - PADDING - Icons.SMALL_SIZE,
-                rowY + 1,
-                ColorUtils.text);
-        }
+        GuiHudEditor.drawStateIcons(entry.element, rowX - PADDING + width - PADDING, rowY + 1);
     }
 
     /** Left-click picks the element up, right-click shows or hides it, like on its box. Locked ones stay. */

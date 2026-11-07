@@ -9,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
@@ -77,6 +79,7 @@ public class GuiHudEditor extends GuiScreen {
     private int menuHeight;
     private HudElement draggedElement;
     private boolean carryingElement;
+    private HudElement attachingElement;
     private int grabOffsetX;
     private int grabOffsetY;
     /** How far the menu was dragged from its default spot. Not saved. */
@@ -318,7 +321,13 @@ public class GuiHudEditor extends GuiScreen {
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         }
 
-        drawElementBoxes(hoveredInList != null ? hoveredInList : highlighted);
+        HudElement focused = hoveredInList != null ? hoveredInList : highlighted;
+        drawElementBoxes(focused);
+        if (attachingElement != null) {
+            drawAttachLine(attachingElement, mouseX, mouseY);
+        } else if (focused != null) {
+            drawAttachLines(focused);
+        }
         if (!menuHidden) {
             drawMenuPanel(mouseX, mouseY);
         }
@@ -427,6 +436,8 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("opacity", opacity));
         lines.add(helpLine("reset_opacity", opacity, reset));
         lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
+        String attach = HudEditorKeybind.getKeyName(HudEditorKeybind.ATTACH);
+        lines.add(helpLine("attach", attach, attach));
     }
 
     private String getHelpTitleKey() {
@@ -584,9 +595,7 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.x, bounds.y, bounds.getRight(), bounds.getBottom(), fillColor);
         drawOutline(bounds, borderColor);
         drawCenterMark(bounds, borderColor);
-        if (HudLayout.isLocked(element)) {
-            Icons.drawSmall(Icons.SMALL_LOCK, bounds.getRight() - Icons.SMALL_SIZE, bounds.y, ColorUtils.text);
-        }
+        drawStateIcons(element, bounds.getRight(), bounds.y);
         if (DashboardConfig.showPositions) {
             drawPosition(bounds);
         }
@@ -676,6 +685,58 @@ public class GuiHudEditor extends GuiScreen {
             ColorUtils.text.getColor());
     }
 
+    /** Lock and attach icons, ending at the right edge, the lock rightmost. Also used by the Elements list. */
+    static void drawStateIcons(HudElement element, int right, int y) {
+        int x = right - Icons.SMALL_SIZE;
+        if (HudLayout.isLocked(element)) {
+            Icons.drawSmall(Icons.SMALL_LOCK, x, y, ColorUtils.text);
+            x -= Icons.SMALL_SIZE;
+        }
+        if (HudLayout.getAttachedTo(element) != null) {
+            Icons.drawSmall(Icons.SMALL_ATTACH, x, y, ColorUtils.text);
+        }
+    }
+
+    /** To the element this one follows, and from the ones following it. */
+    private void drawAttachLines(HudElement element) {
+        HudElement parent = HudLayout.getAttachedTo(element);
+        if (parent != null) {
+            drawAttachLine(element, parent);
+        }
+        for (ElementBox box : boxes) {
+            if (HudLayout.getAttachedTo(box.element) == element) {
+                drawAttachLine(box.element, element);
+            }
+        }
+    }
+
+    private void drawAttachLine(HudElement from, HudElement to) {
+        HudBounds bounds = HudLayout.getBounds(to, width, height);
+        drawAttachLine(from, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+    }
+
+    /** From the element's middle. */
+    private void drawAttachLine(HudElement from, int toX, int toY) {
+        HudBounds bounds = HudLayout.getBounds(from, width, height);
+        drawLine(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, toX, toY, ColorUtils.attachLine.getColor());
+    }
+
+    private static void drawLine(int fromX, int fromY, int toX, int toY, int color) {
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+        GL11.glLineWidth(HudLayout.getGameGuiScale() * 1.5f);
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawing(GL11.GL_LINES);
+        tessellator.setColorRGBA_I(color & 0xFFFFFF, color >>> 24);
+        tessellator.addVertex(fromX, fromY, 0);
+        tessellator.addVertex(toX, toY, 0);
+        tessellator.draw();
+        GL11.glLineWidth(1);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
+    }
+
     static void drawOutline(HudBounds bounds, int color) {
         drawRect(bounds.x - 1, bounds.y - 1, bounds.getRight() + 1, bounds.y, color);
         drawRect(bounds.x - 1, bounds.getBottom(), bounds.getRight() + 1, bounds.getBottom() + 1, color);
@@ -696,6 +757,14 @@ public class GuiHudEditor extends GuiScreen {
                 EnumChatFormatting.GRAY + StatCollector.translateToLocalFormatted(
                     "dashboard.editor.element_tooltip.locked",
                     HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
+        }
+        HudElement attachedTo = HudLayout.getAttachedTo(element);
+        if (attachedTo != null) {
+            lines.add(
+                noteLine(
+                    "element_tooltip.attached",
+                    attachedTo.getDisplayName(),
+                    HudEditorKeybind.getKeyName(HudEditorKeybind.ATTACH)));
         }
         lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (ElementOpacity.isAllowed(element)) {
@@ -795,6 +864,15 @@ public class GuiHudEditor extends GuiScreen {
         if (carryingElement) {
             carryingElement = false;
             draggedElement = null;
+            return;
+        }
+        // Any click ends choosing, a left click on another element also attaches to it
+        if (attachingElement != null) {
+            ElementBox target = mouseButton == 0 && !isOverMenu(mouseX, mouseY) ? findBoxAt(mouseX, mouseY) : null;
+            if (target != null && HudLayout.attach(attachingElement, target.element, width, height)) {
+                GuiHelpers.playClickSound();
+            }
+            attachingElement = null;
             return;
         }
         if (modFilter.click(mouseX, mouseY, mouseButton) || elementList.click(mouseX, mouseY, mouseButton)) {
@@ -965,6 +1043,12 @@ public class GuiHudEditor extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
+        int attachKey = HudEditorKeybind.ATTACH.getKeyCode();
+        boolean attachPressed = attachKey != 0 && keyCode == attachKey && !Keyboard.isRepeatEvent();
+        if (attachingElement != null && (keyCode == Keyboard.KEY_ESCAPE || attachPressed)) {
+            attachingElement = null;
+            return;
+        }
         // Esc closes the open list instead of the editor, and while typing in its search box every key goes there
         if (elementList.isOpen() && keyCode == Keyboard.KEY_ESCAPE) {
             elementList.close();
@@ -995,6 +1079,20 @@ public class GuiHudEditor extends GuiScreen {
             } else {
                 HudLayout.setLocked(element, !HudLayout.isLocked(element));
                 GuiHelpers.playClickSound();
+            }
+            return;
+        }
+        // Attached ones come loose, others wait for a click on the element to attach to
+        if (draggedElement == null && attachPressed) {
+            HudElement element = findElementUnderMouse();
+            if (element == null || HudLayout.isLocked(element)) {
+                return;
+            }
+            if (HudLayout.getAttachedTo(element) != null) {
+                HudLayout.detach(element, width, height);
+                GuiHelpers.playClickSound();
+            } else {
+                attachingElement = element;
             }
             return;
         }
