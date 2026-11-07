@@ -28,20 +28,34 @@ Without a key, open it while in a world through **Mod Options**, **Dashboard**, 
 
 Every part of the HUD gets its own box, even when it is not showing right now, so you can always find and grab it.
 
+Hover over an element, then:
+
 | Action                         | How                                                      |
 |--------------------------------|----------------------------------------------------------|
-| Move an element                | Drag the element (hold **Shift** to stop it snapping)    |
-| Hide or show an element        | **Right-click** the element                              |
-| Reset an element's position    | **Ctrl + click** the element                             |
-| Resize an element              | **Alt + scroll** over the element                        |
-| Reset an element's size        | **Alt + click** the element                              |
-| Make a background see-through  | **Ctrl + scroll** over the element (Inventory, Belt Hotbar) |
-| Zoom into an image             | **Scroll** over it, **middle-drag** to move around, **middle-click** to reset |
-| See the controls again         | Hover the **?** in the editor menu                       |
+| Move it                        | Drag it (hold **Shift** to stop it snapping)             |
+| Move it by 1 pixel             | **Arrow keys**                                           |
+| Hide or show it                | **Right-click**                                          |
+| Reset its position             | **R**                                                    |
+| Resize it                      | **Alt + scroll**                                         |
+| Reset its size                 | **Alt + R**                                              |
+| Make its background see-through | **Ctrl + scroll** (some elements)                       |
+| Reset the see-through background | **Ctrl + R**                                           |
+| Lock it, so it can't be changed by accident | **L** (again to unlock)                     |
+| Attach it to another element   | **A**, then click the other element (**A** again to detach) |
+| Zoom into an image             | **Scroll**, **middle-drag** to move around, **middle-click** to reset |
+
+The keys in bold are the defaults. Change them in **Controls**, under **Dashboard Editor**. Hover the **?** in the editor
+menu to see the controls with your own keys.
 
 Hover an element to see its name, its size and which mod it belongs to. If that mod has its own position setting for
 the element, the tooltip also tells you where to find it. Once you move the element in the editor, Dashboard's position
 is used instead, until you reset it.
+
+### Attaching elements
+
+An attached element follows the one it is attached to, so you can keep a bar right above the hotbar wherever the
+hotbar goes. Drag it to change how far from the other element it sits, it stays attached. Resetting its position
+(**R**) also detaches it. Hover either element to see a line between them.
 
 ### Editor buttons
 
@@ -49,13 +63,16 @@ is used instead, until you reset it.
 - **Preview**: shows sample content for elements that are not showing right now, so you can see what you are moving.
 - **Labels**: shows each element's name inside its box.
 - **Position**: shows each element's position next to its box.
+- **Elements**: a list of every element in the editor, grouped by mod, with a search box. Hover over a row to light
+  up its element, click it to pick the element up (click again to drop it), right-click it to hide or show it. Handy
+  for elements that are tiny or covered by others.
 - **Mods**: a list of mods with tick boxes. Only Minecraft and Dashboard are ticked at first, so the editor starts
   tidy. Tick a mod to arrange its elements too. Unticked mods still show in game.
 - **Reset**: puts every element shown in the editor back where it started.
 - **Customize**: opens the styling options below.
 - **Done**: saves and closes the editor.
 
-You can also drag the editor menu itself out of the way.
+You can also drag the editor menu itself out of the way, or hide it with **D** to reach the elements under it.
 
 ### Layouts
 
