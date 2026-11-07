@@ -491,3 +491,5 @@ dashboard.config.other.pickup_feed_seconds=Item Pickups Time
 dashboard.config.other.pickup_feed_seconds.tooltip=How long each row of the item pickups shows, in seconds
 dashboard.config.other.pickup_feed_slide_out=Item Pickups Slide Out
 dashboard.config.other.pickup_feed_slide_out.tooltip=How long each row of the item pickups takes to slide away, in milliseconds, 0 to just disappear
+dashboard.config.other.active_layout=Active Layout
+dashboard.config.other.active_layout.tooltip=Which of the HUD layouts is used. Each one remembers its own element positions, sizes and looks
