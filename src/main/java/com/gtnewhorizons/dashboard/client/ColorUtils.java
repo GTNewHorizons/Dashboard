@@ -27,6 +27,7 @@ public final class ColorUtils {
         notShowingBorder        = color.argb("notShowingBorder",        "0xA0A0A0A0"),
 
         highlightBorder         = color.argb("highlightBorder",         "0xFFFFFFFF"),
+        attachLine              = color.argb("attachLine",              "0xFFE2BD3A"),
 
         menuBackground          = color.argb("menuBackground",          "0xA0202020"),
         grid                    = color.argb("grid",                    "0x20FFFFFF"),
