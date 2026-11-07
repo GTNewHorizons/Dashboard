@@ -70,6 +70,7 @@ dashboard.editor.help_tooltip.reset_opacity=§6[%s]+[%s]§7 to reset the see-thr
 dashboard.editor.help_tooltip.lock=§6[%s]§7 to lock, so it can not be changed by accident
 dashboard.editor.help_tooltip.menu=Drag this menu to move it, or press §6[%s]§7 to hide it
 dashboard.editor.help_tooltip.change_keys=Change some of these keys in Options > Controls > Dashboard Editor
+dashboard.editor.help_tooltip.layout=Editing layout %s of %s, switch in game with §6[%s]§7
 dashboard.editor.help_tooltip.ingameinfo=InGameInfoXML text only shows up here after it was toggled on in game
 dashboard.editor.help_tooltip.journeymap=The JourneyMap minimap only shows up here while it is turned on in JourneyMap
 

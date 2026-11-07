@@ -460,6 +460,12 @@ public class GuiHudEditor extends GuiScreen {
             lines.add("");
             lines.add(noteLine("help_tooltip.menu", HudEditorKeybind.getKeyName(HudEditorKeybind.HIDE_MENU)));
             lines.add(noteLine("help_tooltip.change_keys"));
+            lines.add(
+                noteLine(
+                    "help_tooltip.layout",
+                    HudLayout.getActiveLayout(),
+                    HudLayout.LAYOUT_COUNT,
+                    HudEditorKeybind.getKeyName(HudEditorKeybind.NEXT_LAYOUT)));
             // These only show under some conditions, which is easy to miss
             boolean inGameInfo = Mods.INGAMEINFO.isModLoaded();
             // TODO: JourneyMap release with MiniMapRenderEvent
