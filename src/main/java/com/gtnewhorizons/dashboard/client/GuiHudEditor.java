@@ -321,9 +321,12 @@ public class GuiHudEditor extends GuiScreen {
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         }
 
-        drawElementBoxes(hoveredInList != null ? hoveredInList : highlighted);
+        HudElement focused = hoveredInList != null ? hoveredInList : highlighted;
+        drawElementBoxes(focused);
         if (attachingElement != null) {
             drawAttachLine(attachingElement, mouseX, mouseY);
+        } else if (focused != null) {
+            drawAttachLines(focused);
         }
         if (!menuHidden) {
             drawMenuPanel(mouseX, mouseY);
@@ -684,6 +687,24 @@ public class GuiHudEditor extends GuiScreen {
             ColorUtils.text.getColor());
     }
 
+    /** To the element this one follows, and from the ones following it. */
+    private void drawAttachLines(HudElement element) {
+        HudElement parent = HudLayout.getAttachedTo(element);
+        if (parent != null) {
+            drawAttachLine(element, parent);
+        }
+        for (ElementBox box : boxes) {
+            if (HudLayout.getAttachedTo(box.element) == element) {
+                drawAttachLine(box.element, element);
+            }
+        }
+    }
+
+    private void drawAttachLine(HudElement from, HudElement to) {
+        HudBounds bounds = HudLayout.getBounds(to, width, height);
+        drawAttachLine(from, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+    }
+
     /** From the element's middle. */
     private void drawAttachLine(HudElement from, int toX, int toY) {
         HudBounds bounds = HudLayout.getBounds(from, width, height);
@@ -726,6 +747,14 @@ public class GuiHudEditor extends GuiScreen {
                 EnumChatFormatting.GRAY + StatCollector.translateToLocalFormatted(
                     "dashboard.editor.element_tooltip.locked",
                     HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
+        }
+        HudElement attachedTo = HudLayout.getAttachedTo(element);
+        if (attachedTo != null) {
+            lines.add(
+                noteLine(
+                    "element_tooltip.attached",
+                    attachedTo.getDisplayName(),
+                    HudEditorKeybind.getKeyName(HudEditorKeybind.ATTACH)));
         }
         lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (ElementOpacity.isAllowed(element)) {

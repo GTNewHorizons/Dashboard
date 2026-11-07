@@ -79,6 +79,7 @@ dashboard.editor.help_tooltip.journeymap=The JourneyMap minimap only shows up he
 ## Element tooltip
 dashboard.editor.element_tooltip.hidden=Hidden
 dashboard.editor.element_tooltip.locked=§cLocked, press §6[%s]§c to unlock
+dashboard.editor.element_tooltip.attached=§cAttached to %s, press §6[%s]§c to detach
 dashboard.editor.element_tooltip.not_showing=Not showing right now
 dashboard.editor.element_tooltip.size=Size: %s (drawn at %s)
 dashboard.editor.element_tooltip.size_smallest=Size: %s (drawn at %s, smallest)
