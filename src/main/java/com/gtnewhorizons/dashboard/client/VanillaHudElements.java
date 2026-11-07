@@ -139,6 +139,7 @@ public final class VanillaHudElements {
             bounds -> drawBarSample(experience, BarSlot.EXPERIENCE, bounds.x, bounds.y));
         HudRegistry.register(EXPERIENCE_LEVEL);
         PreviewDrawing.setImitationInBounds(EXPERIENCE_LEVEL, bounds -> drawLevelNumber(bounds, SAMPLE_LEVEL));
+        HudLayout.attachByDefault(EXPERIENCE_LEVEL, experience);
         HudElement jumpBar = add(
             ElementType.JUMPBAR,
             "jump_bar",

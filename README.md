@@ -57,6 +57,9 @@ An attached element follows the one it is attached to, so you can keep a bar rig
 hotbar goes. Drag it to change how far from the other element it sits, it stays attached. Resetting its position
 (**R**) also detaches it. Hover either element to see a line between them.
 
+The XP level number is attached to the XP bar from the start. Detach it with **A** if you want to place it on its own,
+**R** attaches it again.
+
 ### Editor buttons
 
 - **Grid**: shows a grid and snaps elements to it.

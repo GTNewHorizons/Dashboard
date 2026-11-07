@@ -37,10 +37,12 @@ public class HudElementState {
     public Integer opacity;
     public boolean locked;
     public String attachedTo;
+    public boolean detached;
 
     boolean isDefault() {
         return visible == null && !moved
             && attachedTo == null
+            && !detached
             && theme == null
             && !flipped
             && !numberOn
