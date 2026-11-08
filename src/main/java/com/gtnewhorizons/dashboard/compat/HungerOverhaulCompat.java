@@ -3,6 +3,7 @@ package com.gtnewhorizons.dashboard.compat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
@@ -10,6 +11,7 @@ import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.client.PreviewDrawing;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -47,8 +49,10 @@ public final class HungerOverhaulCompat {
         } catch (ReflectiveOperationException e) {
             Dashboard.LOG.warn("Could not read the Hunger Overhaul addGuiText setting, assuming it is on", e);
         }
-        HudRegistry.registerFallback(HEALTH.element);
-        HudRegistry.registerFallback(HUNGER.element);
+        for (StatusLine line : new StatusLine[] { HEALTH, HUNGER }) {
+            PreviewDrawing.setImitationInBounds(line.element, line::drawPreview);
+            HudRegistry.registerFallback(line.element);
+        }
     }
 
     /** Called by the mixin instead of adding the line to Forge's list, with the row it would have taken there. */
@@ -86,9 +90,18 @@ public final class HungerOverhaulCompat {
             }
         }
 
+        void drawPreview(HudBounds bounds) {
+            Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(getShownText(), bounds.x, bounds.y, 0xFFFFFF);
+        }
+
+        /** The last line drawn, or Hunger Overhaul's own yellow word before any showed. */
+        private String getShownText() {
+            return text != null ? text : EnumChatFormatting.YELLOW + StatCollector.translateToLocal(sampleKey);
+        }
+
         HudBounds getBounds(int screenWidth, int screenHeight) {
             FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-            int width = font.getStringWidth(text != null ? text : StatCollector.translateToLocal(sampleKey));
+            int width = font.getStringWidth(getShownText());
             int x = right ? screenWidth - width - RIGHT_MARGIN : EDGE_MARGIN;
             return new HudBounds(x, EDGE_MARGIN + row * ROW_HEIGHT, width, font.FONT_HEIGHT);
         }
