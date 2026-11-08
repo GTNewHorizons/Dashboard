@@ -20,6 +20,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     TINKERS("TConstruct", "tinker", () -> TinkersBeltHotbar.register()),
     APPLECORE("AppleCore"),
     GRAVISUITE("GraviSuite", () -> GraviSuiteCompat.register()),
+    HUNGEROVERHAUL("HungerOverhaul", () -> HungerOverhaulCompat.register()),
     BACKHAND("backhand"),
     INGAMEINFO("InGameInfoXML"),
     // JOURNEYMAP("journeymap", () -> JourneyMapCompat.register()), // TODO: JourneyMap release with MiniMapRenderEvent
