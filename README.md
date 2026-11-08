@@ -136,6 +136,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
 - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
 - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
+- **EnderIO**: the Conduit Probe modes and the Yeta Wrench mode (its selector and its icons in the corner)
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
 - **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
 - **GalaxySpace**: the atmospheric pressure bar

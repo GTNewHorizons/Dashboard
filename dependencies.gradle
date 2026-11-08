@@ -12,6 +12,7 @@ dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Backhand:1.8.16:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Battlegear2-for-Backhand:1.6.8-backhand:dev") // Needs Backhand
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Botania:1.13.37-GTNH:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:EnderIO:2.10.53:dev")
     runtimeOnlyNonPublishable("ganymedes01.etfuturum:Et-Futurum-Requiem:2.6.64-GTNH:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Galacticraft:3.4.34-GTNH:dev") // Needs tinker
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Galaxy-Space-GTNH:1.1.143-GTNH:dev") // Needs Galacticraft and Tinker
