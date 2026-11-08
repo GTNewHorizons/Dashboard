@@ -258,6 +258,21 @@ dashboard.element.enderio.yeta_wrench_mode=Yeta Wrench Mode
 dashboard.element.enderio.yeta_wrench_mode.description=Shows while holding a Yeta Wrench, the current conduit display mode
 dashboard.element.enderio.yeta_wrench_mode.own_settings=EnderIO config > yetaWrenchOverlayMode
 
+## TaskNH
+dashboard.element.tasknh.pinned_tasks=Pinned Tasks
+dashboard.element.tasknh.pinned_tasks.description=The tasks pinned to the HUD in the TaskNH task list
+dashboard.element.tasknh.pinned_tasks.own_settings=TaskNH task list > HUD settings
+dashboard.element.tasknh.pinned_tasks.sample=Build a power line
+dashboard.element.tasknh.pinned_tasks.sample_item=Craft cables
+
+## Akashic Tome
+dashboard.element.akashictome.book_hint=Book Hint
+dashboard.element.akashictome.book_hint.description=Shows which guide book the tome switches to for the block you look at, while holding an Akashic Tome
+
+## LootGames
+dashboard.element.lootgames.game_info=Minigame Info
+dashboard.element.lootgames.game_info.description=Shows while playing a LootGames minigame, Minesweeper or Sudoku
+
 ## GTNHLib (+ServerUtilities)
 dashboard.element.gtnhlib.above_hotbar_text=Text Above Hotbar
 dashboard.element.gtnhlib.above_hotbar_text.description=Short messages GTNH mods show above the hotbar\nServerUtilities notifications move with it

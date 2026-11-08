@@ -149,6 +149,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Random Things**: the notification card
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
 - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
+- **TaskNH**: the pinned task list
 - **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
 - **Waila**: the block info box (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)
 -->
