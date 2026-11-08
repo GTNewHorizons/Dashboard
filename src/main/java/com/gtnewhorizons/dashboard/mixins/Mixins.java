@@ -39,6 +39,10 @@ public enum Mixins implements IMixins {
         .addClientMixins("gravisuite.MixinClientTickHandler_Hud")
         .addRequiredMod(Mods.GRAVISUITE)
         .setPhase(Phase.LATE)),
+    HUNGEROVERHAUL_HUD(new MixinBuilder("Make the Hunger Overhaul status text movable")
+        .addClientMixins("hungeroverhaul.MixinIguanaEventHook_Hud")
+        .addRequiredMod(Mods.HUNGEROVERHAUL)
+        .setPhase(Phase.LATE)),
     THAUMCRAFT_HUD(new MixinBuilder("Make the Thaumcraft HUD movable")
         .addClientMixins(
             "thaumcraft.MixinClientTickEventsFML_Hud",

@@ -110,6 +110,7 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 
 - **AppleCore**: saturation and exhaustion on the food bar
 - **GraviSuite**: status text
+- **Hunger Overhaul**: the health and hunger status text (like Hurt or Hungry)
 - **IndustrialCraft 2**: the Nano and Quantum helmet HUD (armor charge and held item info)
 <!-- TODO: bump version
 - **JourneyMap**: the minimap (needs JourneyMap {version} or newer)
