@@ -131,6 +131,7 @@ More mods are on the way.
 These mods use Dashboard's API to make their own HUD movable. This needs a recent version of both the mod and Dashboard:
 
 - **Adventure Backpack**: potion icons and tanks
+- **Akashic Tome**: the book hint next to the crosshair
 - **Backhand**: the off-hand slot, separate from the hotbar
 - **Battlegear 2**: shield block bar and quiver slots
 - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
@@ -145,6 +146,7 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
 - **Infernal Mobs**: the elite mob health bar, with its name and modifiers
 - **InGameInfoXML**: each text area (top left, top right, and so on)
+- **LootGames**: the Minigames info in the top left
 - **Nature's Compass**: the biome search text
 - **Random Things**: the notification card
 - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
