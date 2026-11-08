@@ -249,6 +249,15 @@ dashboard.element.bogosorter.usage_ticker.description=Pops up for a moment when 
 dashboard.element.gregtech.power_goggles=Power Goggles
 dashboard.element.gregtech.power_goggles.own_settings=Power Goggles config, opened with §6[%s]
 
+## EnderIO
+dashboard.element.enderio.conduit_probe=Conduit Probe
+dashboard.element.enderio.conduit_probe.description=Shows while holding a Conduit Probe, with its probe and copy mode
+dashboard.element.enderio.yeta_wrench_selector=Yeta Wrench Selector
+dashboard.element.enderio.yeta_wrench_selector.description=Shows for a moment after switching the Yeta Wrench mode\nOnly with the default overlay (EnderIO config > yetaWrenchOverlayMode 0)
+dashboard.element.enderio.yeta_wrench_mode=Yeta Wrench Mode
+dashboard.element.enderio.yeta_wrench_mode.description=Shows while holding a Yeta Wrench, the current conduit display mode
+dashboard.element.enderio.yeta_wrench_mode.own_settings=EnderIO config > yetaWrenchOverlayMode
+
 ## GTNHLib (+ServerUtilities)
 dashboard.element.gtnhlib.above_hotbar_text=Text Above Hotbar
 dashboard.element.gtnhlib.above_hotbar_text.description=Short messages GTNH mods show above the hotbar\nServerUtilities notifications move with it
