@@ -2,7 +2,7 @@
 
 How a mod makes its own HUD movable, resizable and hideable in Dashboard's HUD editor, without depending on Dashboard.
 
-Up to date with **Dashboard 1.0.7**. Newer releases may add API not covered here, see the
+Up to date with **Dashboard 1.0.20**. Newer releases may add API not covered here, see the
 [version table](#2-minimum-dashboard-version).
 
 The whole API is four classes in
@@ -71,6 +71,12 @@ Compiling against that same minimum makes it impossible to use newer API by acci
 | 1.0.0 | First release with the API |
 | 1.0.2 | The short constructor `new HudElement(id, bounds)`, and `.description` and `.own_settings` picked up automatically. The usual minimum |
 | 1.0.3 to 1.0.7 | No API changes. They add or rename lang keys for some mods, and remove Dashboard's own hooks for mods that now use the API |
+| 1.0.8 to 1.0.12 | No API changes. They remove Dashboard's own hooks for more mods that now use the API |
+| 1.0.13 | Lang keys for GregTech |
+| 1.0.14 | Lang keys for Random Things |
+| 1.0.15 to 1.0.18 | No API changes |
+| 1.0.19 | Lang keys for EnderIO |
+| 1.0.20 | Lang keys for TaskNH, Akashic Tome and LootGames |
 
 ### 3. One helper class
 
@@ -238,13 +244,17 @@ public void onPostRenderGameOverlay(RenderGameOverlayEvent.Post e) {
   If the keys do not match the id, pass the name key with `new HudElement(id, translationKey, bounds)`, and the other
   keys with `setDescription` and `setOwnSettings`. Both also take key bindings: each one fills two `%s` in order, the
   bound key and then its name in Controls.
+- **Why Dashboard's file:**
+  - The names only show in Dashboard's own screens, like the editor tooltip and the Elements list. So they belong with
+    the rest of the editor text, written the same way, and translators find all of it in one place.
+  - Adding them is also a check: Dashboard looks at the mod's PR before the keys go in, so the element ids and the code
+    using the API are confirmed to work before players save layouts with those ids.
 - **Adding the keys:** open a PR to Dashboard adding a section for the mod to
   [`en_US.lang`](../src/main/resources/assets/dashboard/lang/en_US.lang). Until a Dashboard release has them, the editor
   shows the raw key, like `dashboard.element.mymod.mana_bar`. So the mod's minimum version is the first release with
   its keys.
 - **Keys in the mod instead:** Minecraft merges every mod's lang files, so the same keys in the mod's own `en_US.lang`
-  work too, and need no Dashboard release. Dashboard's file is preferred, so translators find all editor text in one
-  place, but this is fine for a mod that would rather not wait on Dashboard.
+  work too, and need no Dashboard release. Fine for a mod that would rather not wait on Dashboard.
 
 ## Default bounds
 
