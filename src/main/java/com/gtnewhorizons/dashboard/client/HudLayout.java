@@ -254,6 +254,10 @@ public final class HudLayout {
         if (parent != null) {
             HudBounds parentDefault = parent.getDefaultBounds(screenWidth, screenHeight);
             HudBounds parentBounds = getBounds(parent, parentDefault, screenWidth, screenHeight, depth + 1);
+            // Same object when the parent is untouched, so the shift can be skipped while drawing
+            if (!moved && scale == 1 && parentBounds == parentDefault) {
+                return defaultBounds;
+            }
             if (moved) {
                 x = parentBounds.x + state.offsetX;
                 y = parentBounds.y + state.offsetY;
