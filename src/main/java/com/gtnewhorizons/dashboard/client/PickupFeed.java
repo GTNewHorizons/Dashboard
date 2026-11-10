@@ -105,27 +105,35 @@ public final class PickupFeed {
                 Row row = ROWS.get(i);
                 long slidingFor = Math.max(0, now - row.start - showMillis);
                 int slideX = slideOutMillis == 0 ? 0 : (int) (slidingFor * WIDTH / slideOutMillis);
-                drawRow(bounds, ROWS.size() - 1 - i, row.stack, row.count, slideX);
+                drawRow(bounds, ROWS.size() - 1 - i, row.stack, row.text, slideX);
             }
         });
     }
 
     private static void drawSample(HudBounds bounds) {
         for (int i = 0; i < SAMPLE_ITEMS.length; i++) {
-            drawRow(bounds, SAMPLE_ITEMS.length - 1 - i, SAMPLE_ITEMS[i], SAMPLE_COUNTS[i], 0);
+            drawRow(
+                bounds,
+                SAMPLE_ITEMS.length - 1 - i,
+                SAMPLE_ITEMS[i],
+                getText(SAMPLE_ITEMS[i], SAMPLE_COUNTS[i]),
+                0);
         }
+    }
+
+    private static String getText(ItemStack stack, int count) {
+        return "+" + count + " " + stack.getDisplayName();
     }
 
     /**
      * Right aligned: the item at the right edge, its count and name left of it. Both move right together by
      * {@code slideX}, since items can not fade like text.
      */
-    private static void drawRow(HudBounds bounds, int rowFromBottom, ItemStack stack, int count, int slideX) {
+    private static void drawRow(HudBounds bounds, int rowFromBottom, ItemStack stack, String text, int slideX) {
         int y = bounds.getBottom() - (rowFromBottom + 1) * ROW_HEIGHT + 1;
         int itemX = bounds.getRight() - ITEM_SIZE + slideX;
         PreviewDrawing.drawItem(stack, itemX, y);
         FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-        String text = "+" + count + " " + stack.getDisplayName();
         font.drawStringWithShadow(
             text,
             itemX - TEXT_GAP - font.getStringWidth(text),
@@ -138,11 +146,13 @@ public final class PickupFeed {
         private final ItemStack stack;
         private final int count;
         private final long start;
+        private final String text;
 
         private Row(ItemStack stack, int count, long start) {
             this.stack = stack;
             this.count = count;
             this.start = start;
+            this.text = getText(stack, count);
         }
     }
 }
