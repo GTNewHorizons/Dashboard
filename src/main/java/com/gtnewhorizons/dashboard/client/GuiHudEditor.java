@@ -28,7 +28,6 @@ import com.gtnewhorizons.dashboard.compat.Mods;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /** The HUD editor: a box per element, so players can see and grab elements even while they are not showing. */
 @SideOnly(Side.CLIENT)
@@ -465,21 +464,14 @@ public class GuiHudEditor extends GuiScreen {
     /** Turns the empty lines into a line across the tooltip. Dashes, since Angelica skips empty spaces. */
     private void fillSeparators(List<String> lines) {
         int width = 0;
-        IntArrayList emptyLines = new IntArrayList(Math.max(3, lines.size() / 8));
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
+        for (String line : lines) {
             width = Math.max(width, fontRendererObj.getStringWidth(line));
-            if (line.isEmpty()) {
-                emptyLines.add(i);
-            }
         }
         char[] dashes = new char[width / Math.max(1, fontRendererObj.getCharWidth('-'))];
         Arrays.fill(dashes, '-');
         String separator = EnumChatFormatting.DARK_GRAY.toString() + EnumChatFormatting.STRIKETHROUGH
             + new String(dashes);
-        for (int i = 0; i < emptyLines.size(); i++) {
-            lines.set(emptyLines.getInt(i), separator);
-        }
+        lines.replaceAll(line -> line.isEmpty() ? separator : line);
     }
 
     private List<String> getMenuTooltip(int mouseX, int mouseY) {
