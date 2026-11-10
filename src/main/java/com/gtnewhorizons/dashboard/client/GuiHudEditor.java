@@ -467,7 +467,9 @@ public class GuiHudEditor extends GuiScreen {
         for (String line : lines) {
             width = Math.max(width, fontRendererObj.getStringWidth(line));
         }
-        char[] dashes = new char[width / Math.max(1, fontRendererObj.getCharWidth('-'))];
+        // Rounded up, so the line reaches the right edge, the tooltip grows by less than a dash for it
+        int dashWidth = Math.max(1, fontRendererObj.getCharWidth('-'));
+        char[] dashes = new char[(width + dashWidth - 1) / dashWidth];
         Arrays.fill(dashes, '-');
         String separator = EnumChatFormatting.DARK_GRAY.toString() + EnumChatFormatting.STRIKETHROUGH
             + new String(dashes);
