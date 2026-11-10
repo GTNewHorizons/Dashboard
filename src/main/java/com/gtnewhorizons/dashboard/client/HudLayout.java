@@ -359,7 +359,10 @@ public final class HudLayout {
      */
     public static boolean attach(HudElement element, HudElement attachTo, int screenWidth, int screenHeight) {
         HudElement parent = attachTo;
-        for (int depth = 0; parent != null && depth < MAX_ATTACH_DEPTH; depth++) {
+        // A chain without a loop is never longer than all elements, also when an edited file has a loop elsewhere
+        int maxDepth = HudRegistry.getElements()
+            .size();
+        for (int depth = 0; parent != null && depth <= maxDepth; depth++) {
             if (parent == element) {
                 return false;
             }
