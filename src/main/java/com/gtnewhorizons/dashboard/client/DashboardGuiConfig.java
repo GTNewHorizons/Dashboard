@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.StatCollector;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigException;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
@@ -24,7 +25,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class DashboardGuiConfig extends GuiConfig {
 
     public DashboardGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, getElements(), Dashboard.MODID, false, false, "Dashboard Configuration");
+        super(
+            parent,
+            getElements(),
+            Dashboard.MODID,
+            false,
+            false,
+            StatCollector.translateToLocal("dashboard.config.title"));
     }
 
     @SuppressWarnings("rawtypes")

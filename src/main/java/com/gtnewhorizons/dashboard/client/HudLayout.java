@@ -254,9 +254,31 @@ public final class HudLayout {
         if (parent != null) {
             HudBounds parentDefault = parent.getDefaultBounds(screenWidth, screenHeight);
             HudBounds parentBounds = getBounds(parent, parentDefault, screenWidth, screenHeight, depth + 1);
-            // Not moved yet, so it keeps its default distance from the element it follows by default
-            x = parentBounds.x + (moved ? state.offsetX : defaultBounds.x - parentDefault.x);
-            y = parentBounds.y + (moved ? state.offsetY : defaultBounds.y - parentDefault.y);
+            // Same object when the parent is untouched, so the shift can be skipped while drawing
+            if (!moved && scale == 1 && parentBounds == parentDefault) {
+                return defaultBounds;
+            }
+            if (moved) {
+                x = parentBounds.x + state.offsetX;
+                y = parentBounds.y + state.offsetY;
+            } else {
+                // Not moved yet: its center keeps its default spot on the element it follows, also when either is
+                // resized
+                float centerX = followPoint(
+                    defaultBounds.x + defaultBounds.width / 2f,
+                    parentDefault.x,
+                    parentDefault.width,
+                    parentBounds.x,
+                    parentBounds.width);
+                float centerY = followPoint(
+                    defaultBounds.y + defaultBounds.height / 2f,
+                    parentDefault.y,
+                    parentDefault.height,
+                    parentBounds.y,
+                    parentBounds.height);
+                x = Math.round(centerX - width / 2f);
+                y = Math.round(centerY - height / 2f);
+            }
         } else if (moved) {
             x = anchorPosition(state.anchorX, width, screenWidth) + state.offsetX;
             y = anchorPosition(state.anchorY, height, screenHeight) + state.offsetY;
@@ -274,6 +296,11 @@ public final class HudLayout {
             clampToScreen(y, height, screenHeight),
             width,
             height);
+    }
+
+    /** Where a point given in the parent's default box ends up in its current box, at the same relative spot. */
+    private static float followPoint(float point, int defaultStart, int defaultSize, int start, int size) {
+        return start + (point - defaultStart) * size / Math.max(defaultSize, 1);
     }
 
     /** Moves the element's top left corner to the given position, anchored to the closest edge or the center. */
@@ -336,7 +363,10 @@ public final class HudLayout {
      */
     public static boolean attach(HudElement element, HudElement attachTo, int screenWidth, int screenHeight) {
         HudElement parent = attachTo;
-        for (int depth = 0; parent != null && depth < MAX_ATTACH_DEPTH; depth++) {
+        // A chain without a loop is never longer than all elements, also when an edited file has a loop elsewhere
+        int maxDepth = HudRegistry.getElements()
+            .size();
+        for (int depth = 0; parent != null && depth <= maxDepth; depth++) {
             if (parent == element) {
                 return false;
             }
