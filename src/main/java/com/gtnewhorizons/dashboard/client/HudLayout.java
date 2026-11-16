@@ -425,6 +425,11 @@ public final class HudLayout {
         return id == null ? null : HudRegistry.getElement(id);
     }
 
+    /** True when either one is attached to the other. */
+    public static boolean isAttachedPair(HudElement element, HudElement other) {
+        return getAttachedTo(element) == other || getAttachedTo(other) == element;
+    }
+
     /** Follows the other element until the player detaches it, like the XP level number and the XP bar. */
     static void attachByDefault(HudElement element, HudElement attachTo) {
         DEFAULT_ATTACHMENTS.put(element.getId(), attachTo.getId());

@@ -57,6 +57,29 @@ final class AvoidOverlap {
         return moved;
     }
 
+    /**
+     * For the editor: where it would move if every element it makes room for showed at its own spot. With All
+     * Elements, it is treated as the one that showed up last.
+     */
+    static HudBounds preview(HudElement element, HudBounds bounds, int screenWidth, int screenHeight) {
+        if (!DashboardConfig.avoidOverlap || element.isNeverMove()) {
+            return bounds;
+        }
+        boolean listed = HudLayout.getAvoid(element).length > 0;
+        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element) || staysPut(element))) {
+            return bounds;
+        }
+        List<HudBounds> inTheWay = new ArrayList<>();
+        for (HudElement other : HudRegistry.getElements()) {
+            if (other == element || !HudLayout.isVisible(other)
+                || (listed ? !HudLayout.avoids(element, other) : HudLayout.isAttachedPair(element, other))) {
+                continue;
+            }
+            inTheWay.add(HudLayout.getBounds(other, screenWidth, screenHeight));
+        }
+        return inTheWay.isEmpty() ? bounds : moveAside(element, bounds, inTheWay, screenWidth, screenHeight);
+    }
+
     private static void clearIfOutdated(int screenWidth, int screenHeight) {
         int frame = HudFrames.current();
         if (frame != movedFrame || screenWidth != movedScreenWidth || screenHeight != movedScreenHeight) {
@@ -89,14 +112,12 @@ final class AvoidOverlap {
         if (staysPut(element) || !element.isDrawnNow()) {
             return null;
         }
-        HudElement parent = HudLayout.getAttachedTo(element);
         List<HudBounds> inTheWay = null;
         for (HudElement other : HudRegistry.getElements()) {
-            if (other == element || other == parent
-                || !other.isDrawnNow()
+            if (other == element || !other.isDrawnNow()
                 || !HudLayout.isVisible(other)
                 || !makesWayFor(element, other)
-                || HudLayout.getAttachedTo(other) == element) {
+                || HudLayout.isAttachedPair(element, other)) {
                 continue;
             }
             if (inTheWay == null) {

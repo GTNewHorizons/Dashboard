@@ -332,6 +332,7 @@ public class GuiHudEditor extends GuiScreen {
         } else if (focused != null) {
             drawAttachLines(focused);
             drawAvoidLines(focused);
+            drawAvoidPreview(focused);
         }
         if (!menuHidden) {
             drawMenuPanel(mouseX, mouseY);
@@ -739,7 +740,7 @@ public class GuiHudEditor extends GuiScreen {
         int color = ColorUtils.avoidLine.getColor();
         for (ElementBox box : boxes) {
             HudElement other = box.element;
-            if (HudLayout.getAttachedTo(other) == element || HudLayout.getAttachedTo(element) == other) {
+            if (HudLayout.isAttachedPair(element, other)) {
                 continue;
             }
             if (HudLayout.avoids(element, other)) {
@@ -748,6 +749,18 @@ public class GuiHudEditor extends GuiScreen {
                 drawLinkLine(other, element, color);
             }
         }
+    }
+
+    /** A faint outline where it would move to in game while the elements it makes room for show. */
+    private void drawAvoidPreview(HudElement element) {
+        HudBounds bounds = HudLayout.getBounds(element, width, height);
+        HudBounds moved = AvoidOverlap.preview(element, bounds, width, height);
+        if (moved == bounds) {
+            return;
+        }
+        int color = ColorUtils.avoidLine.getColor() & 0xFFFFFF | 0x80000000;
+        drawLinkLine(element, moved.x + moved.width / 2, moved.y + moved.height / 2, color);
+        drawOutline(moved, color);
     }
 
     private void drawLinkLine(HudElement from, HudElement to, int color) {
