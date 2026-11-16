@@ -46,7 +46,9 @@ final class AvoidOverlap {
 
     /** The same bounds when nothing is in the way or no side fits. */
     static HudBounds apply(HudElement element, HudBounds bounds, int screenWidth, int screenHeight, int depth) {
-        if (!DashboardConfig.avoidOverlap || depth >= MAX_DEPTH || HudRegistry.isLayoutScreenOpen()) {
+        if (!DashboardConfig.avoidOverlap || element.isNeverMove()
+            || depth >= MAX_DEPTH
+            || HudRegistry.isLayoutScreenOpen()) {
             return bounds;
         }
         boolean listed = element.getAvoid().length > 0;
@@ -116,8 +118,8 @@ final class AvoidOverlap {
     }
 
     /**
-     * Who moves: nobody if both appeared together, never Minecraft's own or locked elements, otherwise the one that
-     * appeared last.
+     * Who moves: nobody if both appeared together, never Minecraft's own, locked or never-move elements, otherwise the
+     * one that appeared last.
      */
     private static boolean makesWayFor(HudElement element, HudElement other) {
         int shownSince = element.getShownSinceFrame();
@@ -129,7 +131,7 @@ final class AvoidOverlap {
     }
 
     private static boolean staysPut(HudElement element) {
-        return element.getId()
+        return element.isNeverMove() || element.getId()
             .startsWith(MINECRAFT_PREFIX) || HudLayout.isLocked(element);
     }
 

@@ -55,6 +55,7 @@ public final class HudElement {
     private String[] descriptionKeyBindings = NO_KEY_BINDINGS;
     private String[] avoidIds = NO_IDS;
     private AvoidSide[] avoidSides;
+    private boolean neverMove;
     private long lastRenderTime;
     private int lastRenderFrame = -2;
     private int shownSinceFrame;
@@ -165,6 +166,16 @@ public final class HudElement {
     /** Null when not set, then the sides are picked from where the element is. */
     public AvoidSide[] getAvoidSides() {
         return avoidSides;
+    }
+
+    /** Keeps this element in place, for one meant to sit on top of others. Other elements still make room for it. */
+    public HudElement setNeverMove() {
+        this.neverMove = true;
+        return this;
+    }
+
+    public boolean isNeverMove() {
+        return neverMove;
     }
 
     /**
