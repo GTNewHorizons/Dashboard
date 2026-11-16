@@ -3,6 +3,7 @@ package com.gtnewhorizons.dashboard.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.AvoidSide;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
@@ -13,7 +14,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * An element moves out of the way of the elements it avoids, only while one of them is on screen and would overlap
- * it. Off in the editor, so elements are arranged at their own spots there.
+ * it. Off in the editor, so elements are arranged at their own spots there, and when the player turned it off.
  */
 @SideOnly(Side.CLIENT)
 final class AvoidOverlap {
@@ -37,7 +38,9 @@ final class AvoidOverlap {
     /** The same bounds when nothing is in the way or no side fits. */
     static HudBounds apply(HudElement element, HudBounds bounds, int screenWidth, int screenHeight, int depth) {
         String[] ids = element.getAvoid();
-        if (ids.length == 0 || depth >= MAX_DEPTH || HudRegistry.isLayoutScreenOpen()) {
+        if (ids.length == 0 || !DashboardConfig.avoidOverlap
+            || depth >= MAX_DEPTH
+            || HudRegistry.isLayoutScreenOpen()) {
             return bounds;
         }
         List<HudBounds> inTheWay = null;

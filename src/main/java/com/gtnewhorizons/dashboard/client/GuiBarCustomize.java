@@ -46,6 +46,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
     private static final int BUTTON_RESET_CROSSHAIR = 14;
     private static final int BUTTON_TINKERS_CROSSHAIR = 15;
+    private static final int BUTTON_AVOID_OVERLAP = 16;
     private static final int SWATCH_SIZE = 20;
     private static final int LINE_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
@@ -106,6 +107,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton crosshairSizeButton;
     private GuiButton resetCrosshairButton;
     private GuiButton tinkersCrosshairButton;
+    private GuiButton avoidOverlapButton;
     private StatusEffectsSection statusEffects;
     private ScreenOverlaysSection screenOverlays;
     private HotbarSection hotbar;
@@ -305,6 +307,11 @@ public class GuiBarCustomize extends GuiScreen {
         }
         addSectionEnd(rendering.getResetButton());
 
+        avoidOverlapButton = GuiHelpers.button(BUTTON_AVOID_OVERLAP, 0, columnWidth);
+        updateAvoidOverlapButton();
+        addHeader("dashboard.customize.placement");
+        addSectionEnd(avoidOverlapButton);
+
         list = new BarList();
         list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
         LIST_SCROLL.setValue(list, scroll);
@@ -481,6 +488,11 @@ public class GuiBarCustomize extends GuiScreen {
         }
     }
 
+    private void updateAvoidOverlapButton() {
+        avoidOverlapButton.displayString = StatCollector.translateToLocal("dashboard.customize.avoid_overlap") + ": "
+            + GuiHelpers.getOnOff(DashboardConfig.avoidOverlap);
+    }
+
     /** Ctrl goes back to vanilla. */
     private void changeCrosshairStyle() {
         DashboardConfig.crosshairStyle = isCtrlKeyDown() ? Crosshairs.VANILLA
@@ -644,6 +656,9 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_TINKERS_CROSSHAIR -> Arrays.asList(
                 StatCollector.translateToLocal("dashboard.customize.tinkers_crosshair.on"),
                 StatCollector.translateToLocal("dashboard.customize.tinkers_crosshair.off"));
+            case BUTTON_AVOID_OVERLAP -> Arrays.asList(
+                StatCollector.translateToLocal("dashboard.customize.avoid_overlap.on"),
+                StatCollector.translateToLocal("dashboard.customize.avoid_overlap.off"));
             default -> getSectionTooltip(button);
         };
     }
@@ -788,6 +803,11 @@ public class GuiBarCustomize extends GuiScreen {
                 DashboardConfig.tinkersCrosshair = !isCtrlKeyDown() && !DashboardConfig.tinkersCrosshair;
                 ConfigurationManager.save(DashboardConfig.class);
                 updateCrosshairButtons();
+            }
+            case BUTTON_AVOID_OVERLAP -> {
+                DashboardConfig.avoidOverlap = !DashboardConfig.avoidOverlap;
+                ConfigurationManager.save(DashboardConfig.class);
+                updateAvoidOverlapButton();
             }
             case BUTTON_RESET -> {
                 for (HudElement bar : bars) {

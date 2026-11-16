@@ -356,6 +356,10 @@ dashboard.customize.status_effects=Status Effects
 dashboard.customize.screen_overlays=Screen Overlays
 dashboard.customize.hotbar=Hotbar
 dashboard.customize.rendering=Rendering
+dashboard.customize.placement=Placement
+dashboard.customize.avoid_overlap=Avoid Overlap
+dashboard.customize.avoid_overlap.on=On: elements move aside so they don't cover each other
+dashboard.customize.avoid_overlap.off=Off: elements always stay where you put them
 
 # Rendering section
 dashboard.rendering.hidden_held_items=Hidden Held Items
@@ -458,6 +462,8 @@ dashboard.config.editor.show_positions=Show Positions
 dashboard.config.editor.show_positions.tooltip=Show the element position, measured from the middle of the screen, next to its box in the HUD editor
 dashboard.config.editor.shown_editor_mods=Mods Shown in the Editor
 dashboard.config.editor.shown_editor_mods.tooltip=Mod ids whose elements show in the HUD editor. Other mods are left out, to tidy it. They still show in game
+dashboard.config.editor.avoid_overlap=Avoid Overlap
+dashboard.config.editor.avoid_overlap.tooltip=Move HUD elements out of the way of the ones they avoid, only while both show. Like Waila's box below the boss bar
 dashboard.config.editor.crosshair_style=Crosshair Style
 dashboard.config.editor.crosshair_style.tooltip=Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet
 dashboard.config.editor.crosshair_size=Crosshair Size
