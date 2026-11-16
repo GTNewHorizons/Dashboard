@@ -9,6 +9,8 @@ import net.minecraft.util.StatCollector;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.gtnewhorizons.dashboard.client.HudFrames;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 
@@ -51,6 +53,7 @@ public final class HudElement {
     private String descriptionKey;
     private String[] descriptionKeyBindings = NO_KEY_BINDINGS;
     private long lastRenderTime;
+    private int lastRenderFrame = -2;
     private boolean replaced;
 
     /**
@@ -252,8 +255,17 @@ public final class HudElement {
         return System.currentTimeMillis() - lastRenderTime < SHOWING_TIMEOUT_MILLIS;
     }
 
+    /**
+     * True if the element was drawn in this HUD frame or the one before, even if the player hid it. The frame before
+     * counts too, since elements drawn later in the frame have not been drawn yet.
+     */
+    public boolean isDrawnNow() {
+        return HudFrames.current() - lastRenderFrame <= 1;
+    }
+
     void markRendered() {
         lastRenderTime = System.currentTimeMillis();
+        lastRenderFrame = HudFrames.current();
     }
 
     /** True for a fallback whose mod registered the same element itself, see {@link HudRegistry#registerFallback}. */
