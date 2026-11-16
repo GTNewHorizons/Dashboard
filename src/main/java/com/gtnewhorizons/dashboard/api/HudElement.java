@@ -20,6 +20,7 @@ public final class HudElement {
     private static final long SHOWING_TIMEOUT_MILLIS = 500;
     private static final String KEY_PREFIX = "dashboard.element.";
     private static final String[] NO_KEY_BINDINGS = {};
+    private static final String[] NO_IDS = {};
 
     @FunctionalInterface
     public interface DefaultBoundsProvider {
@@ -52,6 +53,8 @@ public final class HudElement {
     private boolean visibleByDefault = true;
     private String descriptionKey;
     private String[] descriptionKeyBindings = NO_KEY_BINDINGS;
+    private String[] avoidIds = NO_IDS;
+    private AvoidSide[] avoidSides;
     private long lastRenderTime;
     private int lastRenderFrame = -2;
     private boolean replaced;
@@ -134,6 +137,33 @@ public final class HudElement {
 
     public boolean isVisibleByDefault() {
         return visibleByDefault;
+    }
+
+    /**
+     * While one of these elements is on screen and would overlap this one, this one moves out of its way. Passing ids
+     * instead of elements means the other mod does not have to be a dependency. Ids nobody registered are ignored.
+     */
+    public HudElement setAvoid(String... elementIds) {
+        this.avoidIds = elementIds;
+        return this;
+    }
+
+    public String[] getAvoid() {
+        return avoidIds;
+    }
+
+    /**
+     * Which way to move to avoid overlapping, tried in order. When not set, the element moves toward the middle of the
+     * screen first, so it fits wherever it sits.
+     */
+    public HudElement setAvoidSides(AvoidSide... sides) {
+        this.avoidSides = sides.length > 0 ? sides : null;
+        return this;
+    }
+
+    /** Null when not set, then the sides are picked from where the element is. */
+    public AvoidSide[] getAvoidSides() {
+        return avoidSides;
     }
 
     /**
