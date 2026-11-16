@@ -199,16 +199,30 @@ public final class HudLayout {
         return state == null || state.avoid == null ? element.getAvoid() : state.avoid;
     }
 
-    /**
-     * Adds the other element to the ones this one avoids, or takes it off. Taking off the last one leaves an empty
-     * choice, so the mod's list does not come back until a reset.
-     */
-    public static void toggleAvoid(HudElement element, HudElement other) {
+    /** True once the player chose what it avoids, also when that is nothing. */
+    public static boolean hasAvoidChoice(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.avoid != null;
+    }
+
+    /** Adds the other element to the ones this one avoids. */
+    public static void addAvoid(HudElement element, HudElement other) {
         List<String> ids = new ArrayList<>(Arrays.asList(getAvoid(element)));
-        if (!ids.remove(other.getId())) {
+        if (!ids.contains(other.getId())) {
             ids.add(other.getId());
         }
         getOrCreateState(element).avoid = ids.toArray(new String[0]);
+        changed = true;
+    }
+
+    /**
+     * Makes it avoid nothing, also with All Elements on, and forgets its direction. Stays that way until a reset brings
+     * back the mod's choice.
+     */
+    public static void clearAvoid(HudElement element) {
+        HudElementState state = getOrCreateState(element);
+        state.avoid = new String[0];
+        state.avoidFirstSide = null;
         changed = true;
     }
 

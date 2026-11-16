@@ -42,7 +42,7 @@ Hover over an element, then:
 | Reset the see-through background | **Ctrl + R**                                           |
 | Lock it, so it can't be changed by accident | **L** (again to unlock)                     |
 | Attach it to another element   | **A**, then click the other element (**A** again to detach) |
-| Make room for another element  | **V**, then click the other element (again to stop)      |
+| Make room for another element  | **V**, then click the other element (**V** again to stop) |
 | Pick which way it makes room   | **B** (Down, Up, Right, Left, then back to automatic)    |
 | Zoom into an image             | **Scroll**, **middle-drag** to move around, **middle-click** to reset |
 
@@ -73,8 +73,8 @@ Turn it on in **Customize**, under **Placement**:
   stay where they are.
 
 In the editor, nothing moves, so you can arrange everything at its own spot. Hover an element and press **V**, then
-click another element to make the first one make room for it. Press **B** to pick which way it moves. Hover either
-element to see a line between them.
+click another element to make the first one make room for it, **V** again stops it. Press **B** to pick which way it
+moves. Hover either element to see a line between them.
 
 ### Editor buttons
 

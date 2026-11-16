@@ -42,7 +42,7 @@ final class AvoidOverlap {
             return bounds;
         }
         boolean listed = HudLayout.getAvoid(element).length > 0;
-        if (!listed && !DashboardConfig.avoidOverlapAuto) {
+        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element))) {
             return bounds;
         }
         clearIfOutdated(screenWidth, screenHeight);
@@ -140,7 +140,7 @@ final class AvoidOverlap {
         if (findOverlap(bounds, inTheWay) == null) {
             return bounds;
         }
-        AvoidSide first = HudLayout.getAvoidFirstSide(element);
+        AvoidSide first = HudLayout.getAvoid(element).length > 0 ? HudLayout.getAvoidFirstSide(element) : null;
         if (first != null) {
             HudBounds moved = pushAside(bounds, first, inTheWay, screenWidth, screenHeight);
             if (moved != null) {

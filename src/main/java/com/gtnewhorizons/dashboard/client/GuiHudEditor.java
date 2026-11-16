@@ -811,7 +811,7 @@ public class GuiHudEditor extends GuiScreen {
             lines.add(noteLine("element_tooltip.avoids", avoided, HudEditorKeybind.getKeyName(HudEditorKeybind.AVOID)));
         }
         AvoidSide firstSide = HudLayout.getAvoidFirstSide(element);
-        if (firstSide != null) {
+        if (firstSide != null && !avoided.isEmpty()) {
             lines.add(
                 noteLine(
                     "element_tooltip.avoid_direction",
@@ -934,11 +934,11 @@ public class GuiHudEditor extends GuiScreen {
             attachingElement = null;
             return;
         }
-        // The same for avoiding, where a left click on another element starts or stops avoiding it
+        // The same for avoiding, where a left click on another element makes room for it
         if (avoidingElement != null) {
             ElementBox target = findChosenBox(mouseX, mouseY, mouseButton);
             if (target != null && target.element != avoidingElement) {
-                HudLayout.toggleAvoid(avoidingElement, target.element);
+                HudLayout.addAvoid(avoidingElement, target.element);
                 GuiHelpers.playClickSound();
             }
             avoidingElement = null;
@@ -1171,10 +1171,16 @@ public class GuiHudEditor extends GuiScreen {
             }
             return;
         }
-        // Waits for a click on the element to start or stop avoiding
+        // Like attach: one that makes room already stops, others wait for a click on the element to make room for
         if (draggedElement == null && avoidPressed) {
             HudElement element = findElementUnderMouse();
-            if (element != null && !HudLayout.isLocked(element)) {
+            if (element == null || HudLayout.isLocked(element)) {
+                return;
+            }
+            if (HudLayout.getAvoid(element).length > 0) {
+                HudLayout.clearAvoid(element);
+                GuiHelpers.playClickSound();
+            } else {
                 avoidingElement = element;
             }
             return;
@@ -1182,7 +1188,7 @@ public class GuiHudEditor extends GuiScreen {
         int directionKey = HudEditorKeybind.AVOID_DIRECTION.getKeyCode();
         if (draggedElement == null && directionKey != 0 && keyCode == directionKey && !Keyboard.isRepeatEvent()) {
             HudElement element = findElementUnderMouse();
-            if (element != null && !HudLayout.isLocked(element)) {
+            if (element != null && !HudLayout.isLocked(element) && HudLayout.getAvoid(element).length > 0) {
                 HudLayout.cycleAvoidFirstSide(element);
                 GuiHelpers.playClickSound();
             }
