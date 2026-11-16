@@ -57,6 +57,7 @@ public final class HudElement {
     private AvoidSide[] avoidSides;
     private long lastRenderTime;
     private int lastRenderFrame = -2;
+    private int shownSinceFrame;
     private boolean replaced;
 
     /**
@@ -293,9 +294,18 @@ public final class HudElement {
         return HudFrames.current() - lastRenderFrame <= 1;
     }
 
+    /** The HUD frame it started showing in, this time. Only meaningful while {@link #isDrawnNow()}. */
+    public int getShownSinceFrame() {
+        return shownSinceFrame;
+    }
+
     void markRendered() {
+        int frame = HudFrames.current();
+        if (!isDrawnNow()) {
+            shownSinceFrame = frame;
+        }
         lastRenderTime = System.currentTimeMillis();
-        lastRenderFrame = HudFrames.current();
+        lastRenderFrame = frame;
     }
 
     /** True for a fallback whose mod registered the same element itself, see {@link HudRegistry#registerFallback}. */

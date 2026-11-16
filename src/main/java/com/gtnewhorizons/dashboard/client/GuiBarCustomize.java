@@ -47,6 +47,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_RESET_CROSSHAIR = 14;
     private static final int BUTTON_TINKERS_CROSSHAIR = 15;
     private static final int BUTTON_AVOID_OVERLAP = 16;
+    private static final int BUTTON_AVOID_OVERLAP_AUTO = 17;
     private static final int SWATCH_SIZE = 20;
     private static final int LINE_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
@@ -108,6 +109,7 @@ public class GuiBarCustomize extends GuiScreen {
     private GuiButton resetCrosshairButton;
     private GuiButton tinkersCrosshairButton;
     private GuiButton avoidOverlapButton;
+    private GuiButton avoidOverlapAutoButton;
     private StatusEffectsSection statusEffects;
     private ScreenOverlaysSection screenOverlays;
     private HotbarSection hotbar;
@@ -308,9 +310,10 @@ public class GuiBarCustomize extends GuiScreen {
         addSectionEnd(rendering.getResetButton());
 
         avoidOverlapButton = GuiHelpers.button(BUTTON_AVOID_OVERLAP, 0, columnWidth);
-        updateAvoidOverlapButton();
+        avoidOverlapAutoButton = GuiHelpers.button(BUTTON_AVOID_OVERLAP_AUTO, 0, columnWidth);
+        updatePlacementButtons();
         addHeader("dashboard.customize.placement");
-        addSectionEnd(avoidOverlapButton);
+        addSectionEnd(avoidOverlapButton, avoidOverlapAutoButton);
 
         list = new BarList();
         list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
@@ -488,9 +491,14 @@ public class GuiBarCustomize extends GuiScreen {
         }
     }
 
-    private void updateAvoidOverlapButton() {
+    /** Auto only does something while Avoid Overlap is on. */
+    private void updatePlacementButtons() {
         avoidOverlapButton.displayString = StatCollector.translateToLocal("dashboard.customize.avoid_overlap") + ": "
             + GuiHelpers.getOnOff(DashboardConfig.avoidOverlap);
+        avoidOverlapAutoButton.displayString = StatCollector.translateToLocal("dashboard.customize.avoid_overlap_auto")
+            + ": "
+            + GuiHelpers.getOnOff(DashboardConfig.avoidOverlapAuto);
+        avoidOverlapAutoButton.enabled = DashboardConfig.avoidOverlap;
     }
 
     /** Ctrl goes back to vanilla. */
@@ -659,6 +667,9 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_AVOID_OVERLAP -> Arrays.asList(
                 StatCollector.translateToLocal("dashboard.customize.avoid_overlap.on"),
                 StatCollector.translateToLocal("dashboard.customize.avoid_overlap.off"));
+            case BUTTON_AVOID_OVERLAP_AUTO -> Arrays.asList(
+                StatCollector.translateToLocal("dashboard.customize.avoid_overlap_auto.on"),
+                StatCollector.translateToLocal("dashboard.customize.avoid_overlap_auto.off"));
             default -> getSectionTooltip(button);
         };
     }
@@ -807,7 +818,12 @@ public class GuiBarCustomize extends GuiScreen {
             case BUTTON_AVOID_OVERLAP -> {
                 DashboardConfig.avoidOverlap = !DashboardConfig.avoidOverlap;
                 ConfigurationManager.save(DashboardConfig.class);
-                updateAvoidOverlapButton();
+                updatePlacementButtons();
+            }
+            case BUTTON_AVOID_OVERLAP_AUTO -> {
+                DashboardConfig.avoidOverlapAuto = !DashboardConfig.avoidOverlapAuto;
+                ConfigurationManager.save(DashboardConfig.class);
+                updatePlacementButtons();
             }
             case BUTTON_RESET -> {
                 for (HudElement bar : bars) {

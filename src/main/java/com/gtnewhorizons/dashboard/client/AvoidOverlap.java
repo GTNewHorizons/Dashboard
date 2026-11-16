@@ -1,7 +1,9 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.gtnewhorizons.dashboard.DashboardConfig;
 import com.gtnewhorizons.dashboard.api.AvoidSide;
@@ -13,17 +15,18 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * An element moves out of the way of the elements it avoids, only while one of them is on screen and would overlap
- * it. Off in the editor, so elements are arranged at their own spots there, and when the player turned it off.
+ * Moves an element out of the way while another element would cover it. Uses the element's own avoid list, or every
+ * element on screen with All Elements on. Does nothing in the editor or while the setting is off.
  */
 @SideOnly(Side.CLIENT)
 final class AvoidOverlap {
 
     private static final int GAP = 2;
-    /** Elements avoiding each other in a circle would ask each other forever, and real chains are short. */
+    /** Stops elements that avoid each other from asking each other forever. */
     private static final int MAX_DEPTH = 4;
+    private static final String MINECRAFT_PREFIX = "minecraft:";
 
-    // Toward the middle of the screen first, for elements that did not pick their sides
+    // Toward the middle of the screen first, when the element picked no sides
     private static final AvoidSide[] FROM_TOP_LEFT = { AvoidSide.BELOW, AvoidSide.RIGHT, AvoidSide.LEFT,
         AvoidSide.ABOVE };
     private static final AvoidSide[] FROM_TOP_RIGHT = { AvoidSide.BELOW, AvoidSide.LEFT, AvoidSide.RIGHT,
@@ -33,16 +36,48 @@ final class AvoidOverlap {
     private static final AvoidSide[] FROM_BOTTOM_RIGHT = { AvoidSide.ABOVE, AvoidSide.LEFT, AvoidSide.RIGHT,
         AvoidSide.BELOW };
 
+    private static final Map<HudElement, HudBounds> MOVED = new IdentityHashMap<>();
+    private static final HudBounds NOT_MOVED = new HudBounds(0, 0, 0, 0);
+    private static int movedFrame = -1;
+    private static int movedScreenWidth;
+    private static int movedScreenHeight;
+
     private AvoidOverlap() {}
 
     /** The same bounds when nothing is in the way or no side fits. */
     static HudBounds apply(HudElement element, HudBounds bounds, int screenWidth, int screenHeight, int depth) {
-        String[] ids = element.getAvoid();
-        if (ids.length == 0 || !DashboardConfig.avoidOverlap
-            || depth >= MAX_DEPTH
-            || HudRegistry.isLayoutScreenOpen()) {
+        if (!DashboardConfig.avoidOverlap || depth >= MAX_DEPTH || HudRegistry.isLayoutScreenOpen()) {
             return bounds;
         }
+        boolean listed = element.getAvoid().length > 0;
+        if (!listed && !DashboardConfig.avoidOverlapAuto) {
+            return bounds;
+        }
+        clearIfOutdated(screenWidth, screenHeight);
+        HudBounds known = MOVED.get(element);
+        if (known != null) {
+            return known == NOT_MOVED ? bounds : known;
+        }
+        List<HudBounds> inTheWay = listed ? findListed(element, screenWidth, screenHeight, depth)
+            : findAuto(element, screenWidth, screenHeight, depth);
+        HudBounds moved = inTheWay == null ? bounds : moveAside(element, bounds, inTheWay, screenWidth, screenHeight);
+        MOVED.put(element, moved == bounds ? NOT_MOVED : moved);
+        return moved;
+    }
+
+    private static void clearIfOutdated(int screenWidth, int screenHeight) {
+        int frame = HudFrames.current();
+        if (frame != movedFrame || screenWidth != movedScreenWidth || screenHeight != movedScreenHeight) {
+            MOVED.clear();
+            movedFrame = frame;
+            movedScreenWidth = screenWidth;
+            movedScreenHeight = screenHeight;
+        }
+    }
+
+    /** The elements on its own avoid list that are on screen. */
+    private static List<HudBounds> findListed(HudElement element, int screenWidth, int screenHeight, int depth) {
+        String[] ids = element.getAvoid();
         List<HudBounds> inTheWay = null;
         for (String id : ids) {
             HudElement other = HudRegistry.getElement(id);
@@ -52,14 +87,66 @@ final class AvoidOverlap {
             if (inTheWay == null) {
                 inTheWay = new ArrayList<>(ids.length);
             }
-            HudBounds otherDefault = other.getDefaultBounds(screenWidth, screenHeight);
-            inTheWay.add(HudLayout.getBounds(other, otherDefault, screenWidth, screenHeight, depth + 1));
+            inTheWay.add(getBounds(other, screenWidth, screenHeight, depth));
         }
-        if (inTheWay == null || findOverlap(bounds, inTheWay) == null) {
+        return inTheWay;
+    }
+
+    /** Every element on screen it has to make room for. Attached elements belong together, so they are skipped. */
+    private static List<HudBounds> findAuto(HudElement element, int screenWidth, int screenHeight, int depth) {
+        if (staysPut(element) || !element.isDrawnNow()) {
+            return null;
+        }
+        HudElement parent = HudLayout.getAttachedTo(element);
+        List<HudBounds> inTheWay = null;
+        for (HudElement other : HudRegistry.getElements()) {
+            if (other == element || other == parent
+                || !other.isDrawnNow()
+                || !HudLayout.isVisible(other)
+                || !makesWayFor(element, other)
+                || HudLayout.getAttachedTo(other) == element) {
+                continue;
+            }
+            if (inTheWay == null) {
+                inTheWay = new ArrayList<>();
+            }
+            inTheWay.add(getBounds(other, screenWidth, screenHeight, depth));
+        }
+        return inTheWay;
+    }
+
+    /**
+     * Who moves: nobody if both appeared together, never Minecraft's own or locked elements, otherwise the one that
+     * appeared last.
+     */
+    private static boolean makesWayFor(HudElement element, HudElement other) {
+        int shownSince = element.getShownSinceFrame();
+        int otherShownSince = other.getShownSinceFrame();
+        if (shownSince == otherShownSince) {
+            return false;
+        }
+        return staysPut(other) || otherShownSince < shownSince;
+    }
+
+    private static boolean staysPut(HudElement element) {
+        return element.getId()
+            .startsWith(MINECRAFT_PREFIX) || HudLayout.isLocked(element);
+    }
+
+    /** Where the other element is now, after making room itself. */
+    private static HudBounds getBounds(HudElement other, int screenWidth, int screenHeight, int depth) {
+        HudBounds otherDefault = other.getDefaultBounds(screenWidth, screenHeight);
+        return HudLayout.getBounds(other, otherDefault, screenWidth, screenHeight, depth + 1);
+    }
+
+    /** Tries each side in order and takes the first spot that fits on screen. */
+    private static HudBounds moveAside(HudElement element, HudBounds bounds, List<HudBounds> inTheWay, int screenWidth,
+        int screenHeight) {
+        if (findOverlap(bounds, inTheWay) == null) {
             return bounds;
         }
         for (AvoidSide side : getSides(element, bounds, screenWidth, screenHeight)) {
-            HudBounds moved = moveAside(bounds, side, inTheWay, screenWidth, screenHeight);
+            HudBounds moved = pushAside(bounds, side, inTheWay, screenWidth, screenHeight);
             if (moved != null) {
                 return moved;
             }
@@ -80,11 +167,8 @@ final class AvoidOverlap {
         return left ? FROM_BOTTOM_LEFT : FROM_BOTTOM_RIGHT;
     }
 
-    /**
-     * Pushed past the element in the way, again past the next one it lands on. Each push only goes further the same
-     * way, so it passes each element at most once. Null when it ends up off screen.
-     */
-    private static HudBounds moveAside(HudBounds bounds, AvoidSide side, List<HudBounds> inTheWay, int screenWidth,
+    /** Pushes past each element in the way until it is clear. Null if it ends up off screen. */
+    private static HudBounds pushAside(HudBounds bounds, AvoidSide side, List<HudBounds> inTheWay, int screenWidth,
         int screenHeight) {
         HudBounds moved = bounds;
         HudBounds overlap = findOverlap(moved, inTheWay);
