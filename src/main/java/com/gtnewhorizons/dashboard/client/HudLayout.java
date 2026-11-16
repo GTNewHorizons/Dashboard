@@ -205,12 +205,22 @@ public final class HudLayout {
         return state != null && state.avoid != null;
     }
 
+    public static boolean avoids(HudElement element, HudElement other) {
+        for (String id : getAvoid(element)) {
+            if (id.equals(other.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Adds the other element to the ones this one avoids. */
     public static void addAvoid(HudElement element, HudElement other) {
-        List<String> ids = new ArrayList<>(Arrays.asList(getAvoid(element)));
-        if (!ids.contains(other.getId())) {
-            ids.add(other.getId());
+        if (avoids(element, other)) {
+            return;
         }
+        List<String> ids = new ArrayList<>(Arrays.asList(getAvoid(element)));
+        ids.add(other.getId());
         getOrCreateState(element).avoid = ids.toArray(new String[0]);
         changed = true;
     }

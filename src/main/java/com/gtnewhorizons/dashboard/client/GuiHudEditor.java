@@ -712,29 +712,41 @@ public class GuiHudEditor extends GuiScreen {
 
     /** To the element this one follows, and from the ones following it. */
     private void drawAttachLines(HudElement element) {
-        int color = ColorUtils.attachLine.getColor();
         HudElement parent = HudLayout.getAttachedTo(element);
         if (parent != null) {
-            drawLinkLine(element, parent, color);
+            drawAttachLine(element, parent);
         }
         for (ElementBox box : boxes) {
             if (HudLayout.getAttachedTo(box.element) == element) {
-                drawLinkLine(box.element, element, color);
+                drawAttachLine(box.element, element);
             }
+        }
+    }
+
+    /** Dashed line for elements that are both attached and avoided. */
+    private void drawAttachLine(HudElement from, HudElement to) {
+        drawLinkLine(from, to, ColorUtils.attachLine.getColor());
+        if (HudLayout.avoids(from, to) || HudLayout.avoids(to, from)) {
+            GL11.glEnable(GL11.GL_LINE_STIPPLE);
+            GL11.glLineStipple(HudLayout.getGameGuiScale() * 2, (short) 0x00FF);
+            drawLinkLine(from, to, ColorUtils.avoidLine.getColor());
+            GL11.glDisable(GL11.GL_LINE_STIPPLE);
         }
     }
 
     /** To the elements this one makes room for, and from the ones making room for it. */
     private void drawAvoidLines(HudElement element) {
         int color = ColorUtils.avoidLine.getColor();
-        List<String> avoided = Arrays.asList(HudLayout.getAvoid(element));
         for (ElementBox box : boxes) {
-            if (avoided.contains(box.element.getId())) {
-                drawLinkLine(element, box.element, color);
-            } else if (Arrays.asList(HudLayout.getAvoid(box.element))
-                .contains(element.getId())) {
-                    drawLinkLine(box.element, element, color);
-                }
+            HudElement other = box.element;
+            if (HudLayout.getAttachedTo(other) == element || HudLayout.getAttachedTo(element) == other) {
+                continue;
+            }
+            if (HudLayout.avoids(element, other)) {
+                drawLinkLine(element, other, color);
+            } else if (HudLayout.avoids(other, element)) {
+                drawLinkLine(other, element, color);
+            }
         }
     }
 
