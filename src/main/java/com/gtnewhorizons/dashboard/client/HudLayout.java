@@ -212,15 +212,18 @@ public final class HudLayout {
         changed = true;
     }
 
-    /** The sides it tries: the player's choice, the mod's, or null to pick from where it is. */
-    public static AvoidSide[] getAvoidSides(HudElement element) {
+    /** The way the player wants it to make room first, or null to keep the mod's or the automatic order. */
+    public static AvoidSide getAvoidFirstSide(HudElement element) {
         HudElementState state = getStates().get(element.getId());
-        return state == null || state.avoidSides == null ? element.getAvoidSides() : state.avoidSides;
+        return state == null ? null : state.avoidFirstSide;
     }
 
-    /** Null goes back to the mod's choice. */
-    public static void setAvoidSides(HudElement element, AvoidSide[] sides) {
-        getOrCreateState(element).avoidSides = sides;
+    /** Automatic, then down, up, right and left, then automatic again. */
+    public static void cycleAvoidFirstSide(HudElement element) {
+        AvoidSide current = getAvoidFirstSide(element);
+        AvoidSide[] sides = AvoidSide.values();
+        int next = current == null ? 0 : current.ordinal() + 1;
+        getOrCreateState(element).avoidFirstSide = next < sides.length ? sides[next] : null;
         removeIfDefault(element);
         changed = true;
     }
@@ -450,7 +453,7 @@ public final class HudLayout {
             state.attachedTo = null;
             state.detached = false;
             state.avoid = null;
-            state.avoidSides = null;
+            state.avoidFirstSide = null;
             removeIfDefault(element);
             changed = true;
         }
@@ -469,7 +472,7 @@ public final class HudLayout {
                 state.attachedTo = null;
                 state.detached = false;
                 state.avoid = null;
-                state.avoidSides = null;
+                state.avoidFirstSide = null;
                 state.sizeStep = 0;
                 state.zoom = null;
                 state.opacity = null;

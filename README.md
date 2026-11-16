@@ -42,6 +42,8 @@ Hover over an element, then:
 | Reset the see-through background | **Ctrl + R**                                           |
 | Lock it, so it can't be changed by accident | **L** (again to unlock)                     |
 | Attach it to another element   | **A**, then click the other element (**A** again to detach) |
+| Make room for another element  | **V**, then click the other element (again to stop)      |
+| Pick which way it makes room   | **B** (Down, Up, Right, Left, then back to automatic)    |
 | Zoom into an image             | **Scroll**, **middle-drag** to move around, **middle-click** to reset |
 
 The keys in bold are the defaults. Change them in **Controls**, under **Dashboard Editor**. Hover the **?** in the editor
@@ -59,6 +61,20 @@ hotbar goes. Drag it to change how far from the other element it sits, it stays 
 
 The XP level number is attached to the XP bar from the start. Detach it with **A** if you want to place it on its own,
 **R** attaches it again.
+
+### Avoid Overlap
+
+Elements can make room for each other: while two of them would cover each other, one moves aside, and it moves back
+once the other is gone. For example, a box at the top of the screen can move below the boss bar while a boss is near.
+Turn it on in **Customize**, under **Placement**:
+
+- **Avoid Overlap**: only elements set up for it make room, by their mod or by you.
+- **All Elements**: every element makes room. The one that shows up last moves. Minecraft's own and locked elements
+  stay where they are.
+
+In the editor, nothing moves, so you can arrange everything at its own spot. Hover an element and press **V**, then
+click another element to make the first one make room for it. Press **B** to pick which way it moves. Hover either
+element to see a line between them.
 
 ### Editor buttons
 
@@ -96,6 +112,7 @@ Customize are shared by all three.
 - **Screen Overlays**: turn down the pumpkin, portal, fire and underwater overlays, the vignette, the sleep fade, the
   hurt shake, the nausea wobble and the night vision flicker.
 - **Rendering**: pick items that should look like an empty hand when held in first person.
+- **Placement**: let elements make room for each other, see [Avoid Overlap](#avoid-overlap).
 
 Dashboard also adds an **Inventory** element: your 27 inventory slots on a see-through background, so you can see
 what you carry without opening the inventory. It uses the inventory screen's look, so resource packs change it too.

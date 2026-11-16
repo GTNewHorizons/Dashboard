@@ -56,6 +56,11 @@ public final class HudEditorKeybind {
         Keyboard.KEY_V,
         "key.categories.dashboard_editor");
 
+    public static final KeyBinding AVOID_DIRECTION = new KeyBinding(
+        "key.dashboard.avoid_direction",
+        Keyboard.KEY_B,
+        "key.categories.dashboard_editor");
+
     public static final KeyBinding HIDE_MENU = new KeyBinding(
         "key.dashboard.hide_menu",
         Keyboard.KEY_D,
@@ -86,6 +91,7 @@ public final class HudEditorKeybind {
         ClientRegistry.registerKeyBinding(LOCK);
         ClientRegistry.registerKeyBinding(ATTACH);
         ClientRegistry.registerKeyBinding(AVOID);
+        ClientRegistry.registerKeyBinding(AVOID_DIRECTION);
         ClientRegistry.registerKeyBinding(HIDE_MENU);
         ClientRegistry.registerKeyBinding(SIZE_MODIFIER);
         ClientRegistry.registerKeyBinding(OPACITY_MODIFIER);

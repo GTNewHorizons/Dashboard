@@ -1,6 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,11 +157,23 @@ final class AvoidOverlap {
         return bounds;
     }
 
+    /** The player's first side, then the mod's order, or the automatic one. */
     private static AvoidSide[] getSides(HudElement element, HudBounds bounds, int screenWidth, int screenHeight) {
-        AvoidSide[] sides = HudLayout.getAvoidSides(element);
-        if (sides != null) {
+        AvoidSide[] sides = element.getAvoidSides();
+        if (sides == null) {
+            sides = getAutomaticSides(bounds, screenWidth, screenHeight);
+        }
+        AvoidSide first = HudLayout.getAvoidFirstSide(element);
+        if (first == null) {
             return sides;
         }
+        List<AvoidSide> ordered = new ArrayList<>(Arrays.asList(sides));
+        ordered.remove(first);
+        ordered.add(0, first);
+        return ordered.toArray(new AvoidSide[0]);
+    }
+
+    private static AvoidSide[] getAutomaticSides(HudBounds bounds, int screenWidth, int screenHeight) {
         boolean top = bounds.y + bounds.height / 2 < screenHeight / 2;
         boolean left = bounds.x + bounds.width / 2 < screenWidth / 2;
         if (top) {

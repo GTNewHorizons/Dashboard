@@ -19,7 +19,7 @@ import com.gtnewhorizons.dashboard.api.AvoidSide;
  * An element attached to another one has that one's id in attachedTo, and its offset is the distance from that
  * element's top left corner instead, so it follows it around.
  * <p>
- * avoid and avoidSides are the player's Avoid Overlap choice, null to use the mod's.
+ * avoid and avoidFirstSide are the player's Avoid Overlap choice, null to use the mod's or the automatic one.
  */
 public class HudElementState {
 
@@ -43,7 +43,7 @@ public class HudElementState {
     public String attachedTo;
     public boolean detached;
     public String[] avoid;
-    public AvoidSide[] avoidSides;
+    public AvoidSide avoidFirstSide;
 
     boolean isDefault() {
         return visible == null && !moved
@@ -59,6 +59,6 @@ public class HudElementState {
             && opacity == null
             && !locked
             && avoid == null
-            && avoidSides == null;
+            && avoidFirstSide == null;
     }
 }
