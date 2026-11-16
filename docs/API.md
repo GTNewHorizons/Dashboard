@@ -302,7 +302,7 @@ A mod sets up its element with these, all chainable like the other extras:
 | Method | Use it when |
 |---|---|
 | `setAvoid(ids...)` | The element should make room for these elements while they show, like a box at the top middle making room for the boss bar. Ids are plain text, so the other mod does not have to be a dependency, and ids nobody registered are ignored |
-| `setAvoidSides(sides...)` | The element should try these sides, in order. Without it, it moves toward the middle of the screen first: an element in the top half tries below first, one in the bottom half above |
+| `setAvoidSides(sides...)` | The element should try these sides, in order. Without it, it moves to the closest free spot: the side where it has to move the least, so an element covering the bottom of another one moves below it |
 | `setNeverMove()` | The element is meant to sit on top of others and should never move. Other elements still make room for it |
 
 ```java
@@ -310,8 +310,9 @@ INFO_BOX.setAvoid("minecraft:boss_health")
     .setAvoidSides(AvoidSide.BELOW, AvoidSide.LEFT, AvoidSide.RIGHT);
 ```
 
-The element moves to the first side where it fits fully on screen, past every element in the way. If no side fits, it
-stays. Nothing moves while the editor is open, so players arrange elements at their own spots there.
+The element moves past every element in the way, only to spots fully on screen. If no side fits, it stays. A side the
+player picked in the editor is tried first. Nothing moves while the editor is open, so players arrange elements at
+their own spots there.
 
 ## Special cases
 

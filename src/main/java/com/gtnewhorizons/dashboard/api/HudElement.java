@@ -155,8 +155,8 @@ public final class HudElement {
     }
 
     /**
-     * Which way to move to avoid overlapping, tried in order. When not set, the element moves toward the middle of the
-     * screen first, so it fits wherever it sits.
+     * Which way to move to avoid overlapping, tried in order. When not set, the element moves to the closest free spot,
+     * the side where it has to move the least.
      */
     public HudElement setAvoidSides(AvoidSide... sides) {
         this.avoidSides = sides.length > 0 ? sides : null;

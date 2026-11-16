@@ -1,7 +1,6 @@
 package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +25,6 @@ final class AvoidOverlap {
     /** Stops elements that avoid each other from asking each other forever. */
     private static final int MAX_DEPTH = 4;
     private static final String MINECRAFT_PREFIX = "minecraft:";
-
-    // Toward the middle of the screen first, when the element picked no sides
-    private static final AvoidSide[] FROM_TOP_LEFT = { AvoidSide.BELOW, AvoidSide.RIGHT, AvoidSide.LEFT,
-        AvoidSide.ABOVE };
-    private static final AvoidSide[] FROM_TOP_RIGHT = { AvoidSide.BELOW, AvoidSide.LEFT, AvoidSide.RIGHT,
-        AvoidSide.ABOVE };
-    private static final AvoidSide[] FROM_BOTTOM_LEFT = { AvoidSide.ABOVE, AvoidSide.RIGHT, AvoidSide.LEFT,
-        AvoidSide.BELOW };
-    private static final AvoidSide[] FROM_BOTTOM_RIGHT = { AvoidSide.ABOVE, AvoidSide.LEFT, AvoidSide.RIGHT,
-        AvoidSide.BELOW };
 
     private static final Map<HudElement, HudBounds> MOVED = new IdentityHashMap<>();
     private static final HudBounds NOT_MOVED = new HudBounds(0, 0, 0, 0);
@@ -142,44 +131,52 @@ final class AvoidOverlap {
         return HudLayout.getBounds(other, otherDefault, screenWidth, screenHeight, depth + 1);
     }
 
-    /** Tries each side in order and takes the first spot that fits on screen. */
+    /**
+     * The player's side first. Then the mod's sides in order if it set any, otherwise the closest free spot. Only
+     * spots fully on screen count.
+     */
     private static HudBounds moveAside(HudElement element, HudBounds bounds, List<HudBounds> inTheWay, int screenWidth,
         int screenHeight) {
         if (findOverlap(bounds, inTheWay) == null) {
             return bounds;
         }
-        for (AvoidSide side : getSides(element, bounds, screenWidth, screenHeight)) {
-            HudBounds moved = pushAside(bounds, side, inTheWay, screenWidth, screenHeight);
+        AvoidSide first = HudLayout.getAvoidFirstSide(element);
+        if (first != null) {
+            HudBounds moved = pushAside(bounds, first, inTheWay, screenWidth, screenHeight);
             if (moved != null) {
                 return moved;
             }
         }
-        return bounds;
+        AvoidSide[] modSides = element.getAvoidSides();
+        if (modSides != null) {
+            for (AvoidSide side : modSides) {
+                HudBounds moved = side == first ? null : pushAside(bounds, side, inTheWay, screenWidth, screenHeight);
+                if (moved != null) {
+                    return moved;
+                }
+            }
+            return bounds;
+        }
+        return findClosestSpot(bounds, first, inTheWay, screenWidth, screenHeight);
     }
 
-    /** The player's first side, then the mod's order, or the automatic one. */
-    private static AvoidSide[] getSides(HudElement element, HudBounds bounds, int screenWidth, int screenHeight) {
-        AvoidSide[] sides = element.getAvoidSides();
-        if (sides == null) {
-            sides = getAutomaticSides(bounds, screenWidth, screenHeight);
+    /** The side where it has to move the least, so it stays as close to its own spot as it can. */
+    private static HudBounds findClosestSpot(HudBounds bounds, AvoidSide tried, List<HudBounds> inTheWay,
+        int screenWidth, int screenHeight) {
+        HudBounds closest = bounds;
+        int closestDistance = Integer.MAX_VALUE;
+        for (AvoidSide side : AvoidSide.values()) {
+            HudBounds moved = side == tried ? null : pushAside(bounds, side, inTheWay, screenWidth, screenHeight);
+            if (moved == null) {
+                continue;
+            }
+            int distance = Math.abs(moved.x - bounds.x) + Math.abs(moved.y - bounds.y);
+            if (distance < closestDistance) {
+                closest = moved;
+                closestDistance = distance;
+            }
         }
-        AvoidSide first = HudLayout.getAvoidFirstSide(element);
-        if (first == null) {
-            return sides;
-        }
-        List<AvoidSide> ordered = new ArrayList<>(Arrays.asList(sides));
-        ordered.remove(first);
-        ordered.add(0, first);
-        return ordered.toArray(new AvoidSide[0]);
-    }
-
-    private static AvoidSide[] getAutomaticSides(HudBounds bounds, int screenWidth, int screenHeight) {
-        boolean top = bounds.y + bounds.height / 2 < screenHeight / 2;
-        boolean left = bounds.x + bounds.width / 2 < screenWidth / 2;
-        if (top) {
-            return left ? FROM_TOP_LEFT : FROM_TOP_RIGHT;
-        }
-        return left ? FROM_BOTTOM_LEFT : FROM_BOTTOM_RIGHT;
+        return closest;
     }
 
     /** Pushes past each element in the way until it is clear. Null if it ends up off screen. */
