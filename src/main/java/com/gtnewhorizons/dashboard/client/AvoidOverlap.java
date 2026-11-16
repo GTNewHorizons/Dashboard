@@ -64,7 +64,9 @@ final class AvoidOverlap {
             return bounds;
         }
         boolean listed = HudLayout.getAvoid(element).length > 0;
-        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element) || staysPut(element))) {
+        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element)
+            || staysPut(element)
+            || element.isCurrentlyShowing())) {
             return bounds;
         }
         List<HudBounds> inTheWay = new ArrayList<>();
