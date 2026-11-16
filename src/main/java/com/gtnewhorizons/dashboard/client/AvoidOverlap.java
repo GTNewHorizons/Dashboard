@@ -36,9 +36,7 @@ final class AvoidOverlap {
 
     /** The same bounds when nothing is in the way or no side fits. */
     static HudBounds apply(HudElement element, HudBounds bounds, int screenWidth, int screenHeight, int depth) {
-        if (!DashboardConfig.avoidOverlap || element.isNeverMove()
-            || depth >= MAX_DEPTH
-            || HudRegistry.isLayoutScreenOpen()) {
+        if (!canMove(element) || depth >= MAX_DEPTH || HudRegistry.isLayoutScreenOpen()) {
             return bounds;
         }
         boolean listed = HudLayout.getAvoid(element).length > 0;
@@ -62,7 +60,7 @@ final class AvoidOverlap {
      * Elements, it is treated as the one that showed up last.
      */
     static HudBounds preview(HudElement element, HudBounds bounds, int screenWidth, int screenHeight) {
-        if (!DashboardConfig.avoidOverlap || element.isNeverMove()) {
+        if (!canMove(element)) {
             return bounds;
         }
         boolean listed = HudLayout.getAvoid(element).length > 0;
@@ -78,6 +76,11 @@ final class AvoidOverlap {
             inTheWay.add(HudLayout.getBounds(other, screenWidth, screenHeight));
         }
         return inTheWay.isEmpty() ? bounds : moveAside(element, bounds, inTheWay, screenWidth, screenHeight);
+    }
+
+    /** Locked comes first: a locked element stays put, also with its own list. */
+    private static boolean canMove(HudElement element) {
+        return DashboardConfig.avoidOverlap && !element.isNeverMove() && !HudLayout.isLocked(element);
     }
 
     private static void clearIfOutdated(int screenWidth, int screenHeight) {

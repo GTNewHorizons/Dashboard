@@ -74,7 +74,8 @@ Turn it on in **Customize**, under **Placement**:
 
 In the editor, nothing moves, so you can arrange everything at its own spot. Hover an element and press **V**, then
 click another element to make the first one make room for it, **V** again stops it. Press **B** to pick which way it
-moves. Hover either element to see a line between them.
+moves. Hover either element to see a line between them, and a faint outline where it would move. A locked element
+never moves.
 
 ### Editor buttons
 
