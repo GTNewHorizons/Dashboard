@@ -3,8 +3,10 @@ package com.gtnewhorizons.dashboard.client;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -68,6 +70,7 @@ public class GuiHudEditor extends GuiScreen {
 
     /** Every element's box for the current frame, most important first. */
     private final List<ElementBox> boxes = new ArrayList<>();
+    private final Map<HudElement, HudBounds> boxBounds = new IdentityHashMap<>();
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
     private GuiButton customizeButton;
@@ -753,8 +756,8 @@ public class GuiHudEditor extends GuiScreen {
 
     /** A faint outline where it would move to in game while the elements it makes room for show. */
     private void drawAvoidPreview(HudElement element) {
-        HudBounds bounds = HudLayout.getBounds(element, width, height);
-        HudBounds moved = AvoidOverlap.preview(element, bounds, width, height);
+        HudBounds bounds = getBoxBounds(element);
+        HudBounds moved = AvoidOverlap.preview(element, bounds, boxBounds, width, height);
         if (moved == bounds) {
             return;
         }
@@ -764,14 +767,20 @@ public class GuiHudEditor extends GuiScreen {
     }
 
     private void drawLinkLine(HudElement from, HudElement to, int color) {
-        HudBounds bounds = HudLayout.getBounds(to, width, height);
+        HudBounds bounds = getBoxBounds(to);
         drawLinkLine(from, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, color);
     }
 
     /** From the element's middle. */
     private void drawLinkLine(HudElement from, int toX, int toY, int color) {
-        HudBounds bounds = HudLayout.getBounds(from, width, height);
+        HudBounds bounds = getBoxBounds(from);
         drawLine(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, toX, toY, color);
+    }
+
+    /** Measured once this frame, or now for an element without a box, like one of an unticked mod. */
+    private HudBounds getBoxBounds(HudElement element) {
+        HudBounds bounds = boxBounds.get(element);
+        return bounds != null ? bounds : HudLayout.getBounds(element, width, height);
     }
 
     private static void drawLine(int fromX, int fromY, int toX, int toY, int color) {
@@ -896,12 +905,14 @@ public class GuiHudEditor extends GuiScreen {
 
     private void updateBoxes() {
         boxes.clear();
+        boxBounds.clear();
         for (HudElement element : HudRegistry.getElements()) {
             if (!EditorModFilter.isInEditor(element)) {
                 continue;
             }
-            boxes.add(
-                new ElementBox(element, HudLayout.getBounds(element, width, height), element.isCurrentlyShowing()));
+            HudBounds bounds = HudLayout.getBounds(element, width, height);
+            boxes.add(new ElementBox(element, bounds, element.isCurrentlyShowing()));
+            boxBounds.put(element, bounds);
         }
         boxes.sort(PICK_PRIORITY);
     }
