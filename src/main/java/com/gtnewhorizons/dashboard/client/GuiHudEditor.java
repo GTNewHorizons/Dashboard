@@ -346,7 +346,9 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         if (highlighted != null && draggedElement == null) {
-            drawHoveringText(getTooltip(highlighted), mouseX, mouseY, fontRendererObj);
+            List<String> tooltip = getTooltip(highlighted);
+            GuiHelpers.wrapTooltip(tooltip, fontRendererObj, mouseX, width);
+            drawHoveringText(tooltip, mouseX, mouseY, fontRendererObj);
         } else if (!draggingMenu) {
             List<String> menuTooltip = getMenuTooltip(mouseX, mouseY);
             if (!menuTooltip.isEmpty()) {
@@ -457,7 +459,7 @@ public class GuiHudEditor extends GuiScreen {
 
     /** One control in the help tooltip's bullet list. */
     private static String helpLine(String name, Object... keys) {
-        return EnumChatFormatting.GRAY + " - " + translate("help_tooltip." + name, keys);
+        return EnumChatFormatting.GRAY + GuiHelpers.BULLET + translate("help_tooltip." + name, keys);
     }
 
     /** A gray line under a tooltip's first line. */
@@ -515,7 +517,6 @@ public class GuiHudEditor extends GuiScreen {
             // if (journeyMap) {
             // lines.add(noteLine("help_tooltip.journeymap"));
             // }
-            fillSeparators(lines);
         }
         for (ToggleButton button : toggleButtons) {
             if (button.mousePressed(mc, mouseX, mouseY)) {
@@ -538,6 +539,8 @@ public class GuiHudEditor extends GuiScreen {
             lines.add(noteLine("mods_tooltip.game"));
             lines.add(noteLine("mods_tooltip.ctrl"));
         }
+        GuiHelpers.wrapTooltip(lines, fontRendererObj, mouseX, width);
+        fillSeparators(lines);
         return lines;
     }
 
