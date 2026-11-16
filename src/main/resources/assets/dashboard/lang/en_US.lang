@@ -10,6 +10,7 @@ key.categories.dashboard_editor=Dashboard Editor
 key.dashboard.reset=Reset
 key.dashboard.lock=Lock
 key.dashboard.attach=Attach
+key.dashboard.avoid=Choose What to Avoid
 key.dashboard.hide_menu=Hide Editor Menu
 key.dashboard.size_modifier=Resize (hold)
 key.dashboard.opacity_modifier=See-through (hold)

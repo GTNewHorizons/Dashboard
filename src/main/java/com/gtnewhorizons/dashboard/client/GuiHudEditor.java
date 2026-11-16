@@ -79,6 +79,7 @@ public class GuiHudEditor extends GuiScreen {
     private HudElement draggedElement;
     private boolean carryingElement;
     private HudElement attachingElement;
+    private HudElement avoidingElement;
     private int grabOffsetX;
     private int grabOffsetY;
     /** How far the menu was dragged from its default spot. Not saved. */
@@ -324,6 +325,8 @@ public class GuiHudEditor extends GuiScreen {
         drawElementBoxes(focused);
         if (attachingElement != null) {
             drawAttachLine(attachingElement, mouseX, mouseY);
+        } else if (avoidingElement != null) {
+            drawAttachLine(avoidingElement, mouseX, mouseY);
         } else if (focused != null) {
             drawAttachLines(focused);
         }
@@ -821,6 +824,11 @@ public class GuiHudEditor extends GuiScreen {
         boxes.sort(PICK_PRIORITY);
     }
 
+    /** The box picked with a left click while choosing an element to attach to or avoid, or null. */
+    private ElementBox findChosenBox(int mouseX, int mouseY, int mouseButton) {
+        return mouseButton == 0 && !isOverMenu(mouseX, mouseY) ? findBoxAt(mouseX, mouseY) : null;
+    }
+
     /** The most important box under the mouse. */
     private ElementBox findBoxAt(int mouseX, int mouseY) {
         for (ElementBox box : boxes) {
@@ -862,11 +870,21 @@ public class GuiHudEditor extends GuiScreen {
         }
         // Any click ends choosing, a left click on another element also attaches to it
         if (attachingElement != null) {
-            ElementBox target = mouseButton == 0 && !isOverMenu(mouseX, mouseY) ? findBoxAt(mouseX, mouseY) : null;
+            ElementBox target = findChosenBox(mouseX, mouseY, mouseButton);
             if (target != null && HudLayout.attach(attachingElement, target.element, width, height)) {
                 GuiHelpers.playClickSound();
             }
             attachingElement = null;
+            return;
+        }
+        // The same for avoiding, where a left click on another element starts or stops avoiding it
+        if (avoidingElement != null) {
+            ElementBox target = findChosenBox(mouseX, mouseY, mouseButton);
+            if (target != null && target.element != avoidingElement) {
+                HudLayout.toggleAvoid(avoidingElement, target.element);
+                GuiHelpers.playClickSound();
+            }
+            avoidingElement = null;
             return;
         }
         if (modFilter.click(mouseX, mouseY, mouseButton) || elementList.click(mouseX, mouseY, mouseButton)) {
@@ -1043,6 +1061,12 @@ public class GuiHudEditor extends GuiScreen {
             attachingElement = null;
             return;
         }
+        int avoidKey = HudEditorKeybind.AVOID.getKeyCode();
+        boolean avoidPressed = avoidKey != 0 && keyCode == avoidKey && !Keyboard.isRepeatEvent();
+        if (avoidingElement != null && (keyCode == Keyboard.KEY_ESCAPE || avoidPressed)) {
+            avoidingElement = null;
+            return;
+        }
         // Esc closes the open list instead of the editor, and while typing in its search box every key goes there
         if (elementList.isOpen() && keyCode == Keyboard.KEY_ESCAPE) {
             elementList.close();
@@ -1087,6 +1111,14 @@ public class GuiHudEditor extends GuiScreen {
                 GuiHelpers.playClickSound();
             } else {
                 attachingElement = element;
+            }
+            return;
+        }
+        // Waits for a click on the element to start or stop avoiding
+        if (draggedElement == null && avoidPressed) {
+            HudElement element = findElementUnderMouse();
+            if (element != null && !HudLayout.isLocked(element)) {
+                avoidingElement = element;
             }
             return;
         }

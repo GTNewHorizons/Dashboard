@@ -6,8 +6,11 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
@@ -196,10 +199,16 @@ public final class HudLayout {
         return state == null || state.avoid == null ? element.getAvoid() : state.avoid;
     }
 
-    /** Empty goes back to the mod's choice. */
-    public static void setAvoid(HudElement element, String[] ids) {
-        getOrCreateState(element).avoid = ids.length > 0 ? ids : null;
-        removeIfDefault(element);
+    /**
+     * Adds the other element to the ones this one avoids, or takes it off. Taking off the last one leaves an empty
+     * choice, so the mod's list does not come back until a reset.
+     */
+    public static void toggleAvoid(HudElement element, HudElement other) {
+        List<String> ids = new ArrayList<>(Arrays.asList(getAvoid(element)));
+        if (!ids.remove(other.getId())) {
+            ids.add(other.getId());
+        }
+        getOrCreateState(element).avoid = ids.toArray(new String[0]);
         changed = true;
     }
 
