@@ -236,9 +236,19 @@ public final class HudLayout {
         return getBounds(element, defaultBounds, screenWidth, screenHeight, 0);
     }
 
-    /** Depth counts the attached elements followed so far, so a loop in an edited file can not go on forever. */
-    private static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight,
+    /**
+     * Depth counts the elements followed so far, attached ones and ones avoided, so a loop can not go on forever.
+     * Moved out of the way of other elements, see {@link AvoidOverlap}.
+     */
+    static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight,
         int depth) {
+        HudBounds placed = getPlacedBounds(element, defaultBounds, screenWidth, screenHeight, depth);
+        return AvoidOverlap.apply(element, placed, screenWidth, screenHeight, depth);
+    }
+
+    /** Where the player put the element, or its default spot. */
+    private static HudBounds getPlacedBounds(HudElement element, HudBounds defaultBounds, int screenWidth,
+        int screenHeight, int depth) {
         HudElementState state = getStates().get(element.getId());
         float scale = getScale(element);
         HudElement parent = depth < MAX_ATTACH_DEPTH ? getAttachedTo(element) : null;
