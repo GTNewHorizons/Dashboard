@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardOtherConfig;
+import com.gtnewhorizons.dashboard.api.AvoidSide;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -185,6 +186,32 @@ public final class HudLayout {
 
     public static void setLocked(HudElement element, boolean locked) {
         getOrCreateState(element).locked = locked;
+        removeIfDefault(element);
+        changed = true;
+    }
+
+    /** The elements it avoids: the player's choice, or the mod's when the player made none. */
+    public static String[] getAvoid(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.avoid == null ? element.getAvoid() : state.avoid;
+    }
+
+    /** Empty goes back to the mod's choice. */
+    public static void setAvoid(HudElement element, String[] ids) {
+        getOrCreateState(element).avoid = ids.length > 0 ? ids : null;
+        removeIfDefault(element);
+        changed = true;
+    }
+
+    /** The sides it tries: the player's choice, the mod's, or null to pick from where it is. */
+    public static AvoidSide[] getAvoidSides(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.avoidSides == null ? element.getAvoidSides() : state.avoidSides;
+    }
+
+    /** Null goes back to the mod's choice. */
+    public static void setAvoidSides(HudElement element, AvoidSide[] sides) {
+        getOrCreateState(element).avoidSides = sides;
         removeIfDefault(element);
         changed = true;
     }
@@ -404,8 +431,8 @@ public final class HudLayout {
     }
 
     /**
-     * Moves the element back to its default position, which also puts its attachment back to the default one. Hidden
-     * stays.
+     * Moves the element back to its default position, which also puts its attachment and Avoid Overlap choice back to
+     * the default ones. Hidden stays.
      */
     public static void resetPosition(HudElement element) {
         HudElementState state = getStates().get(element.getId());
@@ -413,12 +440,17 @@ public final class HudLayout {
             state.moved = false;
             state.attachedTo = null;
             state.detached = false;
+            state.avoid = null;
+            state.avoidSides = null;
             removeIfDefault(element);
             changed = true;
         }
     }
 
-    /** Positions, sizes, image zoom, background opacity and visibility. Looks are reset in the Customize screen. */
+    /**
+     * Positions, sizes, image zoom, background opacity, visibility and Avoid Overlap choices. Looks are reset in the
+     * Customize screen.
+     */
     public static void reset(Iterable<HudElement> elements) {
         for (HudElement element : elements) {
             HudElementState state = getStates().get(element.getId());
@@ -427,6 +459,8 @@ public final class HudLayout {
                 state.moved = false;
                 state.attachedTo = null;
                 state.detached = false;
+                state.avoid = null;
+                state.avoidSides = null;
                 state.sizeStep = 0;
                 state.zoom = null;
                 state.opacity = null;

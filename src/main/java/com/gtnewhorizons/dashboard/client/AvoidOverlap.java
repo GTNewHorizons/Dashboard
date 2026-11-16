@@ -51,7 +51,7 @@ final class AvoidOverlap {
             || HudRegistry.isLayoutScreenOpen()) {
             return bounds;
         }
-        boolean listed = element.getAvoid().length > 0;
+        boolean listed = HudLayout.getAvoid(element).length > 0;
         if (!listed && !DashboardConfig.avoidOverlapAuto) {
             return bounds;
         }
@@ -79,7 +79,7 @@ final class AvoidOverlap {
 
     /** The elements on its own avoid list that are on screen. */
     private static List<HudBounds> findListed(HudElement element, int screenWidth, int screenHeight, int depth) {
-        String[] ids = element.getAvoid();
+        String[] ids = HudLayout.getAvoid(element);
         List<HudBounds> inTheWay = null;
         for (String id : ids) {
             HudElement other = HudRegistry.getElement(id);
@@ -157,7 +157,7 @@ final class AvoidOverlap {
     }
 
     private static AvoidSide[] getSides(HudElement element, HudBounds bounds, int screenWidth, int screenHeight) {
-        AvoidSide[] sides = element.getAvoidSides();
+        AvoidSide[] sides = HudLayout.getAvoidSides(element);
         if (sides != null) {
             return sides;
         }
