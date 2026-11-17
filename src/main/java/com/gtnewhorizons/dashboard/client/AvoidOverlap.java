@@ -28,11 +28,15 @@ final class AvoidOverlap {
 
     private static final Map<HudElement, HudBounds> MOVED = new IdentityHashMap<>();
     private static final Map<HudElement, HudBounds> FINAL_BOUNDS = new IdentityHashMap<>();
-    private static final Map<HudElement, Integer> AREAS = new IdentityHashMap<>();
+    private static final Map<HudElement, ShownArea> AREAS = new IdentityHashMap<>();
     private static final HudBounds NOT_MOVED = new HudBounds(0, 0, 0, 0);
     private static int movedFrame = -1;
     private static int movedScreenWidth;
     private static int movedScreenHeight;
+
+    static {
+        HudRegistry.addLayoutListener(AREAS::clear);
+    }
 
     private AvoidOverlap() {}
 
@@ -108,10 +112,13 @@ final class AvoidOverlap {
 
     private static void clearIfOutdated(int screenWidth, int screenHeight) {
         int frame = HudFrames.current();
-        if (frame != movedFrame || screenWidth != movedScreenWidth || screenHeight != movedScreenHeight) {
+        boolean resized = screenWidth != movedScreenWidth || screenHeight != movedScreenHeight;
+        if (frame != movedFrame || resized) {
             MOVED.clear();
             FINAL_BOUNDS.clear();
-            AREAS.clear();
+            if (resized) {
+                AREAS.clear();
+            }
             movedFrame = frame;
             movedScreenWidth = screenWidth;
             movedScreenHeight = screenHeight;
@@ -183,16 +190,17 @@ final class AvoidOverlap {
                 .compareTo(other.getId()) > 0;
     }
 
-    /** Its size where the player put it, measured once per frame. Moving aside does not change it. */
+    /** Its size when it started showing, so one that grows later does not swap places with the other. */
     private static int getArea(HudElement element, int screenWidth, int screenHeight) {
-        Integer known = AREAS.get(element);
-        if (known != null) {
-            return known;
+        int shownSince = element.getShownSinceFrame();
+        ShownArea known = AREAS.get(element);
+        if (known != null && known.shownSince == shownSince) {
+            return known.area;
         }
         HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
         float scale = HudLayout.getScale(element);
         int area = Math.round(defaultBounds.width * scale) * Math.round(defaultBounds.height * scale);
-        AREAS.put(element, area);
+        AREAS.put(element, new ShownArea(shownSince, area));
         return area;
     }
 
@@ -296,5 +304,16 @@ final class AvoidOverlap {
             }
         }
         return null;
+    }
+
+    private static final class ShownArea {
+
+        final int shownSince;
+        final int area;
+
+        ShownArea(int shownSince, int area) {
+            this.shownSince = shownSince;
+            this.area = area;
+        }
     }
 }
