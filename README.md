@@ -69,8 +69,8 @@ once the other is gone. For example, a box at the top of the screen can move bel
 Turn it on in **Customize**, under **Placement**:
 
 - **Avoid Overlap**: only elements set up for it make room, by their mod or by you.
-- **All Elements**: every element makes room. The one that shows up last moves. Minecraft's own and locked elements
-  stay where they are.
+- **All Elements**: every element makes room. The one that shows up last moves, or the smaller one if both show up
+  together. Minecraft's own and locked elements stay where they are.
 
 In the editor, nothing moves, so you can arrange everything at its own spot. Hover an element and press **V**, then
 click another element to make the first one make room for it, **V** again stops it. Press **B** to pick which way it

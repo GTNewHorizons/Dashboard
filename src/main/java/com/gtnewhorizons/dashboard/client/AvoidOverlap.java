@@ -28,6 +28,7 @@ final class AvoidOverlap {
 
     private static final Map<HudElement, HudBounds> MOVED = new IdentityHashMap<>();
     private static final Map<HudElement, HudBounds> FINAL_BOUNDS = new IdentityHashMap<>();
+    private static final Map<HudElement, Integer> AREAS = new IdentityHashMap<>();
     private static final HudBounds NOT_MOVED = new HudBounds(0, 0, 0, 0);
     private static int movedFrame = -1;
     private static int movedScreenWidth;
@@ -73,9 +74,7 @@ final class AvoidOverlap {
         }
         String[] avoid = HudLayout.getAvoid(element);
         boolean listed = avoid.length > 0;
-        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element)
-            || staysPut(element)
-            || element.isCurrentlyShowing())) {
+        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element) || staysPut(element))) {
             return bounds;
         }
         List<HudBounds> inTheWay = new ArrayList<>();
@@ -89,10 +88,18 @@ final class AvoidOverlap {
                 }
             }
         } else {
+            // On screen now = showed up together with the others, so the smaller one moves
+            boolean showing = element.isCurrentlyShowing();
             for (Map.Entry<HudElement, HudBounds> box : boxes.entrySet()) {
                 HudElement other = box.getKey();
-                if (other != element && HudLayout.isVisible(other) && !HudLayout.isAttachedPair(element, other)) {
-                    inTheWay.add(box.getValue());
+                HudBounds otherBounds = box.getValue();
+                if (other == element || !HudLayout.isVisible(other) || HudLayout.isAttachedPair(element, other)) {
+                    continue;
+                }
+                if (!showing || staysPut(other)
+                    || (other.isCurrentlyShowing()
+                        && losesTie(element, getArea(bounds), other, getArea(otherBounds)))) {
+                    inTheWay.add(otherBounds);
                 }
             }
         }
@@ -104,6 +111,7 @@ final class AvoidOverlap {
         if (frame != movedFrame || screenWidth != movedScreenWidth || screenHeight != movedScreenHeight) {
             MOVED.clear();
             FINAL_BOUNDS.clear();
+            AREAS.clear();
             movedFrame = frame;
             movedScreenWidth = screenWidth;
             movedScreenHeight = screenHeight;
@@ -136,7 +144,7 @@ final class AvoidOverlap {
         for (HudElement other : HudRegistry.getElements()) {
             if (other == element || !other.isDrawnNow()
                 || !HudLayout.isVisible(other)
-                || !makesWayFor(element, other)
+                || !makesWayFor(element, other, screenWidth, screenHeight)
                 || HudLayout.isAttachedPair(element, other)) {
                 continue;
             }
@@ -149,16 +157,47 @@ final class AvoidOverlap {
     }
 
     /**
-     * Who moves: nobody if both appeared together, never Minecraft's own, locked or never-move elements, otherwise the
-     * one that appeared last.
+     * Who moves: never Minecraft's own, locked or never-move elements, otherwise the one that appeared last. When both
+     * appeared together, like after joining, the smaller one.
      */
-    private static boolean makesWayFor(HudElement element, HudElement other) {
+    private static boolean makesWayFor(HudElement element, HudElement other, int screenWidth, int screenHeight) {
+        if (staysPut(other)) {
+            return true;
+        }
         int shownSince = element.getShownSinceFrame();
         int otherShownSince = other.getShownSinceFrame();
-        if (shownSince == otherShownSince) {
-            return false;
+        if (shownSince != otherShownSince) {
+            return otherShownSince < shownSince;
         }
-        return staysPut(other) || otherShownSince < shownSince;
+        return losesTie(
+            element,
+            getArea(element, screenWidth, screenHeight),
+            other,
+            getArea(other, screenWidth, screenHeight));
+    }
+
+    /** The smaller one moves, it changes the screen the least. Same size: the id decides, so it is always the same. */
+    private static boolean losesTie(HudElement element, int area, HudElement other, int otherArea) {
+        return area != otherArea ? area < otherArea
+            : element.getId()
+                .compareTo(other.getId()) > 0;
+    }
+
+    /** Its size where the player put it, measured once per frame. Moving aside does not change it. */
+    private static int getArea(HudElement element, int screenWidth, int screenHeight) {
+        Integer known = AREAS.get(element);
+        if (known != null) {
+            return known;
+        }
+        HudBounds defaultBounds = element.getDefaultBounds(screenWidth, screenHeight);
+        float scale = HudLayout.getScale(element);
+        int area = Math.round(defaultBounds.width * scale) * Math.round(defaultBounds.height * scale);
+        AREAS.put(element, area);
+        return area;
+    }
+
+    private static int getArea(HudBounds bounds) {
+        return bounds.width * bounds.height;
     }
 
     private static boolean staysPut(HudElement element) {
