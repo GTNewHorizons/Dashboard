@@ -28,6 +28,7 @@ public final class ColorUtils {
 
         highlightBorder         = color.argb("highlightBorder",         "0xFFFFFFFF"),
         attachLine              = color.argb("attachLine",              "0xFFE2BD3A"),
+        avoidLine               = color.argb("avoidLine",               "0xFF68AFE2"),
 
         menuBackground          = color.argb("menuBackground",          "0xA0202020"),
         grid                    = color.argb("grid",                    "0x20FFFFFF"),

@@ -1,5 +1,7 @@
 package com.gtnewhorizons.dashboard.client;
 
+import com.gtnewhorizons.dashboard.api.AvoidSide;
+
 /**
  * What the player changed about one HUD element. Saved as JSON.
  * <p>
@@ -16,6 +18,8 @@ package com.gtnewhorizons.dashboard.client;
  * <p>
  * An element attached to another one has that one's id in attachedTo, and its offset is the distance from that
  * element's top left corner instead, so it follows it around.
+ * <p>
+ * avoid and avoidFirstSide are the player's Avoid Overlap choice, null to use the mod's or the automatic one.
  */
 public class HudElementState {
 
@@ -38,6 +42,8 @@ public class HudElementState {
     public boolean locked;
     public String attachedTo;
     public boolean detached;
+    public String[] avoid;
+    public AvoidSide avoidFirstSide;
 
     boolean isDefault() {
         return visible == null && !moved
@@ -51,6 +57,8 @@ public class HudElementState {
             && sizeStep == 0
             && zoom == null
             && opacity == null
-            && !locked;
+            && !locked
+            && avoid == null
+            && avoidFirstSide == null;
     }
 }

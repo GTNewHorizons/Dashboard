@@ -6,8 +6,11 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
@@ -21,6 +24,7 @@ import com.google.gson.reflect.TypeToken;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.DashboardOtherConfig;
+import com.gtnewhorizons.dashboard.api.AvoidSide;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -189,6 +193,65 @@ public final class HudLayout {
         changed = true;
     }
 
+    /** The elements it avoids: the player's choice, or the mod's when the player made none. */
+    public static String[] getAvoid(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null || state.avoid == null ? element.getAvoid() : state.avoid;
+    }
+
+    /** True once the player chose what it avoids, also when that is nothing. */
+    public static boolean hasAvoidChoice(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.avoid != null;
+    }
+
+    public static boolean avoids(HudElement element, HudElement other) {
+        for (String id : getAvoid(element)) {
+            if (id.equals(other.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Adds the other element to the ones this one avoids. */
+    public static void addAvoid(HudElement element, HudElement other) {
+        if (avoids(element, other)) {
+            return;
+        }
+        List<String> ids = new ArrayList<>(Arrays.asList(getAvoid(element)));
+        ids.add(other.getId());
+        getOrCreateState(element).avoid = ids.toArray(new String[0]);
+        changed = true;
+    }
+
+    /**
+     * Makes it avoid nothing, also with All Elements on, and forgets its direction. Stays that way until a reset brings
+     * back the mod's choice.
+     */
+    public static void clearAvoid(HudElement element) {
+        HudElementState state = getOrCreateState(element);
+        state.avoid = new String[0];
+        state.avoidFirstSide = null;
+        changed = true;
+    }
+
+    /** The way the player wants it to make room first, or null to keep the mod's or the automatic order. */
+    public static AvoidSide getAvoidFirstSide(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state == null ? null : state.avoidFirstSide;
+    }
+
+    /** Automatic, then down, up, right and left, then automatic again. */
+    public static void cycleAvoidFirstSide(HudElement element) {
+        AvoidSide current = getAvoidFirstSide(element);
+        AvoidSide[] sides = AvoidSide.values();
+        int next = current == null ? 0 : current.ordinal() + 1;
+        getOrCreateState(element).avoidFirstSide = next < sides.length ? sides[next] : null;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     /**
      * The GUI scale this element is drawn at. Whole GUI scales keep every texture pixel the same number of screen
      * pixels, so a resized element stays as sharp as the rest of the HUD.
@@ -236,9 +299,19 @@ public final class HudLayout {
         return getBounds(element, defaultBounds, screenWidth, screenHeight, 0);
     }
 
-    /** Depth counts the attached elements followed so far, so a loop in an edited file can not go on forever. */
-    private static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight,
+    /**
+     * Depth counts the elements followed so far, attached ones and ones avoided, so a loop can not go on forever.
+     * Moved out of the way of other elements, see {@link AvoidOverlap}.
+     */
+    static HudBounds getBounds(HudElement element, HudBounds defaultBounds, int screenWidth, int screenHeight,
         int depth) {
+        HudBounds placed = getPlacedBounds(element, defaultBounds, screenWidth, screenHeight, depth);
+        return AvoidOverlap.apply(element, placed, screenWidth, screenHeight, depth);
+    }
+
+    /** Where the player put the element, or its default spot. */
+    private static HudBounds getPlacedBounds(HudElement element, HudBounds defaultBounds, int screenWidth,
+        int screenHeight, int depth) {
         HudElementState state = getStates().get(element.getId());
         float scale = getScale(element);
         HudElement parent = depth < MAX_ATTACH_DEPTH ? getAttachedTo(element) : null;
@@ -352,6 +425,11 @@ public final class HudLayout {
         return id == null ? null : HudRegistry.getElement(id);
     }
 
+    /** True when either one is attached to the other. */
+    public static boolean isAttachedPair(HudElement element, HudElement other) {
+        return getAttachedTo(element) == other || getAttachedTo(other) == element;
+    }
+
     /** Follows the other element until the player detaches it, like the XP level number and the XP bar. */
     static void attachByDefault(HudElement element, HudElement attachTo) {
         DEFAULT_ATTACHMENTS.put(element.getId(), attachTo.getId());
@@ -394,8 +472,8 @@ public final class HudLayout {
     }
 
     /**
-     * Moves the element back to its default position, which also puts its attachment back to the default one. Hidden
-     * stays.
+     * Moves the element back to its default position, which also puts its attachment and Avoid Overlap choice back to
+     * the default ones. Hidden stays.
      */
     public static void resetPosition(HudElement element) {
         HudElementState state = getStates().get(element.getId());
@@ -403,12 +481,17 @@ public final class HudLayout {
             state.moved = false;
             state.attachedTo = null;
             state.detached = false;
+            state.avoid = null;
+            state.avoidFirstSide = null;
             removeIfDefault(element);
             changed = true;
         }
     }
 
-    /** Positions, sizes, image zoom, background opacity and visibility. Looks are reset in the Customize screen. */
+    /**
+     * Positions, sizes, image zoom, background opacity, visibility and Avoid Overlap choices. Looks are reset in the
+     * Customize screen.
+     */
     public static void reset(Iterable<HudElement> elements) {
         for (HudElement element : elements) {
             HudElementState state = getStates().get(element.getId());
@@ -417,6 +500,8 @@ public final class HudLayout {
                 state.moved = false;
                 state.attachedTo = null;
                 state.detached = false;
+                state.avoid = null;
+                state.avoidFirstSide = null;
                 state.sizeStep = 0;
                 state.zoom = null;
                 state.opacity = null;
