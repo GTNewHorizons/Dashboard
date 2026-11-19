@@ -9,6 +9,8 @@ import net.minecraft.util.StatCollector;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.gtnewhorizons.dashboard.client.HudFrames;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 
@@ -18,6 +20,7 @@ public final class HudElement {
     private static final long SHOWING_TIMEOUT_MILLIS = 500;
     private static final String KEY_PREFIX = "dashboard.element.";
     private static final String[] NO_KEY_BINDINGS = {};
+    private static final String[] NO_IDS = {};
 
     @FunctionalInterface
     public interface DefaultBoundsProvider {
@@ -50,7 +53,12 @@ public final class HudElement {
     private boolean visibleByDefault = true;
     private String descriptionKey;
     private String[] descriptionKeyBindings = NO_KEY_BINDINGS;
+    private String[] avoidIds = NO_IDS;
+    private AvoidSide[] avoidSides;
+    private boolean neverMove;
     private long lastRenderTime;
+    private int lastRenderFrame = -2;
+    private int shownSinceFrame;
     private boolean replaced;
 
     /**
@@ -131,6 +139,43 @@ public final class HudElement {
 
     public boolean isVisibleByDefault() {
         return visibleByDefault;
+    }
+
+    /**
+     * While one of these elements is on screen and would overlap this one, this one moves out of its way. Passing ids
+     * instead of elements means the other mod does not have to be a dependency. Ids nobody registered are ignored.
+     */
+    public HudElement setAvoid(String... elementIds) {
+        this.avoidIds = elementIds;
+        return this;
+    }
+
+    public String[] getAvoid() {
+        return avoidIds;
+    }
+
+    /**
+     * Which way to move to avoid overlapping, tried in order. When not set, the element moves to the closest free spot,
+     * the side where it has to move the least.
+     */
+    public HudElement setAvoidSides(AvoidSide... sides) {
+        this.avoidSides = sides.length > 0 ? sides : null;
+        return this;
+    }
+
+    /** Null when not set, then the sides are picked from where the element is. */
+    public AvoidSide[] getAvoidSides() {
+        return avoidSides;
+    }
+
+    /** Keeps this element in place, for one meant to sit on top of others. Other elements still make room for it. */
+    public HudElement setNeverMove() {
+        this.neverMove = true;
+        return this;
+    }
+
+    public boolean isNeverMove() {
+        return neverMove;
     }
 
     /**
@@ -252,8 +297,26 @@ public final class HudElement {
         return System.currentTimeMillis() - lastRenderTime < SHOWING_TIMEOUT_MILLIS;
     }
 
+    /**
+     * True if the element was drawn in this HUD frame or the one before, even if the player hid it. The frame before
+     * counts too, since elements drawn later in the frame have not been drawn yet.
+     */
+    public boolean isDrawnNow() {
+        return HudFrames.current() - lastRenderFrame <= 1;
+    }
+
+    /** The HUD frame it started showing in, this time. Only meaningful while {@link #isDrawnNow()}. */
+    public int getShownSinceFrame() {
+        return shownSinceFrame;
+    }
+
     void markRendered() {
+        int frame = HudFrames.current();
+        if (!isDrawnNow()) {
+            shownSinceFrame = frame;
+        }
         lastRenderTime = System.currentTimeMillis();
+        lastRenderFrame = frame;
     }
 
     /** True for a fallback whose mod registered the same element itself, see {@link HudRegistry#registerFallback}. */

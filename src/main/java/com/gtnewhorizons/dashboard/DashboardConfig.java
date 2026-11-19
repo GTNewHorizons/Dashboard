@@ -36,6 +36,16 @@ public class DashboardConfig {
     @Config.DefaultStringList({ "minecraft", Dashboard.MODID })
     public static String[] shownEditorMods;
 
+    @Config.Comment("HUD elements move aside so they don't cover each other, like Waila's box moving below the boss bar")
+    @Config.LangKey("dashboard.config.editor.avoid_overlap")
+    @Config.DefaultBoolean(false)
+    public static boolean avoidOverlap;
+
+    @Config.Comment("Every element moves aside, not just supported ones. The one that shows up last moves. Minecraft's own and locked elements stay put")
+    @Config.LangKey("dashboard.config.editor.avoid_overlap_auto")
+    @Config.DefaultBoolean(false)
+    public static boolean avoidOverlapAuto;
+
     @Config.Comment("Crosshair shape: 0 is vanilla, 1 and up are the shapes on the crosshair sheet")
     @Config.LangKey("dashboard.config.editor.crosshair_style")
     @Config.DefaultInt(0)

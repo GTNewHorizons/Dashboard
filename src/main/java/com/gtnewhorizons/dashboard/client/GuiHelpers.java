@@ -10,6 +10,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
@@ -25,6 +26,9 @@ final class GuiHelpers {
 
     static final int BUTTON_HEIGHT = 20;
     private static final String ELLIPSIS = "...";
+    static final String BULLET = " - ";
+    private static final String BULLET_INDENT = "   ";
+    private static final int MIN_TOOLTIP_WIDTH = 100;
     private static final ResourceLocation CLICK_SOUND = new ResourceLocation("gui.button.press");
     private static final int DIRT_COLOR = 0x404040;
     private static final float DIRT_TILE = 32;
@@ -73,6 +77,30 @@ final class GuiHelpers {
 
     static List<String> getTooltip(String langKey) {
         return Collections.singletonList(StatCollector.translateToLocal(langKey));
+    }
+
+    /**
+     * Splits lines too wide for the screen, since tooltips never wrap on their own. Vanilla draws a tooltip right of
+     * the
+     * mouse, or left of it when it does not fit there, so the wider side is used. Colors carry over to the next line,
+     * and the rest of a bullet line is indented under its text.
+     */
+    @SuppressWarnings("unchecked")
+    static void wrapTooltip(List<String> lines, FontRenderer font, int mouseX, int screenWidth) {
+        int maxWidth = Math.max(MIN_TOOLTIP_WIDTH, Math.max(screenWidth - mouseX - 16, mouseX - 20));
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (font.getStringWidth(line) <= maxWidth) {
+                continue;
+            }
+            String indent = EnumChatFormatting.getTextWithoutFormattingCodes(line)
+                .startsWith(BULLET) ? BULLET_INDENT : "";
+            List<String> parts = font.listFormattedStringToWidth(line, maxWidth - font.getStringWidth(indent));
+            lines.set(i, parts.get(0));
+            for (int part = 1; part < parts.size(); part++) {
+                lines.add(++i, indent + parts.get(part));
+            }
+        }
     }
 
     /** The full text as a tooltip, for text that had to be cut to fit. Null when nothing was cut. */

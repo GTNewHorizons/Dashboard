@@ -3,7 +3,10 @@ package com.gtnewhorizons.dashboard.client;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -21,6 +24,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.gtnewhorizons.dashboard.DashboardConfig;
+import com.gtnewhorizons.dashboard.api.AvoidSide;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -66,6 +70,7 @@ public class GuiHudEditor extends GuiScreen {
 
     /** Every element's box for the current frame, most important first. */
     private final List<ElementBox> boxes = new ArrayList<>();
+    private final Map<HudElement, HudBounds> boxBounds = new IdentityHashMap<>();
     private final List<List<GuiButton>> buttonRows = new ArrayList<>();
     private final List<ToggleButton> toggleButtons = new ArrayList<>();
     private GuiButton customizeButton;
@@ -79,6 +84,7 @@ public class GuiHudEditor extends GuiScreen {
     private HudElement draggedElement;
     private boolean carryingElement;
     private HudElement attachingElement;
+    private HudElement avoidingElement;
     private int grabOffsetX;
     private int grabOffsetY;
     /** How far the menu was dragged from its default spot. Not saved. */
@@ -323,9 +329,13 @@ public class GuiHudEditor extends GuiScreen {
         HudElement focused = hoveredInList != null ? hoveredInList : highlighted;
         drawElementBoxes(focused);
         if (attachingElement != null) {
-            drawAttachLine(attachingElement, mouseX, mouseY);
+            drawLinkLine(attachingElement, mouseX, mouseY, ColorUtils.attachLine.getColor());
+        } else if (avoidingElement != null) {
+            drawLinkLine(avoidingElement, mouseX, mouseY, ColorUtils.avoidLine.getColor());
         } else if (focused != null) {
             drawAttachLines(focused);
+            drawAvoidLines(focused);
+            drawAvoidPreview(focused);
         }
         if (!menuHidden) {
             drawMenuPanel(mouseX, mouseY);
@@ -340,7 +350,9 @@ public class GuiHudEditor extends GuiScreen {
         }
 
         if (highlighted != null && draggedElement == null) {
-            drawHoveringText(getTooltip(highlighted), mouseX, mouseY, fontRendererObj);
+            List<String> tooltip = getTooltip(highlighted);
+            GuiHelpers.wrapTooltip(tooltip, fontRendererObj, mouseX, width);
+            drawHoveringText(tooltip, mouseX, mouseY, fontRendererObj);
         } else if (!draggingMenu) {
             List<String> menuTooltip = getMenuTooltip(mouseX, mouseY);
             if (!menuTooltip.isEmpty()) {
@@ -437,6 +449,9 @@ public class GuiHudEditor extends GuiScreen {
         lines.add(helpLine("lock", HudEditorKeybind.getKeyName(HudEditorKeybind.LOCK)));
         String attach = HudEditorKeybind.getKeyName(HudEditorKeybind.ATTACH);
         lines.add(helpLine("attach", attach, attach));
+        String avoid = HudEditorKeybind.getKeyName(HudEditorKeybind.AVOID);
+        lines.add(helpLine("avoid", avoid, avoid));
+        lines.add(helpLine("avoid_direction", HudEditorKeybind.getKeyName(HudEditorKeybind.AVOID_DIRECTION)));
     }
 
     private String getHelpTitleKey() {
@@ -448,7 +463,7 @@ public class GuiHudEditor extends GuiScreen {
 
     /** One control in the help tooltip's bullet list. */
     private static String helpLine(String name, Object... keys) {
-        return EnumChatFormatting.GRAY + " - " + translate("help_tooltip." + name, keys);
+        return EnumChatFormatting.GRAY + GuiHelpers.BULLET + translate("help_tooltip." + name, keys);
     }
 
     /** A gray line under a tooltip's first line. */
@@ -506,7 +521,6 @@ public class GuiHudEditor extends GuiScreen {
             // if (journeyMap) {
             // lines.add(noteLine("help_tooltip.journeymap"));
             // }
-            fillSeparators(lines);
         }
         for (ToggleButton button : toggleButtons) {
             if (button.mousePressed(mc, mouseX, mouseY)) {
@@ -529,6 +543,8 @@ public class GuiHudEditor extends GuiScreen {
             lines.add(noteLine("mods_tooltip.game"));
             lines.add(noteLine("mods_tooltip.ctrl"));
         }
+        GuiHelpers.wrapTooltip(lines, fontRendererObj, mouseX, width);
+        fillSeparators(lines);
         return lines;
     }
 
@@ -679,7 +695,10 @@ public class GuiHudEditor extends GuiScreen {
             ColorUtils.text.getColor());
     }
 
-    /** Lock and attach icons, ending at the right edge, the lock rightmost. Also used by the Elements list. */
+    /**
+     * Lock, attach and avoid icons, ending at the right edge, the lock rightmost. The avoid icon only shows for an
+     * element with its own avoid list. Also used by the Elements list.
+     */
     static void drawStateIcons(HudElement element, int right, int y) {
         int x = right - Icons.SMALL_SIZE;
         if (HudLayout.isLocked(element)) {
@@ -688,6 +707,10 @@ public class GuiHudEditor extends GuiScreen {
         }
         if (HudLayout.getAttachedTo(element) != null) {
             Icons.drawSmall(Icons.SMALL_ATTACH, x, y, ColorUtils.text);
+            x -= Icons.SMALL_SIZE;
+        }
+        if (HudLayout.getAvoid(element).length > 0) {
+            Icons.drawSmall(Icons.SMALL_AVOID, x, y, ColorUtils.text);
         }
     }
 
@@ -704,15 +727,60 @@ public class GuiHudEditor extends GuiScreen {
         }
     }
 
+    /** Dashed line for elements that are both attached and avoided. */
     private void drawAttachLine(HudElement from, HudElement to) {
-        HudBounds bounds = HudLayout.getBounds(to, width, height);
-        drawAttachLine(from, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+        drawLinkLine(from, to, ColorUtils.attachLine.getColor());
+        if (HudLayout.avoids(from, to) || HudLayout.avoids(to, from)) {
+            GL11.glEnable(GL11.GL_LINE_STIPPLE);
+            GL11.glLineStipple(HudLayout.getGameGuiScale() * 2, (short) 0x00FF);
+            drawLinkLine(from, to, ColorUtils.avoidLine.getColor());
+            GL11.glDisable(GL11.GL_LINE_STIPPLE);
+        }
+    }
+
+    /** To the elements this one makes room for, and from the ones making room for it. */
+    private void drawAvoidLines(HudElement element) {
+        int color = ColorUtils.avoidLine.getColor();
+        for (ElementBox box : boxes) {
+            HudElement other = box.element;
+            if (HudLayout.isAttachedPair(element, other)) {
+                continue;
+            }
+            if (HudLayout.avoids(element, other)) {
+                drawLinkLine(element, other, color);
+            } else if (HudLayout.avoids(other, element)) {
+                drawLinkLine(other, element, color);
+            }
+        }
+    }
+
+    /** A faint outline where it would move to in game while the elements it makes room for show. */
+    private void drawAvoidPreview(HudElement element) {
+        HudBounds bounds = getBoxBounds(element);
+        HudBounds moved = AvoidOverlap.preview(element, bounds, boxBounds, width, height);
+        if (moved == bounds) {
+            return;
+        }
+        int color = ColorUtils.avoidLine.getColor() & 0xFFFFFF | 0x80000000;
+        drawLinkLine(element, moved.x + moved.width / 2, moved.y + moved.height / 2, color);
+        drawOutline(moved, color);
+    }
+
+    private void drawLinkLine(HudElement from, HudElement to, int color) {
+        HudBounds bounds = getBoxBounds(to);
+        drawLinkLine(from, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, color);
     }
 
     /** From the element's middle. */
-    private void drawAttachLine(HudElement from, int toX, int toY) {
-        HudBounds bounds = HudLayout.getBounds(from, width, height);
-        drawLine(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, toX, toY, ColorUtils.attachLine.getColor());
+    private void drawLinkLine(HudElement from, int toX, int toY, int color) {
+        HudBounds bounds = getBoxBounds(from);
+        drawLine(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, toX, toY, color);
+    }
+
+    /** Measured once this frame, or now for an element without a box, like one of an unticked mod. */
+    private HudBounds getBoxBounds(HudElement element) {
+        HudBounds bounds = boxBounds.get(element);
+        return bounds != null ? bounds : HudLayout.getBounds(element, width, height);
     }
 
     private static void drawLine(int fromX, int fromY, int toX, int toY, int color) {
@@ -738,6 +806,18 @@ public class GuiHudEditor extends GuiScreen {
         drawRect(bounds.getRight(), bounds.y, bounds.getRight() + 1, bounds.getBottom(), color);
     }
 
+    /** The names of the elements it makes room for, leaving out the ones whose mod is not loaded. */
+    private static String getAvoidedNames(HudElement element) {
+        List<String> names = new ArrayList<>();
+        for (String id : HudLayout.getAvoid(element)) {
+            HudElement avoided = HudRegistry.getElement(id);
+            if (avoided != null) {
+                names.add(avoided.getDisplayName());
+            }
+        }
+        return String.join(", ", names);
+    }
+
     /** The name and the element's state first, then what it is and where its own settings are, then its mod. */
     private List<String> getTooltip(HudElement element) {
         List<String> lines = new ArrayList<>();
@@ -759,6 +839,20 @@ public class GuiHudEditor extends GuiScreen {
                     "element_tooltip.attached",
                     attachedTo.getDisplayName(),
                     HudEditorKeybind.getKeyName(HudEditorKeybind.ATTACH)));
+        }
+        String avoided = getAvoidedNames(element);
+        if (!avoided.isEmpty()) {
+            lines.add(noteLine("element_tooltip.avoids", avoided, HudEditorKeybind.getKeyName(HudEditorKeybind.AVOID)));
+        }
+        AvoidSide firstSide = HudLayout.getAvoidFirstSide(element);
+        if (firstSide != null && !avoided.isEmpty()) {
+            lines.add(
+                noteLine(
+                    "element_tooltip.avoid_direction",
+                    translate(
+                        "avoid_side." + firstSide.name()
+                            .toLowerCase(Locale.ROOT)),
+                    HudEditorKeybind.getKeyName(HudEditorKeybind.AVOID_DIRECTION)));
         }
         lines.add(EnumChatFormatting.GRAY + getSizeText(element));
         if (ElementOpacity.isAllowed(element)) {
@@ -811,14 +905,21 @@ public class GuiHudEditor extends GuiScreen {
 
     private void updateBoxes() {
         boxes.clear();
+        boxBounds.clear();
         for (HudElement element : HudRegistry.getElements()) {
             if (!EditorModFilter.isInEditor(element)) {
                 continue;
             }
-            boxes.add(
-                new ElementBox(element, HudLayout.getBounds(element, width, height), element.isCurrentlyShowing()));
+            HudBounds bounds = HudLayout.getBounds(element, width, height);
+            boxes.add(new ElementBox(element, bounds, element.isCurrentlyShowing()));
+            boxBounds.put(element, bounds);
         }
         boxes.sort(PICK_PRIORITY);
+    }
+
+    /** The box picked with a left click while choosing an element to attach to or avoid, or null. */
+    private ElementBox findChosenBox(int mouseX, int mouseY, int mouseButton) {
+        return mouseButton == 0 && !isOverMenu(mouseX, mouseY) ? findBoxAt(mouseX, mouseY) : null;
     }
 
     /** The most important box under the mouse. */
@@ -862,11 +963,21 @@ public class GuiHudEditor extends GuiScreen {
         }
         // Any click ends choosing, a left click on another element also attaches to it
         if (attachingElement != null) {
-            ElementBox target = mouseButton == 0 && !isOverMenu(mouseX, mouseY) ? findBoxAt(mouseX, mouseY) : null;
+            ElementBox target = findChosenBox(mouseX, mouseY, mouseButton);
             if (target != null && HudLayout.attach(attachingElement, target.element, width, height)) {
                 GuiHelpers.playClickSound();
             }
             attachingElement = null;
+            return;
+        }
+        // The same for avoiding, where a left click on another element makes room for it
+        if (avoidingElement != null) {
+            ElementBox target = findChosenBox(mouseX, mouseY, mouseButton);
+            if (target != null && target.element != avoidingElement) {
+                HudLayout.addAvoid(avoidingElement, target.element);
+                GuiHelpers.playClickSound();
+            }
+            avoidingElement = null;
             return;
         }
         if (modFilter.click(mouseX, mouseY, mouseButton) || elementList.click(mouseX, mouseY, mouseButton)) {
@@ -1043,6 +1154,12 @@ public class GuiHudEditor extends GuiScreen {
             attachingElement = null;
             return;
         }
+        int avoidKey = HudEditorKeybind.AVOID.getKeyCode();
+        boolean avoidPressed = avoidKey != 0 && keyCode == avoidKey && !Keyboard.isRepeatEvent();
+        if (avoidingElement != null && (keyCode == Keyboard.KEY_ESCAPE || avoidPressed)) {
+            avoidingElement = null;
+            return;
+        }
         // Esc closes the open list instead of the editor, and while typing in its search box every key goes there
         if (elementList.isOpen() && keyCode == Keyboard.KEY_ESCAPE) {
             elementList.close();
@@ -1087,6 +1204,29 @@ public class GuiHudEditor extends GuiScreen {
                 GuiHelpers.playClickSound();
             } else {
                 attachingElement = element;
+            }
+            return;
+        }
+        // Like attach: one that makes room already stops, others wait for a click on the element to make room for
+        if (draggedElement == null && avoidPressed) {
+            HudElement element = findElementUnderMouse();
+            if (element == null || HudLayout.isLocked(element)) {
+                return;
+            }
+            if (HudLayout.getAvoid(element).length > 0) {
+                HudLayout.clearAvoid(element);
+                GuiHelpers.playClickSound();
+            } else {
+                avoidingElement = element;
+            }
+            return;
+        }
+        int directionKey = HudEditorKeybind.AVOID_DIRECTION.getKeyCode();
+        if (draggedElement == null && directionKey != 0 && keyCode == directionKey && !Keyboard.isRepeatEvent()) {
+            HudElement element = findElementUnderMouse();
+            if (element != null && !HudLayout.isLocked(element) && HudLayout.getAvoid(element).length > 0) {
+                HudLayout.cycleAvoidFirstSide(element);
+                GuiHelpers.playClickSound();
             }
             return;
         }

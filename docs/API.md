@@ -2,10 +2,10 @@
 
 How a mod makes its own HUD movable, resizable and hideable in Dashboard's HUD editor, without depending on Dashboard.
 
-Up to date with **Dashboard 1.0.20**. Newer releases may add API not covered here, see the
+Up to date with **Dashboard 1.0.23**. Newer releases may add API not covered here, see the
 [version table](#2-minimum-dashboard-version).
 
-The whole API is four classes in
+The whole API is five classes in
 [`com.gtnewhorizons.dashboard.api`](../src/main/java/com/gtnewhorizons/dashboard/api), only for use on the client:
 
 | Class | What it is |
@@ -14,6 +14,7 @@ The whole API is four classes in
 | [`HudRegistry`](../src/main/java/com/gtnewhorizons/dashboard/api/HudRegistry.java) | Registering elements and wrapping their drawing |
 | [`HudBounds`](../src/main/java/com/gtnewhorizons/dashboard/api/HudBounds.java) | A rectangle in GUI scaled pixels |
 | [`HudShift`](../src/main/java/com/gtnewhorizons/dashboard/api/HudShift.java) | Remembers a started move, for code that starts and ends it in different places, like two mixin hooks |
+| [`AvoidSide`](../src/main/java/com/gtnewhorizons/dashboard/api/AvoidSide.java) | Which way an element moves to make room, see [Avoid Overlap](#avoid-overlap) |
 
 ## How it works
 
@@ -77,6 +78,8 @@ Compiling against that same minimum makes it impossible to use newer API by acci
 | 1.0.15 to 1.0.18 | No API changes |
 | 1.0.19 | Lang keys for EnderIO |
 | 1.0.20 | Lang keys for TaskNH, Akashic Tome and LootGames |
+| 1.0.21 to 1.0.22 | No API changes |
+| 1.0.23 | [Avoid Overlap](#avoid-overlap): `setAvoid`, `setAvoidSides`, `AvoidSide` and `setNeverMove` |
 
 ### 3. One helper class
 
@@ -284,6 +287,32 @@ All return the element, so they can be chained.
 **When the element counts as showing:** `beginRender` and `shouldRender` mark it as drawn, and the editor shows the
 real element instead of the preview for half a second after that. So only call them when there is something to draw,
 like only while the player has an effect for an effect icon. Otherwise an empty box shows instead of the preview.
+
+## Avoid Overlap
+
+Players can turn on **Avoid Overlap** in Customize, so elements make room for each other: while two elements would
+cover each other, one moves aside, and it moves back once the other is gone. Both settings are off by default.
+
+- **Avoid Overlap** alone: only elements whose mod set them up make room.
+- **All Elements** as well: every element makes room. The one that shows up last moves. Elements that show up in the
+  same frame or are attached to each other stay as they are, and Minecraft's own and locked elements never move.
+
+A mod sets up its element with these, all chainable like the other extras:
+
+| Method | Use it when |
+|---|---|
+| `setAvoid(ids...)` | The element should make room for these elements while they show, like a box at the top middle making room for the boss bar. Ids are plain text, so the other mod does not have to be a dependency, and ids nobody registered are ignored |
+| `setAvoidSides(sides...)` | The element should try these sides, in order. Without it, it moves to the closest free spot: the side where it has to move the least, so an element covering the bottom of another one moves below it |
+| `setNeverMove()` | The element is meant to sit on top of others and should never move. Other elements still make room for it |
+
+```java
+INFO_BOX.setAvoid("minecraft:boss_health")
+    .setAvoidSides(AvoidSide.BELOW, AvoidSide.LEFT, AvoidSide.RIGHT);
+```
+
+The element moves past every element in the way, only to spots fully on screen. If no side fits, it stays. A side the
+player picked in the editor is tried first. Nothing moves while the editor is open, so players arrange elements at
+their own spots there.
 
 ## Special cases
 
