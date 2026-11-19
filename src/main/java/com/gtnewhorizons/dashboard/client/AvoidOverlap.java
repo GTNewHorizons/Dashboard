@@ -78,7 +78,9 @@ final class AvoidOverlap {
         }
         String[] avoid = HudLayout.getAvoid(element);
         boolean listed = avoid.length > 0;
-        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element) || staysPut(element))) {
+        if (!listed && (!DashboardConfig.avoidOverlapAuto || HudLayout.hasAvoidChoice(element)
+            || staysPut(element)
+            || followsParent(element))) {
             return bounds;
         }
         List<HudBounds> inTheWay = new ArrayList<>();
@@ -144,7 +146,7 @@ final class AvoidOverlap {
 
     /** Every element on screen it has to make room for. Attached elements belong together, so they are skipped. */
     private static List<HudBounds> findAuto(HudElement element, int screenWidth, int screenHeight, int depth) {
-        if (staysPut(element) || !element.isDrawnNow()) {
+        if (staysPut(element) || !element.isDrawnNow() || followsParent(element)) {
             return null;
         }
         List<HudBounds> inTheWay = null;
@@ -206,6 +208,11 @@ final class AvoidOverlap {
 
     private static int getArea(HudBounds bounds) {
         return bounds.width * bounds.height;
+    }
+
+    /** An attached element moves along when its parent makes room, so on its own it would leave its spot on it. */
+    private static boolean followsParent(HudElement element) {
+        return HudLayout.getAttachedTo(element) != null;
     }
 
     private static boolean staysPut(HudElement element) {
