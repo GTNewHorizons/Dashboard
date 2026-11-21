@@ -9,6 +9,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
 import com.gtnewhorizons.dashboard.Dashboard;
+import com.gtnewhorizons.dashboard.DashboardOtherConfig;
 import com.gtnewhorizons.dashboard.api.HudBounds;
 import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
@@ -21,7 +22,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * The server TPS line Extra Utilities draws in the top left corner after {@code /xu_tps}. Extra Utilities draws it at
- * the end of the frame, over every screen, so it is drawn with the HUD instead.
+ * the end of the frame, over every screen, so it is drawn with the HUD instead, unless turned off in the config.
  */
 @SideOnly(Side.CLIENT)
 @EventBusSubscriber(side = Side.CLIENT)
@@ -65,14 +66,18 @@ public final class ExtraUtilitiesCompat {
         HudRegistry.registerFallback(TPS);
     }
 
-    /** False for Extra Utilities' own run at the end of the frame, unless Dashboard could not take it over. */
-    public static boolean shouldDraw() {
-        return drawingInHud || onDraw == null;
+    /** Unless the player turned it off or Dashboard could not take the drawing over. */
+    public static boolean isDrawnWithHud() {
+        return DashboardOtherConfig.extraUtilitiesTpsWithHud && onDraw != null;
+    }
+
+    public static boolean isDrawingInHud() {
+        return drawingInHud;
     }
 
     @SubscribeEvent
     public static void onRenderOverlay(RenderGameOverlayEvent.Post event) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL || onDraw == null) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL || !isDrawnWithHud()) {
             return;
         }
         drawingInHud = true;
