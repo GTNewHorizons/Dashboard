@@ -35,6 +35,10 @@ public enum Mixins implements IMixins {
             "MixinGuiIngameForge_SleepFade",
             "MixinEntityRenderer_Camera")
         .setPhase(Phase.EARLY)),
+    EXTRAUTILITIES_HUD(new MixinBuilder("Make the Extra Utilities TPS line movable")
+        .addClientMixins("extrautilities.MixinCommandTPSTimer_Hud")
+        .addRequiredMod(Mods.EXTRAUTILITIES)
+        .setPhase(Phase.LATE)),
     GRAVISUITE_HUD(new MixinBuilder("Make the GraviSuite status text movable")
         .addClientMixins("gravisuite.MixinClientTickHandler_Hud")
         .addRequiredMod(Mods.GRAVISUITE)

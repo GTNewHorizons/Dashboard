@@ -1,0 +1,104 @@
+package com.gtnewhorizons.dashboard.compat;
+
+import java.lang.reflect.Method;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+
+import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
+import com.gtnewhorizon.gtnhlib.reflect.Fields;
+import com.gtnewhorizons.dashboard.Dashboard;
+import com.gtnewhorizons.dashboard.DashboardOtherConfig;
+import com.gtnewhorizons.dashboard.api.HudBounds;
+import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.api.HudRegistry;
+import com.gtnewhorizons.dashboard.client.PreviewDrawing;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/**
+ * The server TPS line Extra Utilities draws in the top left corner after {@code /xu_tps}. Extra Utilities draws it at
+ * the end of the frame, over every screen, so it is drawn with the HUD instead, unless turned off in the config.
+ */
+@SideOnly(Side.CLIENT)
+@EventBusSubscriber(side = Side.CLIENT)
+public final class ExtraUtilitiesCompat {
+
+    private static final String TIMER_CLASS = "com.rwtema.extrautils.CommandTPSTimer";
+    private static final String SAMPLE_TEXT = "TPS: 12.50(20.00), 10.25(20.00), 31.75(20.00)";
+
+    public static final HudElement TPS = new HudElement("extrautilities:tps", ExtraUtilitiesCompat::getTpsBounds);
+
+    private static Fields.ClassFields<Object>.Field<String> tpsText;
+    private static Object timer;
+    private static Method onDraw;
+    private static boolean drawingInHud;
+
+    private ExtraUtilitiesCompat() {}
+
+    @EventBusSubscriber.Condition
+    public static boolean isExtraUtilitiesLoaded() {
+        return Mods.EXTRAUTILITIES.isModLoaded();
+    }
+
+    public static void register() {
+        try {
+            tpsText = ModFields.field(ModFields.of(TIMER_CLASS), "displayString", String.class);
+        } catch (ReflectiveOperationException e) {
+            Dashboard.LOG.warn("Could not read the Extra Utilities TPS text, assuming the sample width", e);
+        }
+        try {
+            Class<?> timerClass = Class.forName(TIMER_CLASS);
+            timer = timerClass.getField("INSTANCE")
+                .get(null);
+            onDraw = timerClass.getMethod("onDraw", TickEvent.RenderTickEvent.class);
+        } catch (ReflectiveOperationException e) {
+            Dashboard.LOG.warn("Could not find the Extra Utilities TPS drawing, it stays over every screen", e);
+        }
+        PreviewDrawing.setImitation(
+            TPS,
+            (screenWidth, screenHeight) -> Minecraft.getMinecraft().fontRenderer
+                .drawStringWithShadow(SAMPLE_TEXT, 0, 0, 0xFFFFFF));
+        HudRegistry.registerFallback(TPS);
+    }
+
+    /** Unless the player turned it off or Dashboard could not take the drawing over. */
+    public static boolean isDrawnWithHud() {
+        return DashboardOtherConfig.extraUtilitiesTpsWithHud && onDraw != null;
+    }
+
+    public static boolean isDrawingInHud() {
+        return drawingInHud;
+    }
+
+    @SubscribeEvent
+    public static void onRenderOverlay(RenderGameOverlayEvent.Post event) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL || !isDrawnWithHud()) {
+            return;
+        }
+        drawingInHud = true;
+        try {
+            onDraw.invoke(timer, new TickEvent.RenderTickEvent(TickEvent.Phase.END, event.partialTicks));
+        } catch (ReflectiveOperationException e) {
+            Dashboard.LOG
+                .warn("Could not draw the Extra Utilities TPS line with the HUD, it stays over every screen", e);
+            onDraw = null;
+        } finally {
+            drawingInHud = false;
+        }
+    }
+
+    /** As wide as the text shown now, or the sample while the command is off, plus its shadow. */
+    private static HudBounds getTpsBounds(int screenWidth, int screenHeight) {
+        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        String text = tpsText == null ? null : tpsText.getValue(null);
+        if (text == null || text.isEmpty()) {
+            text = SAMPLE_TEXT;
+        }
+        return new HudBounds(0, 0, font.getStringWidth(text) + 1, font.FONT_HEIGHT);
+    }
+}
