@@ -10,7 +10,7 @@
 		"updateUrl": "",
 		"authorList": ["Ranzu"],
 		"credits": "",
-		"logoFile": "",
+		"logoFile": "dashboard_logo.png",
 		"screenshots": [],
 		"parent": "",
 		"requiredMods": ["gtnhlib"],
