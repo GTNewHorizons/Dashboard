@@ -149,6 +149,10 @@ dashboard.element.gravisuite.status.own_settings=GraviSuite config > hudPosition
 dashboard.preview.gravisuite.mode=Gravitation Engine: ON
 dashboard.preview.gravisuite.energy=Energy Level: 100%
 
+## Extra Utilities
+dashboard.element.extrautilities.tps=Server TPS
+dashboard.element.extrautilities.tps.description=Shows how fast the server runs.\nTurn it on or off with the §6/xu_tps§7 command.
+
 ## Hunger Overhaul
 dashboard.element.hungeroverhaul.health_status=Health Status
 dashboard.element.hungeroverhaul.health_status.description=Shows Hurt, Injured or Dying while your health is low

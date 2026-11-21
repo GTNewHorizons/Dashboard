@@ -19,6 +19,7 @@ public enum Mods implements IMod, ITargetMod { // ITargetMod for early mixin(+se
     // spotless:off
     TINKERS("TConstruct", "tinker", () -> TinkersBeltHotbar.register()),
     APPLECORE("AppleCore"),
+    EXTRAUTILITIES("ExtraUtilities", () -> ExtraUtilitiesCompat.register()),
     GRAVISUITE("GraviSuite", () -> GraviSuiteCompat.register()),
     HUNGEROVERHAUL("HungerOverhaul", () -> HungerOverhaulCompat.register()),
     BACKHAND("backhand"),
