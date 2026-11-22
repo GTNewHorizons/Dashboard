@@ -24,6 +24,7 @@ import com.google.gson.JsonParser;
 import com.gtnewhorizon.gtnhlib.util.ResourceUtil;
 import com.gtnewhorizons.dashboard.Dashboard;
 import com.gtnewhorizons.dashboard.api.HudElement;
+import com.gtnewhorizons.dashboard.client.BarSlot.Layer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -105,20 +106,52 @@ public final class BarThemes {
         return slot.fromRight != HudLayout.isFlipped(element);
     }
 
+    /** The empty bar, the fill, then one ornament: the active one while the bar is full. */
     public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
-        drawEmpty(theme, slot, x, y);
-        drawFill(slot, x, y, 0, fraction, fromRight);
+        drawWhole(theme, slot, Layer.EMPTY, x, y);
+        drawFillRange(theme, slot, x, y, 0, fraction, fromRight);
+        drawOrnament(theme, slot, x, y, isFull(slot, fraction));
     }
 
-    public static void drawEmpty(String theme, BarSlot slot, int x, int y) {
+    /**
+     * Health in its state, with the flash row and the health just lost while flashing (flash null when not), and the
+     * hardcore overlay on top. In hardcore, the hardcore ornament replaces the state's.
+     */
+    public static void drawHealth(String theme, BarSlot state, BarSlot flash, int x, int y, float fill, float lastFill,
+        boolean hardcore, boolean fromRight) {
+        drawWhole(theme, flash != null ? BarSlot.HEALTH_FLASH : state, Layer.EMPTY, x, y);
+        if (hardcore) {
+            drawWhole(theme, BarSlot.HEALTH_HARDCORE, Layer.EMPTY, x, y);
+        }
+        if (flash != null) {
+            drawFillRange(theme, flash, x, y, fill, lastFill, fromRight);
+        }
+        drawFillRange(theme, state, x, y, 0, fill, fromRight);
+        if (hardcore) {
+            drawFillRange(theme, BarSlot.HEALTH_HARDCORE, x, y, 0, fill, fromRight);
+        }
+        drawOrnament(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill));
+    }
+
+    /** A layer drawn with its 8 px space, like the empty bar or a single piece. */
+    public static void drawWhole(String theme, BarSlot slot, Layer layer, int x, int y) {
         bindTexture(theme);
         drawFromSheet(
             x - PADDING,
             y - PADDING,
-            slot.emptyU,
-            slot.emptyV,
+            slot.getU(layer),
+            slot.getV(layer),
             slot.width + PADDING * 2,
             slot.height + PADDING * 2);
+    }
+
+    public static void drawOrnament(String theme, BarSlot slot, int x, int y, boolean active) {
+        drawWhole(theme, slot, active ? Layer.ORNAMENT_ACTIVE : Layer.ORNAMENT, x, y);
+    }
+
+    /** Full once the fill covers every pixel of the bar. */
+    public static boolean isFull(BarSlot slot, float fraction) {
+        return Math.round(MathHelper.clamp_float(fraction, 0, 1) * slot.width) >= slot.width;
     }
 
     /** Overlays like the regen shine sit on a health bar, since on their own they would mean nothing. */
@@ -128,10 +161,10 @@ public final class BarThemes {
                 drawBar(theme, BarSlot.HEALTH, x, y, PREVIEW_FILL, fromRight);
                 drawRegenShine(theme, x, y, getSampleRegenStep(), fromRight);
             }
-            case HEALTH_HARDCORE -> {
-                drawBar(theme, BarSlot.HEALTH, x, y, PREVIEW_FILL, fromRight);
-                drawEmpty(theme, BarSlot.HEALTH_HARDCORE, x, y);
-            }
+            case HEALTH_HARDCORE -> drawHealth(theme, BarSlot.HEALTH, null, x, y, PREVIEW_FILL, 0, true, fromRight);
+            case HEALTH_FLASH -> drawFlashSample(theme, BarSlot.HEALTH, x, y, fromRight);
+            case HEALTH_FLASH_POISONED -> drawFlashSample(theme, BarSlot.HEALTH_POISONED, x, y, fromRight);
+            case HEALTH_FLASH_WITHERED -> drawFlashSample(theme, BarSlot.HEALTH_WITHERED, x, y, fromRight);
             case AIR_POP -> {
                 drawBar(theme, BarSlot.AIR, x, y, PREVIEW_FILL, fromRight);
                 drawAirPop(theme, x, y, PREVIEW_FILL, fromRight);
@@ -142,6 +175,11 @@ public final class BarThemes {
             }
             default -> drawBar(theme, slot, x, y, PREVIEW_FILL, fromRight);
         }
+    }
+
+    /** The rest of the bar shows as just lost. */
+    private static void drawFlashSample(String theme, BarSlot state, int x, int y, boolean fromRight) {
+        drawHealth(theme, state, state.getFlashFill(), x, y, PREVIEW_FILL, 1, false, fromRight);
     }
 
     /** From the clock, since samples have no game ticks. */
@@ -161,7 +199,7 @@ public final class BarThemes {
         }
         int offset = step * 8;
         int x = fromRight ? barX + BarSlot.HEALTH.width - BarSlot.HEALTH_REGEN.width - offset : barX + offset;
-        drawEmpty(theme, BarSlot.HEALTH_REGEN, x, barY);
+        drawWhole(theme, BarSlot.HEALTH_REGEN, Layer.EMPTY, x, barY);
     }
 
     public static void drawAirPop(String theme, int barX, int barY, float fill, boolean fromRight) {
@@ -169,7 +207,7 @@ public final class BarThemes {
         int pop = BarSlot.AIR_POP.width;
         int edge = Math.min(Math.round(MathHelper.clamp_float(fill, 0, 1) * width), width - pop);
         int x = fromRight ? barX + width - edge - pop : barX + edge;
-        drawEmpty(theme, BarSlot.AIR_POP, x, barY);
+        drawWhole(theme, BarSlot.AIR_POP, Layer.EMPTY, x, barY);
     }
 
     /** Only part of the fill, like the health lost in a damage flash. */
@@ -194,7 +232,13 @@ public final class BarThemes {
             return;
         }
         int offset = fromRight ? slot.width - end : start;
-        drawFromSheet(x + offset, y, slot.fullU + PADDING + offset, slot.fullV + PADDING, end - start, slot.height);
+        drawFromSheet(
+            x + offset,
+            y,
+            slot.getU(Layer.FULL) + PADDING + offset,
+            slot.getV(Layer.FULL) + PADDING,
+            end - start,
+            slot.height);
     }
 
     private static void drawFromSheet(int x, int y, int u, int v, int width, int height) {

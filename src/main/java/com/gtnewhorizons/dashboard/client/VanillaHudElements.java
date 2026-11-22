@@ -262,7 +262,6 @@ public final class VanillaHudElements {
             case HEALTH_ABSORPTION -> drawIconRowPreview(x, y, false, 16, 160, 169, 0);
             case FOOD_HUNGER -> drawIconRowPreview(x, y, true, 133, 88, 97, 27);
             case AIR_POP -> drawIconRowPreview(x, y, true, -1, 16, 25, 18);
-            case HEALTH_FLASH_EMPTY -> drawIconRowPreview(x, y, false, 25, 52, 61, 0);
             case HEALTH_FLASH -> drawIconRowPreview(x, y, false, 25, 70, 79, 0);
             case HEALTH_FLASH_POISONED -> drawIconRowPreview(x, y, false, 25, 106, 115, 0);
             case HEALTH_FLASH_WITHERED -> drawIconRowPreview(x, y, false, 25, 142, 151, 0);
@@ -577,7 +576,7 @@ public final class VanillaHudElements {
         return true;
     }
 
-    /** With its shake, flash, regeneration, hardcore overlay and the absorption bar above it. */
+    /** With its shake, flash, regeneration and the absorption bar above it. */
     private static void drawThemedHealth(Minecraft mc, String theme, int x, int barY, float fill, float absorption,
         boolean fromRight) {
         EntityPlayer player = mc.thePlayer;
@@ -585,21 +584,20 @@ public final class VanillaHudElements {
             barY += getLowHealthShake(mc);
         }
         BarSlot stateSlot = getStateSlot(BarSlot.HEALTH, player);
-        if (isHealthFlashing(player)) {
-            float lastFill = player.prevHealth / player.getMaxHealth();
-            BarThemes.drawEmpty(theme, BarSlot.HEALTH_FLASH_EMPTY, x, barY);
-            BarThemes.drawFillRange(theme, getFlashSlot(stateSlot), x, barY, fill, lastFill, fromRight);
-            BarThemes.drawFillRange(theme, stateSlot, x, barY, 0, fill, fromRight);
-        } else {
-            BarThemes.drawBar(theme, stateSlot, x, barY, fill, fromRight);
-        }
+        BarThemes.drawHealth(
+            theme,
+            stateSlot,
+            isHealthFlashing(player) ? stateSlot.getFlashFill() : null,
+            x,
+            barY,
+            fill,
+            player.prevHealth / player.getMaxHealth(),
+            mc.theWorld.getWorldInfo()
+                .isHardcoreModeEnabled(),
+            fromRight);
         if (player.isPotionActive(Potion.regeneration)) {
             int step = BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter());
             BarThemes.drawRegenShine(theme, x, barY, step, fromRight);
-        }
-        if (mc.theWorld.getWorldInfo()
-            .isHardcoreModeEnabled()) {
-            BarThemes.drawEmpty(theme, BarSlot.HEALTH_HARDCORE, x, barY);
         }
         if (absorption > 0) {
             float absorptionFill = Math.min(1, absorption / player.getMaxHealth());
@@ -655,12 +653,15 @@ public final class VanillaHudElements {
         return MathHelper.clamp_float(alpha, 0, 1);
     }
 
+    /** One state at a time, withered over poisoned. Hardcore is drawn over any of them. */
     private static BarSlot getStateSlot(BarSlot slot, EntityPlayer player) {
-        if (slot == BarSlot.HEALTH && player.isPotionActive(Potion.poison)) {
-            return BarSlot.HEALTH_POISONED;
-        }
-        if (slot == BarSlot.HEALTH && player.isPotionActive(Potion.wither)) {
-            return BarSlot.HEALTH_WITHERED;
+        if (slot == BarSlot.HEALTH) {
+            if (player.isPotionActive(Potion.wither)) {
+                return BarSlot.HEALTH_WITHERED;
+            }
+            if (player.isPotionActive(Potion.poison)) {
+                return BarSlot.HEALTH_POISONED;
+            }
         }
         if (slot == BarSlot.FOOD && player.isPotionActive(Potion.hunger)) {
             return BarSlot.FOOD_HUNGER;
@@ -693,14 +694,6 @@ public final class VanillaHudElements {
         }
         SHAKE.setSeed(tick * 312871L);
         return SHAKE.nextInt(3) - 1;
-    }
-
-    private static BarSlot getFlashSlot(BarSlot healthSlot) {
-        return switch (healthSlot) {
-            case HEALTH_POISONED -> BarSlot.HEALTH_FLASH_POISONED;
-            case HEALTH_WITHERED -> BarSlot.HEALTH_FLASH_WITHERED;
-            default -> BarSlot.HEALTH_FLASH;
-        };
     }
 
     /** These events fire even when nothing is drawn: no boss nearby, in creative, no armor, or not underwater. */
