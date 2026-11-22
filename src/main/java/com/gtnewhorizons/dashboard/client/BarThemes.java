@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.MathHelper;
@@ -106,11 +106,14 @@ public final class BarThemes {
         return slot.fromRight != HudLayout.isFlipped(element);
     }
 
-    /** The empty bar, the fill, then one ornament: the active one while the bar is full. */
+    /**
+     * The empty bar, the fill, then one ornament: the active one while the bar is full. Sheets are painted filling from
+     * the left, so a bar filling from the right is drawn mirrored.
+     */
     public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
-        drawWhole(theme, slot, Layer.EMPTY, x, y);
+        drawWhole(theme, slot, Layer.EMPTY, x, y, fromRight);
         drawFillRange(theme, slot, x, y, 0, fraction, fromRight);
-        drawOrnament(theme, slot, x, y, isFull(slot, fraction));
+        drawOrnament(theme, slot, x, y, isFull(slot, fraction), fromRight);
     }
 
     /**
@@ -119,9 +122,9 @@ public final class BarThemes {
      */
     public static void drawHealth(String theme, BarSlot state, BarSlot flash, int x, int y, float fill, float lastFill,
         boolean hardcore, boolean fromRight) {
-        drawWhole(theme, flash != null ? BarSlot.HEALTH_FLASH : state, Layer.EMPTY, x, y);
+        drawWhole(theme, flash != null ? BarSlot.HEALTH_FLASH : state, Layer.EMPTY, x, y, fromRight);
         if (hardcore) {
-            drawWhole(theme, BarSlot.HEALTH_HARDCORE, Layer.EMPTY, x, y);
+            drawWhole(theme, BarSlot.HEALTH_HARDCORE, Layer.EMPTY, x, y, fromRight);
         }
         if (flash != null) {
             drawFillRange(theme, flash, x, y, fill, lastFill, fromRight);
@@ -130,11 +133,11 @@ public final class BarThemes {
         if (hardcore) {
             drawFillRange(theme, BarSlot.HEALTH_HARDCORE, x, y, 0, fill, fromRight);
         }
-        drawOrnament(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill));
+        drawOrnament(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill), fromRight);
     }
 
     /** A layer drawn with its 8 px space, like the empty bar or a single piece. */
-    public static void drawWhole(String theme, BarSlot slot, Layer layer, int x, int y) {
+    public static void drawWhole(String theme, BarSlot slot, Layer layer, int x, int y, boolean mirrored) {
         bindTexture(theme);
         drawFromSheet(
             x - PADDING,
@@ -142,11 +145,12 @@ public final class BarThemes {
             slot.getU(layer),
             slot.getV(layer),
             slot.width + PADDING * 2,
-            slot.height + PADDING * 2);
+            slot.height + PADDING * 2,
+            mirrored);
     }
 
-    public static void drawOrnament(String theme, BarSlot slot, int x, int y, boolean active) {
-        drawWhole(theme, slot, active ? Layer.ORNAMENT_ACTIVE : Layer.ORNAMENT, x, y);
+    public static void drawOrnament(String theme, BarSlot slot, int x, int y, boolean active, boolean mirrored) {
+        drawWhole(theme, slot, active ? Layer.ORNAMENT_ACTIVE : Layer.ORNAMENT, x, y, mirrored);
     }
 
     /** Full once the fill covers every pixel of the bar. */
@@ -199,7 +203,7 @@ public final class BarThemes {
         }
         int offset = step * 8;
         int x = fromRight ? barX + BarSlot.HEALTH.width - BarSlot.HEALTH_REGEN.width - offset : barX + offset;
-        drawWhole(theme, BarSlot.HEALTH_REGEN, Layer.EMPTY, x, barY);
+        drawWhole(theme, BarSlot.HEALTH_REGEN, Layer.EMPTY, x, barY, fromRight);
     }
 
     public static void drawAirPop(String theme, int barX, int barY, float fill, boolean fromRight) {
@@ -207,7 +211,7 @@ public final class BarThemes {
         int pop = BarSlot.AIR_POP.width;
         int edge = Math.min(Math.round(MathHelper.clamp_float(fill, 0, 1) * width), width - pop);
         int x = fromRight ? barX + width - edge - pop : barX + edge;
-        drawWhole(theme, BarSlot.AIR_POP, Layer.EMPTY, x, barY);
+        drawWhole(theme, BarSlot.AIR_POP, Layer.EMPTY, x, barY, fromRight);
     }
 
     /** Only part of the fill, like the health lost in a damage flash. */
@@ -231,18 +235,34 @@ public final class BarThemes {
         if (end <= start) {
             return;
         }
-        int offset = fromRight ? slot.width - end : start;
         drawFromSheet(
-            x + offset,
+            x + (fromRight ? slot.width - end : start),
             y,
-            slot.getU(Layer.FULL) + PADDING + offset,
+            slot.getU(Layer.FULL) + PADDING + start,
             slot.getV(Layer.FULL) + PADDING,
             end - start,
-            slot.height);
+            slot.height,
+            fromRight);
     }
 
-    private static void drawFromSheet(int x, int y, int u, int v, int width, int height) {
-        Gui.func_146110_a(x, y, u, v, width, height, SHEET_SIZE, SHEET_SIZE);
+    /** Like Gui.func_146110_a, which can not mirror. */
+    private static void drawFromSheet(int x, int y, int u, int v, int width, int height, boolean mirrored) {
+        float left = (float) u / SHEET_SIZE;
+        float right = (float) (u + width) / SHEET_SIZE;
+        float top = (float) v / SHEET_SIZE;
+        float bottom = (float) (v + height) / SHEET_SIZE;
+        if (mirrored) {
+            float swap = left;
+            left = right;
+            right = swap;
+        }
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV(x, y + height, 0, left, bottom);
+        tessellator.addVertexWithUV(x + width, y + height, 0, right, bottom);
+        tessellator.addVertexWithUV(x + width, y, 0, right, top);
+        tessellator.addVertexWithUV(x, y, 0, left, top);
+        tessellator.draw();
     }
 
     private static void bindTexture(String theme) {
