@@ -190,7 +190,7 @@ under **Dashboard**. While chat is open, you can also zoom into a picture: **scr
 
 To change a picture's starting size, see-through look or animation, add an `images.json` to the same folder, using
 the file names without `.png`. It takes the same settings as pack images, see the
-[Texture Guide](src/main/resources/assets/dashboard/textures/gui/TextureGuide.md).
+[Texture Guide](docs/TextureGuide.md).
 
 ## For Resource Pack Makers
 
@@ -201,7 +201,7 @@ A resource pack can change how Dashboard looks and add to it, all from `assets/d
 - **Pack images**: pictures shown on the HUD, like a logo or a frame around the hotbar, listed in `images.json`. Each
   one is an element players can move, resize and hide in the editor. Images can be see-through and animated.
 
-The [Texture Guide](src/main/resources/assets/dashboard/textures/gui/TextureGuide.md) explains each one: file names,
+The [Texture Guide](docs/TextureGuide.md) explains each one: file names,
 sheet layouts and every setting.
 
 ## For Mod Developers
