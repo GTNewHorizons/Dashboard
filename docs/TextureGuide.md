@@ -1,8 +1,10 @@
 # Dashboard textures
 
+Everything here lives in `assets/dashboard/textures/gui/`.
+
 Each PNG listed in `themes.json` is one bar theme. The file name is the theme id (`simple.png` is the theme `simple`).
-`crosshairs.png` in this folder is the crosshair sheet, not a theme. The `images` folder holds pack images.
-Every theme uses the same layout, shown below.
+`crosshairs.png` is the crosshair sheet, not a theme. The `images` folder holds pack images.
+Every theme uses the same layout, shown below and in [theme_template.png](theme_template.png).
 
 ## themes.json
 
@@ -77,40 +79,64 @@ players can move, resize and hide. They are listed in `images.json`, next to `th
 - Every slot is the bar plus **8 px of space on each side**. The bar starts 8 px in from the slot's top left corner.
 - Wide slots (XP, jump, boss): **198 x 21**, bar **182 x 5**
 - Row slots (everything else): **97 x 25**, bar **81 x 9**
+- Each bar has 4 slots: **empty**, **full**, **ornament** and **ornament active**.
 
 ## Slots
 
 Coordinates are the top left corner of the slot, in pixels (u across, v down).
 
-| v \ u | 0 | 97 | 194 | 291 |
+Wide bars, 2 x 2 each:
+
+| v | u 0 | u 198 |
+|---|---|---|
+| **0** | XP empty | XP full |
+| **21** | XP ornament | XP ornament active |
+| **42** | Jump empty | Jump full |
+| **63** | Jump ornament | Jump ornament active |
+| **84** | Boss empty | Boss full |
+| **105** | Boss ornament | Boss ornament active |
+
+Row bars, one row each:
+
+| v | u 0 | u 97 | u 194 | u 291 |
 |---|---|---|---|---|
-| **0** | XP empty | | XP full *(at u 198)* | |
-| **21** | Jump empty | | Jump full *(at u 198)* | |
-| **42** | Boss empty | | Boss full *(at u 198)* | |
-| **63** | Health empty | Health full | Armor empty | Armor full |
-| **88** | Food empty | Food full | Air empty | Air full |
-| **113** | Mount health empty | Mount health full | | |
-| **138** | Health poisoned (full) | Health withered (full) | Absorption (full) | Hunger effect (full) |
-| **163** | Health flash (empty) | Health flash (full) | Health flash poisoned (full) | Health flash withered (full) |
-| **188** | Health regen shine *(u 0, 25 x 25)*, Air pop *(u 25, 25 x 25)* | Health hardcore overlay | | |
-| **213** | *(kept free for vanilla)* | | | |
-| **238** | AppleCore saturation (full) | AppleCore exhaustion (full) | | |
+| **126** | Health empty | Health full | Health ornament | Health ornament active |
+| **151** | Poisoned empty | Poisoned full | Poisoned ornament | Poisoned ornament active |
+| **176** | Withered empty | Withered full | Withered ornament | Withered ornament active |
+| **201** | Hardcore empty | Hardcore full | Hardcore ornament | Hardcore ornament active |
+| **226** | Flash empty | Flash full | Flash ornament | Flash ornament active |
+| **251** | Flash poisoned (full) | Flash withered (full) | | |
+| **276** | Absorption empty | Absorption full | Absorption ornament | Absorption ornament active |
+| **301** | Armor empty | Armor full | Armor ornament | Armor ornament active |
+| **326** | Food empty | Food full | Food ornament | Food ornament active |
+| **351** | Hunger empty | Hunger full | Hunger ornament | Hunger ornament active |
+| **376** | Air empty | Air full | Air ornament | Air ornament active |
+| **401** | Mount health empty | Mount health full | Mount health ornament | Mount health ornament active |
+| **426** | Regen shine *(u 0, 25 x 25)*, Air pop *(u 25, 25 x 25)* | AppleCore saturation (full) | AppleCore exhaustion (full) | |
 
 ## How the slots are used
 
-- **Empty** slots are drawn whole, including their 8 px space. Paint any flair (outlines, glow, ornaments) there.
-- **Full** slots are cut to how full the bar is, and only the bar area is used. Leave their 8 px space transparent.
-- Flair that reaches into the bar area of an empty slot gets covered by the fill.
-- **States** (poisoned, withered, absorption, hunger effect) are full bars drawn over the normal empty bar.
+- Every slot is drawn exactly as painted. A transparent slot draws nothing, so state rows (poisoned, withered, flash,
+  hunger) need their empty bar and ornaments painted too, not only the fill.
+- **Empty** slots and **ornaments** are drawn whole, including their 8 px space. Paint outlines, glow and frames there.
+- **Full** slots are cut to how full the bar is, and only the bar area is used. Their 8 px space is ignored.
+- Flair that reaches into the bar area of an empty slot gets covered by the fill. Ornaments are drawn after the fill.
+- **Ornament active** replaces the ornament while the bar is completely full.
+- Paint every bar **filling from the left**, with its ornament at the right end. Bars that fill from the right (food,
+  air and mount health by default, or any bar a player flips) are drawn mirrored.
+- **Poisoned** and **withered** replace the health row while the effect lasts. Withered wins over poisoned.
+- **Hunger** replaces the food row during the Hunger effect.
+- **Absorption** is its own bar, drawn above health.
 - **Health flash** is used for half a second after taking damage: the flash empty bar replaces the normal one, and
-  the flash full bar shows the health just lost (normal, poisoned or withered).
+  the flash full bar shows the health just lost. While poisoned or withered, the flash poisoned or flash withered
+  fill shows it instead.
+- **Hardcore** is drawn on top of the health bar in Hardcore worlds, whatever state it is in: its empty over the empty
+  bar, its full over the fill. Its ornaments replace the health ornaments. Leave it transparent where the bar should
+  show through.
 - **Health regen shine** is a 9 x 9 piece (25 x 25 with its 8 px space), drawn whole on top of the health bar during
   Regeneration. It steps along the bar one heart width (8 px) per tick, like vanilla's heart wave.
-- **Health hardcore overlay** is drawn whole (with its 8 px space) on top of the health bar in Hardcore worlds,
-  whatever state the bar is in. Leave it transparent where the bar should show through.
 - **Air pop** is a 9 x 9 piece (25 x 25 with its 8 px space), drawn whole just past the end of the air fill for a
   moment whenever a bubble runs out, like vanilla's popping bubble.
 - **AppleCore saturation** and **AppleCore exhaustion** are only used when AppleCore is installed. Both are full bars
   cut to how full they are and drawn over the food fill, exhaustion first, then saturation. Make them see-through,
   so the food fill shows under them.
-- Food, air and mount health fill from the right by default, the others from the left. Players can flip any bar.
