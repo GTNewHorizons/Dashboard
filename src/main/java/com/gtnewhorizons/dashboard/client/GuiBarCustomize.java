@@ -2,9 +2,12 @@ package com.gtnewhorizons.dashboard.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import net.minecraft.client.gui.GuiButton;
@@ -34,18 +37,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class GuiBarCustomize extends GuiScreen {
 
     private static final int BUTTON_DONE = 0;
-    private static final int BUTTON_ALL = 1;
-    private static final int BUTTON_RESET_FLIPS = 2;
     private static final int BUTTON_STATES = 3;
     private static final int SCROLL_UP = 4;
     private static final int SCROLL_DOWN = 5;
-    private static final int BUTTON_RESET = 6;
     private static final int BUTTON_CROSSHAIR_STYLE = 7;
     private static final int BUTTON_CROSSHAIR_SIZE = 8;
-    private static final int BUTTON_ALL_NUMBERS = 9;
-    private static final int BUTTON_ALL_NUMBER_STYLES = 10;
-    private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
-    private static final int BUTTON_RESET_DECORATIONS = 12;
     private static final int BUTTON_RESET_CROSSHAIR = 14;
     private static final int BUTTON_TINKERS_CROSSHAIR = 15;
     private static final int BUTTON_AVOID_OVERLAP = 16;
@@ -53,11 +49,10 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int SWATCH_SIZE = 20;
     private static final int LINE_HEIGHT = BarSlot.HEALTH.height + BarThemes.PADDING * 2 + 1;
     private static final int THEME_BUTTON_WIDTH = 120;
-    private static final int FLIP_BUTTON_WIDTH = 20;
-    private static final int NUMBER_BUTTON_WIDTH = 40;
-    private static final int NUMBER_STYLE_BUTTON_WIDTH = 52;
-    private static final int DECIMALS_BUTTON_WIDTH = 40;
+    private static final int ICON_BUTTON_WIDTH = 20;
+    private static final int SETTING_BUTTON_WIDTH = 52;
     private static final int SECTION_BUTTON_WIDTH = 80;
+    private static final int ALL_BARS = -1;
     private static final int BOTTOM_BUTTON_WIDTH = 100;
     private static final int COLUMN_GAP = 6;
     private static final int TITLE_Y = 8;
@@ -87,27 +82,20 @@ public class GuiBarCustomize extends GuiScreen {
     private static boolean showStates;
 
     private final GuiScreen parent;
+    private final Set<Integer> open = new HashSet<>();
     private final List<HudElement> bars = new ArrayList<>();
     private final List<BarSlot> slots = new ArrayList<>();
-    private final List<Row> rows = new ArrayList<>();
+    private final List<List<HudElement>> barNumbers = new ArrayList<>();
     private final List<Line> lines = new ArrayList<>();
     private final List<HudElement> numbers = new ArrayList<>();
     private final GuiButton scrollUp = new GuiButton(SCROLL_UP, 0, 0, "");
     private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
     private final GuiButton themeButton = GuiHelpers.button(0, 0, THEME_BUTTON_WIDTH);
-    private final IconButton flipButton = GuiHelpers.iconButton(0, 0, FLIP_BUTTON_WIDTH, Icons.ARROW_RIGHT);
-    private final IconButton decorationButton = GuiHelpers.iconButton(0, 0, FLIP_BUTTON_WIDTH, Icons.DECORATION_ON);
-    private final GuiButton numberButton = GuiHelpers.button(0, 0, NUMBER_BUTTON_WIDTH);
-    private final GuiButton numberStyleButton = GuiHelpers.button(0, 0, NUMBER_STYLE_BUTTON_WIDTH);
-    private final GuiButton decimalsButton = GuiHelpers.button(0, 0, DECIMALS_BUTTON_WIDTH);
+    private final IconButton moreSettingsButton = GuiHelpers.iconButton(0, 0, ICON_BUTTON_WIDTH, Icons.MORE_SETTINGS);
+    private final IconButton barResetButton = GuiHelpers.iconButton(0, 0, ICON_BUTTON_WIDTH, Icons.RESET);
+    private final IconButton flipButton = GuiHelpers.iconButton(0, 0, ICON_BUTTON_WIDTH, Icons.ARROW_RIGHT);
+    private final GuiButton settingButton = GuiHelpers.button(0, 0, SETTING_BUTTON_WIDTH);
     private BarList list;
-    private GuiButton allButton;
-    private GuiButton resetFlipsButton;
-    private GuiButton resetDecorationsButton;
-    private GuiButton allNumbersButton;
-    private GuiButton allNumberStylesButton;
-    private GuiButton allDecimalsButton;
-    private GuiButton resetButton;
     private GuiButton crosshairStyleButton;
     private GuiButton crosshairSizeButton;
     private GuiButton resetCrosshairButton;
@@ -123,9 +111,9 @@ public class GuiBarCustomize extends GuiScreen {
     private int contentWidth;
     private int crosshairLeft;
     private int previewLines;
-    private boolean twoLines;
+    private int numberSampleWidth;
+    private boolean previewBeside;
     private boolean rebuildNeeded;
-    private String allBarsLabel;
     private List<String> rowTooltip;
     private String title;
 
@@ -148,81 +136,36 @@ public class GuiBarCustomize extends GuiScreen {
         title = StatCollector.translateToLocal("dashboard.customize.title");
         bars.clear();
         slots.clear();
-        rows.clear();
+        barNumbers.clear();
         lines.clear();
         numbers.clear();
-        int stateNameWidth = 0;
         for (Map.Entry<HudElement, BarSlot> entry : VanillaHudElements.getThemedBars()
             .entrySet()) {
-            int barIndex = bars.size();
             bars.add(entry.getKey());
             slots.add(entry.getValue());
+            List<HudElement> own = new ArrayList<>();
             HudElement number = BarNumbers.getNumber(entry.getKey());
-            addRow(
-                new Row(
-                    barIndex,
-                    entry.getValue(),
-                    entry.getKey()
-                        .getDisplayName(),
-                    false,
-                    number,
-                    false));
+            if (number != null) {
+                own.add(number);
+            }
             if (entry.getValue() == BarSlot.FOOD) {
-                String saturation = StatCollector.translateToLocal("dashboard.customize.saturation");
-                addRow(new Row(barIndex, BarSlot.FOOD, saturation, false, BarNumbers.getSaturationNumber(), true));
+                own.add(BarNumbers.getSaturationNumber());
             }
-            for (BarSlot state : entry.getValue()
-                .getStates()) {
-                stateNameWidth = Math.max(stateNameWidth, fontRendererObj.getStringWidth(getStateName(state)));
-                if (showStates) {
-                    addRow(new Row(barIndex, state, getStateName(state), true, null, false));
-                }
-            }
+            barNumbers.add(own);
+            numbers.addAll(own);
         }
+        measureColumns();
 
-        // Measured over every row, so the columns line up
-        nameWidth = Math.max(stateNameWidth, fontRendererObj.getStringWidth(getAllBarsName()));
-        int previewWidth = 0;
-        int numberSampleWidth = BarThemes.PADDING + fontRendererObj.getStringWidth("000 / 000");
-        for (Row row : rows) {
-            nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(row.name));
-            int rowWidth = row.number != null && !row.numberOnly ? row.slot.width + numberSampleWidth : row.slot.width;
-            previewWidth = Math.max(previewWidth, rowWidth);
-        }
-        int themeWidth = THEME_BUTTON_WIDTH + (COLUMN_GAP + FLIP_BUTTON_WIDTH) * 2;
-        int numbersWidth = NUMBER_BUTTON_WIDTH + COLUMN_GAP
-            + NUMBER_STYLE_BUTTON_WIDTH
-            + COLUMN_GAP
-            + DECIMALS_BUTTON_WIDTH
-            + COLUMN_GAP
-            + BarThemes.PADDING
-            + previewWidth
-            + BarThemes.PADDING;
-        int oneLineWidth = nameWidth + COLUMN_GAP + themeWidth + COLUMN_GAP + numbersWidth;
-        twoLines = oneLineWidth > width - SCREEN_MARGIN * 2;
-        contentWidth = twoLines ? nameWidth + COLUMN_GAP + Math.max(themeWidth, numbersWidth) : oneLineWidth;
-
-        // Buttons inside the list get their height while the list draws
-        int left = getContentLeft();
         String states = StatCollector
             .translateToLocal(showStates ? "dashboard.customize.hide_states" : "dashboard.customize.show_states");
         GuiButton statesButton = GuiHelpers.button(BUTTON_STATES, 0, SECTION_BUTTON_WIDTH, states);
         String reset = StatCollector.translateToLocal("dashboard.customize.reset");
-        resetButton = GuiHelpers.button(BUTTON_RESET, 0, SECTION_BUTTON_WIDTH, reset);
-        allButton = GuiHelpers.button(BUTTON_ALL, left + getButtonX(), THEME_BUTTON_WIDTH);
-        resetFlipsButton = GuiHelpers.iconButton(BUTTON_RESET_FLIPS, left + getFlipX(), FLIP_BUTTON_WIDTH, Icons.RESET);
-        resetDecorationsButton = GuiHelpers
-            .iconButton(BUTTON_RESET_DECORATIONS, left + getDecorationX(), FLIP_BUTTON_WIDTH, Icons.DECORATION_ON);
-        allNumbersButton = GuiHelpers.button(BUTTON_ALL_NUMBERS, left + getNumberX(), NUMBER_BUTTON_WIDTH);
-        allNumberStylesButton = GuiHelpers
-            .button(BUTTON_ALL_NUMBER_STYLES, left + getNumberStyleX(), NUMBER_STYLE_BUTTON_WIDTH);
-        allDecimalsButton = GuiHelpers.button(BUTTON_ALL_NUMBER_DECIMALS, left + getDecimalsX(), DECIMALS_BUTTON_WIDTH);
         resetCrosshairButton = GuiHelpers.button(BUTTON_RESET_CROSSHAIR, 0, SECTION_BUTTON_WIDTH, reset);
         int crosshairNameWidth = fontRendererObj.getStringWidth(getCrosshairStyleName());
         int crosshairWidth = crosshairNameWidth + COLUMN_GAP
             + THEME_BUTTON_WIDTH
             + COLUMN_GAP
-            + FLIP_BUTTON_WIDTH
+            + ICON_BUTTON_WIDTH
             + COLUMN_GAP
             + CROSSHAIR_BACKGROUNDS.length * SWATCH_SIZE;
         crosshairLeft = width / 2 - crosshairWidth / 2;
@@ -231,7 +174,7 @@ public class GuiBarCustomize extends GuiScreen {
         crosshairSizeButton = GuiHelpers.button(
             BUTTON_CROSSHAIR_SIZE,
             crosshairStyleButton.xPosition + THEME_BUTTON_WIDTH + COLUMN_GAP,
-            FLIP_BUTTON_WIDTH);
+            ICON_BUTTON_WIDTH);
         int columnWidth = Math.min(STATUS_COLUMN_WIDTH, (contentWidth - STATUS_COLUMN_GAP) / 2);
         tinkersCrosshairButton = Mods.TINKERS.isModLoaded()
             ? GuiHelpers.button(BUTTON_TINKERS_CROSSHAIR, 0, columnWidth)
@@ -239,30 +182,18 @@ public class GuiBarCustomize extends GuiScreen {
         updateCrosshairButtons();
 
         addHeader("dashboard.customize.section.bars");
-        if (twoLines) {
-            lines.add(new Line(getAllBarsName(), allButton, resetFlipsButton, resetDecorationsButton));
-            lines.add(new Line(null, allNumbersButton, allNumberStylesButton, allDecimalsButton));
-        } else {
-            lines.add(
-                new Line(
-                    getAllBarsName(),
-                    allButton,
-                    resetFlipsButton,
-                    resetDecorationsButton,
-                    allNumbersButton,
-                    allNumberStylesButton,
-                    allDecimalsButton));
-        }
+        addBar(ALL_BARS);
         lines.add(new Line(null));
-        for (Row row : rows) {
-            if (twoLines && row.number != null && !row.numberOnly) {
-                lines.add(new BarLine(row, true, false));
-                lines.add(new BarLine(row, false, true));
-            } else {
-                lines.add(new BarLine(row, true, true));
+        for (int i = 0; i < bars.size(); i++) {
+            addBar(i);
+            if (showStates) {
+                for (BarSlot state : slots.get(i)
+                    .getStates()) {
+                    lines.add(new StateLine(i, state));
+                }
             }
         }
-        addSectionEnd(statesButton, resetButton);
+        addSectionEnd(statesButton);
 
         addHeader("dashboard.customize.crosshair");
         lines.add(new CrosshairLine());
@@ -336,7 +267,6 @@ public class GuiBarCustomize extends GuiScreen {
                 BOTTOM_BUTTON_WIDTH,
                 GuiHelpers.BUTTON_HEIGHT,
                 done));
-        updateAllBarsRow();
     }
 
     /** A section's title, with a gap below. */
@@ -351,40 +281,101 @@ public class GuiBarCustomize extends GuiScreen {
         lines.add(new Line(null));
     }
 
-    private void addRow(Row row) {
-        rows.add(row);
-        if (row.number != null) {
-            numbers.add(row.number);
+    /** Measured over every bar, setting and state, so the columns line up. */
+    private void measureColumns() {
+        nameWidth = fontRendererObj.getStringWidth(getAllBarsName());
+        int previewWidth = 0;
+        numberSampleWidth = BarThemes.PADDING + fontRendererObj.getStringWidth("000 / 000");
+        for (int i = 0; i < bars.size(); i++) {
+            nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(getBarName(i)));
+            previewWidth = Math.max(
+                previewWidth,
+                slots.get(i).width + numberSampleWidth * barNumbers.get(i)
+                    .size());
+            for (BarSlot state : slots.get(i)
+                .getStates()) {
+                nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(getStateName(state)));
+            }
+        }
+        int descriptionWidth = 0;
+        for (Setting setting : Setting.values()) {
+            nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(setting.getName(false)));
+            nameWidth = Math.max(nameWidth, fontRendererObj.getStringWidth(setting.getName(true)));
+            descriptionWidth = Math.max(descriptionWidth, fontRendererObj.getStringWidth(setting.getDescription()));
+        }
+        int besideWidth = getBesidePreviewX() + previewWidth + BarThemes.PADDING;
+        int settingWidth = getDescriptionX() + descriptionWidth;
+        int belowWidth = getButtonX() + BarThemes.PADDING + previewWidth + BarThemes.PADDING;
+        int maxWidth = width - SCREEN_MARGIN * 2;
+        previewBeside = besideWidth <= maxWidth;
+        contentWidth = Math.min(maxWidth, Math.max(previewBeside ? besideWidth : belowWidth, settingWidth));
+    }
+
+    /** The bar's line, its preview below it on narrow screens, then its settings while open. */
+    private void addBar(int barIndex) {
+        lines.add(new BarLine(barIndex));
+        if (!previewBeside && barIndex != ALL_BARS) {
+            lines.add(new PreviewLine(barIndex));
+        }
+        if (!open.contains(barIndex)) {
+            return;
+        }
+        lines.add(new SettingLine(barIndex, Setting.FILL_DIRECTION, null));
+        lines.add(new SettingLine(barIndex, Setting.DECORATIONS, null));
+        List<HudElement> own = barIndex == ALL_BARS ? Collections.singletonList(null) : barNumbers.get(barIndex);
+        for (HudElement number : own) {
+            lines.add(new SettingLine(barIndex, Setting.NUMBER, number));
+            lines.add(new SettingLine(barIndex, Setting.NUMBER_STYLE, number));
+            lines.add(new SettingLine(barIndex, Setting.DECIMALS, number));
         }
     }
 
-    /** Only changes after a click. */
-    private void updateAllBarsRow() {
-        String mixed = StatCollector.translateToLocal("dashboard.customize.mixed");
-        allBarsLabel = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0))) : mixed;
-        allButton.displayString = fitToButton(allBarsLabel, allButton);
-        resetFlipsButton.enabled = anyBar(HudLayout::isFlipped);
-        resetDecorationsButton.enabled = anyBar(HudLayout::isDecorationHidden);
+    private String getBarName(int barIndex) {
+        return barIndex == ALL_BARS ? getAllBarsName()
+            : bars.get(barIndex)
+                .getDisplayName();
+    }
 
-        int numbersOn = countNumbersOn();
-        allNumbersButton.displayString = numbersOn == numbers.size() ? GuiHelpers.getOnOff(true)
-            : numbersOn == 0 ? GuiHelpers.getOnOff(false) : mixed;
-        NumberStyle style = getCommonNumberStyle();
-        allNumberStylesButton.displayString = style != null ? getStyleSample(style) : mixed;
-        allNumberStylesButton.enabled = numbersOn > 0;
-        Integer decimals = getCommonDecimals();
-        allDecimalsButton.displayString = decimals != null ? getDecimalsLabel(decimals) : mixed;
-        allDecimalsButton.enabled = numbersOn > 0;
+    private List<HudElement> getBars(int barIndex) {
+        return barIndex == ALL_BARS ? bars : Collections.singletonList(bars.get(barIndex));
+    }
 
-        resetButton.enabled = resetFlipsButton.enabled || resetDecorationsButton.enabled
-            || anyBarThemed()
-            || numbersOn > 0
-            || style != NumberStyle.SLASH
-            || anyDecimalsChanged();
+    /** All bars' numbers, or one bar's. */
+    private List<HudElement> getNumbers(int barIndex) {
+        return barIndex == ALL_BARS ? numbers : barNumbers.get(barIndex);
+    }
+
+    /** Theme, fill direction, decorations and its numbers back to how they start. */
+    private void resetBars(int barIndex) {
+        for (HudElement bar : getBars(barIndex)) {
+            HudLayout.setTheme(bar, null);
+            HudLayout.setFlipped(bar, false);
+            HudLayout.setDecorationHidden(bar, false);
+        }
+        for (HudElement number : getNumbers(barIndex)) {
+            HudLayout.setNumberOn(number, false);
+            HudLayout.setNumberStyle(number, NumberStyle.SLASH);
+            HudLayout.setNumberDecimals(number, null);
+        }
+    }
+
+    private boolean isChanged(int barIndex) {
+        for (HudElement bar : getBars(barIndex)) {
+            if (HudLayout.getTheme(bar) != null || HudLayout.isFlipped(bar) || HudLayout.isDecorationHidden(bar)) {
+                return true;
+            }
+        }
+        for (HudElement number : getNumbers(barIndex)) {
+            if (HudLayout.isNumberOn(number) || HudLayout.getNumberStyle(number) != NumberStyle.SLASH
+                || HudLayout.getNumberDecimals(number) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Null if the numbers use different decimals. */
-    private Integer getCommonDecimals() {
+    private static Integer getCommonDecimals(List<HudElement> numbers) {
         int first = BarNumbers.getDecimals(numbers.get(0));
         for (HudElement number : numbers) {
             if (BarNumbers.getDecimals(number) != first) {
@@ -394,31 +385,17 @@ public class GuiBarCustomize extends GuiScreen {
         return first;
     }
 
-    private boolean anyDecimalsChanged() {
+    /** Ctrl goes back to each number's default. Mixed numbers start over from whole numbers. */
+    private static void stepDecimals(List<HudElement> numbers) {
+        Integer common = getCommonDecimals(numbers);
+        int decimals = GuiHelpers
+            .wrap((common != null ? common : 0) + GuiHelpers.getClickStep(), BarNumbers.MAX_DECIMALS + 1);
         for (HudElement number : numbers) {
-            if (HudLayout.getNumberDecimals(number) != null) {
-                return true;
+            if (isCtrlKeyDown()) {
+                HudLayout.setNumberDecimals(number, null);
+            } else {
+                BarNumbers.setDecimals(number, decimals);
             }
-        }
-        return false;
-    }
-
-    /** Ctrl goes back to the number's default. */
-    private static void stepDecimals(HudElement number, int decimals) {
-        if (isCtrlKeyDown()) {
-            HudLayout.setNumberDecimals(number, null);
-        } else {
-            BarNumbers.setDecimals(
-                number,
-                GuiHelpers.wrap(decimals + GuiHelpers.getClickStep(), BarNumbers.MAX_DECIMALS + 1));
-        }
-    }
-
-    private void stepAllDecimals() {
-        Integer common = getCommonDecimals();
-        int decimals = common != null ? common : 0;
-        for (HudElement number : numbers) {
-            stepDecimals(number, decimals);
         }
     }
 
@@ -437,7 +414,7 @@ public class GuiBarCustomize extends GuiScreen {
         return getValueTooltip("dashboard.customize.number_decimals", name);
     }
 
-    private int countNumbersOn() {
+    private static int countNumbersOn(List<HudElement> numbers) {
         int count = 0;
         for (HudElement number : numbers) {
             if (HudLayout.isNumberOn(number)) {
@@ -448,7 +425,7 @@ public class GuiBarCustomize extends GuiScreen {
     }
 
     /** Null if the numbers use different styles. */
-    private NumberStyle getCommonNumberStyle() {
+    private static NumberStyle getCommonNumberStyle(List<HudElement> numbers) {
         NumberStyle first = HudLayout.getNumberStyle(numbers.get(0));
         for (HudElement number : numbers) {
             if (HudLayout.getNumberStyle(number) != first) {
@@ -458,16 +435,17 @@ public class GuiBarCustomize extends GuiScreen {
         return first;
     }
 
-    /** All on, unless all are on already. */
-    private void toggleAllNumbers() {
-        boolean on = !isCtrlKeyDown() && countNumbersOn() < numbers.size();
+    /** All on, unless all are on already. Ctrl turns them off. */
+    private static void toggleNumbers(List<HudElement> numbers) {
+        boolean on = !isCtrlKeyDown() && countNumbersOn(numbers) < numbers.size();
         for (HudElement number : numbers) {
             HudLayout.setNumberOn(number, on);
         }
     }
 
-    private void stepAllNumberStyles() {
-        NumberStyle common = getCommonNumberStyle();
+    /** Mixed numbers start over from the first style. */
+    private static void stepNumberStyles(List<HudElement> numbers) {
+        NumberStyle common = getCommonNumberStyle(numbers);
         NumberStyle style = stepNumberStyle(common != null ? common : NumberStyle.SLASH);
         for (HudElement number : numbers) {
             HudLayout.setNumberStyle(number, style);
@@ -529,15 +507,6 @@ public class GuiBarCustomize extends GuiScreen {
         return StatCollector.translateToLocal("dashboard.customize.crosshair_style");
     }
 
-    private boolean anyBarThemed() {
-        for (HudElement bar : bars) {
-            if (HudLayout.getTheme(bar) != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private int getContentLeft() {
         return (width - contentWidth) / 2;
     }
@@ -546,28 +515,24 @@ public class GuiBarCustomize extends GuiScreen {
         return nameWidth + COLUMN_GAP;
     }
 
-    private int getFlipX() {
+    private int getMoreSettingsX() {
         return getButtonX() + THEME_BUTTON_WIDTH + COLUMN_GAP;
     }
 
-    private int getDecorationX() {
-        return getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
-    }
-
-    private int getNumberX() {
-        return twoLines ? getButtonX() : getDecorationX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
-    }
-
-    private int getNumberStyleX() {
-        return getNumberX() + NUMBER_BUTTON_WIDTH + COLUMN_GAP;
-    }
-
-    private int getDecimalsX() {
-        return getNumberStyleX() + NUMBER_STYLE_BUTTON_WIDTH + COLUMN_GAP;
+    private int getResetX() {
+        return getMoreSettingsX() + ICON_BUTTON_WIDTH + COLUMN_GAP;
     }
 
     private int getPreviewX() {
-        return getDecimalsX() + DECIMALS_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
+        return previewBeside ? getBesidePreviewX() : getButtonX() + BarThemes.PADDING;
+    }
+
+    private int getBesidePreviewX() {
+        return getResetX() + ICON_BUTTON_WIDTH + COLUMN_GAP + BarThemes.PADDING;
+    }
+
+    private int getDescriptionX() {
+        return getButtonX() + SETTING_BUTTON_WIDTH + COLUMN_GAP;
     }
 
     private static String getAllBarsName() {
@@ -595,16 +560,15 @@ public class GuiBarCustomize extends GuiScreen {
         return index == 0 ? null : themes.get(index - 1);
     }
 
-    private void stepAllBars() {
-        // Mixed bars start over from vanilla
-        String current = allBarsMatch() ? HudLayout.getTheme(bars.get(0)) : null;
-        String theme = stepTheme(current);
+    /** Mixed bars start over from vanilla. */
+    private static void stepThemes(List<HudElement> bars) {
+        String theme = stepTheme(themesMatch(bars) ? HudLayout.getTheme(bars.get(0)) : null);
         for (HudElement bar : bars) {
             HudLayout.setTheme(bar, theme);
         }
     }
 
-    private boolean allBarsMatch() {
+    private static boolean themesMatch(List<HudElement> bars) {
         String first = HudLayout.getTheme(bars.get(0));
         for (HudElement bar : bars) {
             String theme = HudLayout.getTheme(bar);
@@ -615,13 +579,14 @@ public class GuiBarCustomize extends GuiScreen {
         return true;
     }
 
-    private boolean anyBar(Predicate<HudElement> check) {
-        for (HudElement bar : bars) {
-            if (check.test(bar)) {
-                return true;
+    private static int count(List<HudElement> elements, Predicate<HudElement> check) {
+        int count = 0;
+        for (HudElement element : elements) {
+            if (check.test(element)) {
+                count++;
             }
         }
-        return false;
+        return count;
     }
 
     @Override
@@ -668,12 +633,6 @@ public class GuiBarCustomize extends GuiScreen {
     /** Null for buttons without a tooltip. */
     private List<String> getButtonTooltip(GuiButton button) {
         return switch (button.id) {
-            case BUTTON_RESET_FLIPS -> GuiHelpers.getTooltip("dashboard.customize.reset_flips");
-            case BUTTON_RESET_DECORATIONS -> GuiHelpers.getTooltip("dashboard.customize.reset_decorations");
-            case BUTTON_ALL -> GuiHelpers.getCutTooltip(button.displayString, allBarsLabel);
-            case BUTTON_ALL_NUMBERS -> GuiHelpers.getTooltip("dashboard.customize.number");
-            case BUTTON_ALL_NUMBER_STYLES -> getStyleTooltip(getCommonNumberStyle());
-            case BUTTON_ALL_NUMBER_DECIMALS -> getDecimalsTooltip(getCommonDecimals());
             case BUTTON_CROSSHAIR_SIZE -> GuiHelpers.getTooltip("dashboard.customize.crosshair_size");
             case BUTTON_TINKERS_CROSSHAIR -> Arrays.asList(
                 StatCollector.translateToLocal("dashboard.customize.tinkers_crosshair.on"),
@@ -711,20 +670,10 @@ public class GuiBarCustomize extends GuiScreen {
         return getValueTooltip("dashboard.customize.number_style", style != null ? style.getDisplayName() : null);
     }
 
+    /** The title, then the value in gray, Mixed when null. */
     private static List<String> getValueTooltip(String titleKey, String value) {
-        return getValueTooltip(titleKey, value, null);
-    }
-
-    /** The title, then the value in gray (Mixed when null), then an optional note in gray. */
-    private static List<String> getValueTooltip(String titleKey, String value, String noteKey) {
-        List<String> lines = new ArrayList<>();
-        lines.add(StatCollector.translateToLocal(titleKey));
         String shown = value != null ? value : StatCollector.translateToLocal("dashboard.customize.mixed");
-        lines.add(EnumChatFormatting.GRAY + shown);
-        if (noteKey != null) {
-            lines.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal(noteKey));
-        }
-        return lines;
+        return Arrays.asList(StatCollector.translateToLocal(titleKey), EnumChatFormatting.GRAY + shown);
     }
 
     private static String getShownHidden(boolean shown) {
@@ -737,7 +686,7 @@ public class GuiBarCustomize extends GuiScreen {
 
     /** On a few backgrounds, to show the inverting. Always at x1, since x5 would not fit the row. */
     private void drawCrosshairPreview(int y) {
-        int x = crosshairSizeButton.xPosition + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+        int x = crosshairSizeButton.xPosition + ICON_BUTTON_WIDTH + COLUMN_GAP;
         for (ColorResource background : CROSSHAIR_BACKGROUNDS) {
             drawRect(x, y, x + SWATCH_SIZE, y + SWATCH_SIZE, background.getColor());
             Crosshairs.draw(Crosshairs.getStyle(), 1, x + SWATCH_SIZE / 2, y + SWATCH_SIZE / 2);
@@ -759,54 +708,36 @@ public class GuiBarCustomize extends GuiScreen {
         fontRendererObj.drawStringWithShadow(BarNumbers.getSampleText(number), x, y, 0xFFFFFF);
     }
 
-    /** Theme and flip on a bar's first line, the number buttons on its last. States get none. */
-    private GuiButton[] getRowButtons(Row row, boolean first, boolean last) {
-        List<GuiButton> rowButtons = new ArrayList<>();
-        if (first && !row.state && !row.numberOnly) {
-            rowButtons.add(themeButton);
-            rowButtons.add(flipButton);
-            rowButtons.add(decorationButton);
+    /** The bar or one of its states, then the bar's number samples after it. */
+    private void drawBarPreview(int barIndex, BarSlot slot, boolean withNumbers, int lineY) {
+        HudElement bar = bars.get(barIndex);
+        String theme = HudLayout.getTheme(bar);
+        int x = getContentLeft() + getPreviewX();
+        int y = lineY + (GuiHelpers.BUTTON_HEIGHT - slot.height) / 2;
+        if (theme == null) {
+            VanillaHudElements.drawVanillaSample(slot, x, y);
+        } else {
+            boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(barIndex));
+            BarThemes.drawSample(theme, slot, x, y, fromRight, !HudLayout.isDecorationHidden(bar));
         }
-        if (last && row.number != null) {
-            rowButtons.add(numberButton);
-            rowButtons.add(numberStyleButton);
-            rowButtons.add(decimalsButton);
+        if (slot == BarSlot.EXPERIENCE) {
+            HudBounds bounds = new HudBounds(x, y - 6, slot.width, slot.height);
+            VanillaHudElements.drawLevelNumber(bounds, VanillaHudElements.SAMPLE_LEVEL);
         }
-        return rowButtons.toArray(new GuiButton[0]);
+        if (!withNumbers) {
+            return;
+        }
+        int numberX = x + slot.width + BarThemes.PADDING;
+        for (HudElement number : barNumbers.get(barIndex)) {
+            drawNumberSample(number, numberX, lineY);
+            numberX += numberSampleWidth;
+        }
     }
 
-    private void placeRowButtons(Row row, int y) {
-        HudElement bar = bars.get(row.barIndex);
-        String theme = HudLayout.getTheme(bar);
-        int left = getContentLeft();
-        themeButton.xPosition = left + getButtonX();
-        themeButton.yPosition = y;
-        themeButton.displayString = fitToButton(getThemeName(theme), themeButton);
-
-        flipButton.xPosition = left + getFlipX();
-        flipButton.yPosition = y;
-        flipButton.icon = BarThemes.fillsFromRight(bar, slots.get(row.barIndex)) ? Icons.ARROW_LEFT : Icons.ARROW_RIGHT;
-        flipButton.enabled = theme != null;
-
-        decorationButton.xPosition = left + getDecorationX();
-        decorationButton.yPosition = y;
-        decorationButton.icon = HudLayout.isDecorationHidden(bar) ? Icons.DECORATION_OFF : Icons.DECORATION_ON;
-        decorationButton.enabled = theme != null;
-
-        if (row.number != null) {
-            boolean on = HudLayout.isNumberOn(row.number);
-            numberButton.xPosition = left + getNumberX();
-            numberButton.yPosition = y;
-            numberButton.displayString = GuiHelpers.getOnOff(on);
-            numberStyleButton.xPosition = left + getNumberStyleX();
-            numberStyleButton.yPosition = y;
-            numberStyleButton.displayString = getStyleSample(HudLayout.getNumberStyle(row.number));
-            numberStyleButton.enabled = on;
-            decimalsButton.xPosition = left + getDecimalsX();
-            decimalsButton.yPosition = y;
-            decimalsButton.displayString = getDecimalsLabel(BarNumbers.getDecimals(row.number));
-            decimalsButton.enabled = on;
-        }
+    /** Places a shared button on the line being drawn. */
+    private void place(GuiButton button, int x, int y) {
+        button.xPosition = getContentLeft() + x;
+        button.yPosition = y;
     }
 
     /** The Forge list misses wheel events. */
@@ -827,20 +758,6 @@ public class GuiBarCustomize extends GuiScreen {
                 showStates = !showStates;
                 rebuildNeeded = true;
             }
-            case BUTTON_ALL -> stepAllBars();
-            case BUTTON_RESET_FLIPS -> {
-                for (HudElement bar : bars) {
-                    HudLayout.setFlipped(bar, false);
-                }
-            }
-            case BUTTON_RESET_DECORATIONS -> {
-                for (HudElement bar : bars) {
-                    HudLayout.setDecorationHidden(bar, false);
-                }
-            }
-            case BUTTON_ALL_NUMBERS -> toggleAllNumbers();
-            case BUTTON_ALL_NUMBER_STYLES -> stepAllNumberStyles();
-            case BUTTON_ALL_NUMBER_DECIMALS -> stepAllDecimals();
             case BUTTON_CROSSHAIR_STYLE -> changeCrosshairStyle();
             case BUTTON_CROSSHAIR_SIZE -> changeCrosshairSize();
             case BUTTON_RESET_CROSSHAIR -> {
@@ -865,18 +782,6 @@ public class GuiBarCustomize extends GuiScreen {
                 ConfigurationManager.save(DashboardConfig.class);
                 updatePlacementButtons();
             }
-            case BUTTON_RESET -> {
-                for (HudElement bar : bars) {
-                    HudLayout.setTheme(bar, null);
-                    HudLayout.setFlipped(bar, false);
-                    HudLayout.setDecorationHidden(bar, false);
-                }
-                for (HudElement number : numbers) {
-                    HudLayout.setNumberOn(number, false);
-                    HudLayout.setNumberStyle(number, NumberStyle.SLASH);
-                    HudLayout.setNumberDecimals(number, null);
-                }
-            }
             default -> {
                 for (CustomizeSection section : sections) {
                     if (section.actionPerformed(button)) {
@@ -888,7 +793,6 @@ public class GuiBarCustomize extends GuiScreen {
         if (rendering.takeListChanged()) {
             rebuildNeeded = true;
         }
-        updateAllBarsRow();
     }
 
     @Override
@@ -1170,130 +1074,296 @@ public class GuiBarCustomize extends GuiScreen {
         }
     }
 
-    /** A bar, one of its states or a number without a bar. On narrow screens a bar's numbers get a second line. */
+    /** A bar or All bars: its name, theme, More settings and reset, with the bar's preview beside it. */
     private final class BarLine extends Line {
 
-        private final Row row;
-        private final boolean first;
-        private final boolean last;
+        private final int barIndex;
 
-        private BarLine(Row row, boolean first, boolean last) {
-            super(null, getRowButtons(row, first, last));
-            this.row = row;
-            this.first = first;
-            this.last = last;
+        private BarLine(int barIndex) {
+            super(null, themeButton, moreSettingsButton, barResetButton);
+            this.barIndex = barIndex;
         }
 
         @Override
         protected void draw(int y, int mouseX, int mouseY) {
-            if (first) {
-                drawRowName(row.name, y, row.state ? ColorUtils.textState.getColor() : ColorUtils.text.getColor());
-            }
-            // The buttons are shared by every bar row, so they get this row's place and labels first
-            placeRowButtons(row, y);
+            drawRowName(getBarName(barIndex), y, ColorUtils.text.getColor());
+            // The buttons are shared by every line, so they get this line's place and labels first
+            placeButtons(y);
             super.draw(y, mouseX, mouseY);
-            if (last) {
-                HudElement bar = bars.get(row.barIndex);
-                drawPreview(bar, HudLayout.getTheme(bar), y);
+            if (previewBeside && barIndex != ALL_BARS) {
+                drawBarPreview(barIndex, slots.get(barIndex), true, y);
             }
+        }
+
+        private void placeButtons(int y) {
+            place(themeButton, getButtonX(), y);
+            themeButton.displayString = fitToButton(getThemeLabel(), themeButton);
+            place(moreSettingsButton, getMoreSettingsX(), y);
+            place(barResetButton, getResetX(), y);
+            barResetButton.enabled = isChanged(barIndex);
+        }
+
+        private String getThemeLabel() {
+            List<HudElement> targets = getBars(barIndex);
+            return themesMatch(targets) ? getThemeName(HudLayout.getTheme(targets.get(0)))
+                : StatCollector.translateToLocal("dashboard.customize.mixed");
         }
 
         @Override
         protected List<String> getTooltip(GuiButton button) {
             if (button == themeButton) {
-                return GuiHelpers
-                    .getCutTooltip(themeButton.displayString, getThemeName(HudLayout.getTheme(bars.get(row.barIndex))));
+                return GuiHelpers.getCutTooltip(themeButton.displayString, getThemeLabel());
             }
-            HudElement bar = bars.get(row.barIndex);
-            if (button == flipButton) {
-                boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
-                return getValueTooltip(
-                    "dashboard.customize.fill_direction",
-                    StatCollector.translateToLocal(
-                        fromRight ? "dashboard.customize.fill_direction.right"
-                            : "dashboard.customize.fill_direction.left"));
+            if (button != moreSettingsButton) {
+                return GuiHelpers.getTooltip("dashboard.customize.reset_bar");
             }
-            if (button == decorationButton) {
-                return getValueTooltip(
-                    "dashboard.customize.decorations",
-                    getShownHidden(!HudLayout.isDecorationHidden(bar)),
-                    "dashboard.customize.decorations.note");
-            }
-            if (button == numberButton) {
-                return GuiHelpers.getTooltip("dashboard.customize.number");
-            }
-            if (button == numberStyleButton) {
-                return getStyleTooltip(HudLayout.getNumberStyle(row.number));
-            }
-            return getDecimalsTooltip(BarNumbers.getDecimals(row.number));
-        }
-
-        private void drawPreview(HudElement bar, String theme, int lineY) {
-            int x = getContentLeft() + getPreviewX();
-            if (row.numberOnly) {
-                drawNumberSample(row.number, x, lineY);
-                return;
-            }
-            if (row.number != null) {
-                drawNumberSample(row.number, x + row.slot.width + BarThemes.PADDING, lineY);
-            }
-
-            int y = lineY + (GuiHelpers.BUTTON_HEIGHT - row.slot.height) / 2;
-            if (theme == null) {
-                VanillaHudElements.drawVanillaSample(row.slot, x, y);
-            } else {
-                boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
-                BarThemes.drawSample(theme, row.slot, x, y, fromRight, !HudLayout.isDecorationHidden(bar));
-            }
-            if (row.slot == BarSlot.EXPERIENCE) {
-                HudBounds bounds = new HudBounds(x, y - 6, row.slot.width, row.slot.height);
-                VanillaHudElements.drawLevelNumber(bounds, VanillaHudElements.SAMPLE_LEVEL);
-            }
+            String title = StatCollector.translateToLocal("dashboard.customize.more_settings");
+            return barIndex == ALL_BARS ? Collections.singletonList(title)
+                : Arrays.asList(
+                    title,
+                    EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.customize.more_settings.hint"));
         }
 
         @Override
         protected void click(int y, int mouseX, int mouseY) {
-            placeRowButtons(row, y);
+            placeButtons(y);
             super.click(y, mouseX, mouseY);
         }
 
         @Override
         protected void onPress(GuiButton button) {
-            HudElement bar = bars.get(row.barIndex);
             if (button == themeButton) {
-                HudLayout.setTheme(bar, stepTheme(HudLayout.getTheme(bar)));
-            } else if (button == flipButton) {
-                HudLayout.setFlipped(bar, !isCtrlKeyDown() && !HudLayout.isFlipped(bar));
-            } else if (button == decorationButton) {
-                HudLayout.setDecorationHidden(bar, !isCtrlKeyDown() && !HudLayout.isDecorationHidden(bar));
-            } else if (button == numberButton) {
-                HudLayout.setNumberOn(row.number, !isCtrlKeyDown() && !HudLayout.isNumberOn(row.number));
-            } else if (button == numberStyleButton) {
-                HudLayout.setNumberStyle(row.number, stepNumberStyle(HudLayout.getNumberStyle(row.number)));
+                stepThemes(getBars(barIndex));
+            } else if (button == moreSettingsButton) {
+                if (!open.remove(barIndex)) {
+                    open.add(barIndex);
+                }
+                rebuildNeeded = true;
             } else {
-                stepDecimals(row.number, BarNumbers.getDecimals(row.number));
+                resetBars(barIndex);
             }
-            updateAllBarsRow();
         }
     }
 
-    /** A bar, one of its states, or a number without a bar (saturation). */
-    private static final class Row {
+    /** On narrow screens, a bar's preview below its line. */
+    private final class PreviewLine extends Line {
 
         private final int barIndex;
-        private final BarSlot slot;
-        private final String name;
-        private final boolean state;
-        private final HudElement number;
-        private final boolean numberOnly;
 
-        private Row(int barIndex, BarSlot slot, String name, boolean state, HudElement number, boolean numberOnly) {
+        private PreviewLine(int barIndex) {
+            super(null);
             this.barIndex = barIndex;
-            this.slot = slot;
-            this.name = name;
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            drawBarPreview(barIndex, slots.get(barIndex), true, y);
+        }
+    }
+
+    /** One of a bar's states, like poisoned, shown as a preview only. */
+    private final class StateLine extends Line {
+
+        private final int barIndex;
+        private final BarSlot state;
+
+        private StateLine(int barIndex, BarSlot state) {
+            super(null);
+            this.barIndex = barIndex;
             this.state = state;
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            drawRowName(getStateName(state), y, ColorUtils.textState.getColor());
+            drawBarPreview(barIndex, state, false, y);
+        }
+    }
+
+    /** One setting of an open bar, or of every bar under All bars: its name, its button, then what it does. */
+    private final class SettingLine extends Line {
+
+        private final int barIndex;
+        private final Setting setting;
+        private final HudElement number;
+
+        private SettingLine(int barIndex, Setting setting, HudElement number) {
+            super(null, setting == Setting.FILL_DIRECTION ? flipButton : settingButton);
+            this.barIndex = barIndex;
+            this.setting = setting;
             this.number = number;
-            this.numberOnly = numberOnly;
+        }
+
+        private boolean isSaturation() {
+            return number != null && number == BarNumbers.getSaturationNumber();
+        }
+
+        private List<HudElement> getTargetNumbers() {
+            return number != null ? Collections.singletonList(number) : numbers;
+        }
+
+        @Override
+        protected void draw(int y, int mouseX, int mouseY) {
+            // A whole line high, so the settings of a bar share one background
+            int left = getContentLeft() - HEADER_OVERHANG;
+            int top = y - (LINE_HEIGHT - GuiHelpers.BUTTON_HEIGHT) / 2;
+            drawRect(
+                left,
+                top,
+                left + contentWidth + HEADER_OVERHANG * 2,
+                top + LINE_HEIGHT,
+                ColorUtils.barSettings.getColor());
+            drawRowName(setting.getName(isSaturation()), y, ColorUtils.textState.getColor());
+            placeButton(y);
+            super.draw(y, mouseX, mouseY);
+            // Only under All bars
+            if (barIndex != ALL_BARS) {
+                return;
+            }
+            int x = getContentLeft() + getDescriptionX();
+            String description = GuiHelpers
+                .fitToWidth(fontRendererObj, setting.getDescription(), getContentLeft() + contentWidth - x);
+            fontRendererObj.drawStringWithShadow(
+                description,
+                x,
+                GuiHelpers.getTextY(fontRendererObj, y),
+                ColorUtils.textState.getColor());
+        }
+
+        private void placeButton(int y) {
+            List<HudElement> targets = getBars(barIndex);
+            boolean themed = count(targets, bar -> HudLayout.getTheme(bar) != null) > 0;
+            if (setting == Setting.FILL_DIRECTION) {
+                place(flipButton, getButtonX(), y);
+                boolean fromRight = barIndex == ALL_BARS ? count(targets, HudLayout::isFlipped) == targets.size()
+                    : BarThemes.fillsFromRight(targets.get(0), slots.get(barIndex));
+                flipButton.icon = fromRight ? Icons.ARROW_LEFT : Icons.ARROW_RIGHT;
+                flipButton.enabled = themed;
+                return;
+            }
+            place(settingButton, getButtonX(), y);
+            String value = getValue();
+            settingButton.displayString = value != null ? value
+                : StatCollector.translateToLocal("dashboard.customize.mixed");
+            settingButton.enabled = setting == Setting.DECORATIONS ? themed
+                : setting == Setting.NUMBER || countNumbersOn(getTargetNumbers()) > 0;
+        }
+
+        /** Null when the bars differ. */
+        private String getValue() {
+            List<HudElement> numbers = getTargetNumbers();
+            return switch (setting) {
+                case DECORATIONS -> getAllOrNone(getBars(barIndex), bar -> !HudLayout.isDecorationHidden(bar), true);
+                case NUMBER -> getAllOrNone(numbers, HudLayout::isNumberOn, true);
+                case NUMBER_STYLE -> {
+                    NumberStyle style = getCommonNumberStyle(numbers);
+                    yield style != null ? getStyleSample(style) : null;
+                }
+                default -> {
+                    Integer decimals = getCommonDecimals(numbers);
+                    yield decimals != null ? getDecimalsLabel(decimals) : null;
+                }
+            };
+        }
+
+        /** On or Off on the button, Shown or Hidden in the tooltip, null when mixed. */
+        private String getAllOrNone(List<HudElement> elements, Predicate<HudElement> check, boolean onOff) {
+            int count = count(elements, check);
+            if (count != 0 && count != elements.size()) {
+                return null;
+            }
+            boolean all = count != 0;
+            return onOff ? GuiHelpers.getOnOff(all) : getShownHidden(all);
+        }
+
+        @Override
+        protected List<String> getTooltip(GuiButton button) {
+            List<HudElement> targets = getBars(barIndex);
+            String title = setting.getNameKey(isSaturation());
+            return switch (setting) {
+                case FILL_DIRECTION -> getValueTooltip(title, getFillDirection(targets));
+                case DECORATIONS -> getValueTooltip(
+                    title,
+                    getAllOrNone(targets, bar -> !HudLayout.isDecorationHidden(bar), false));
+                case NUMBER -> getValueTooltip(title, getAllOrNone(getTargetNumbers(), HudLayout::isNumberOn, false));
+                case NUMBER_STYLE -> getStyleTooltip(getCommonNumberStyle(getTargetNumbers()));
+                default -> getDecimalsTooltip(getCommonDecimals(getTargetNumbers()));
+            };
+        }
+
+        /** From the left or right for a bar, flipped or not for All bars, null when mixed. */
+        private String getFillDirection(List<HudElement> targets) {
+            if (barIndex != ALL_BARS) {
+                boolean fromRight = BarThemes.fillsFromRight(targets.get(0), slots.get(barIndex));
+                return StatCollector.translateToLocal(
+                    fromRight ? "dashboard.customize.fill_direction.right" : "dashboard.customize.fill_direction.left");
+            }
+            int flipped = count(targets, HudLayout::isFlipped);
+            if (flipped != 0 && flipped != targets.size()) {
+                return null;
+            }
+            return StatCollector.translateToLocal(
+                flipped != 0 ? "dashboard.customize.fill_direction.flipped"
+                    : "dashboard.customize.fill_direction.default");
+        }
+
+        @Override
+        protected void click(int y, int mouseX, int mouseY) {
+            placeButton(y);
+            super.click(y, mouseX, mouseY);
+        }
+
+        /** Mixed bars all turn the same way. Ctrl goes back to how they start. */
+        @Override
+        protected void onPress(GuiButton button) {
+            List<HudElement> targets = getBars(barIndex);
+            switch (setting) {
+                case FILL_DIRECTION -> {
+                    boolean flip = !isCtrlKeyDown() && count(targets, HudLayout::isFlipped) < targets.size();
+                    for (HudElement bar : targets) {
+                        HudLayout.setFlipped(bar, flip);
+                    }
+                }
+                case DECORATIONS -> {
+                    boolean hide = !isCtrlKeyDown() && count(targets, HudLayout::isDecorationHidden) == 0;
+                    for (HudElement bar : targets) {
+                        HudLayout.setDecorationHidden(bar, hide);
+                    }
+                }
+                case NUMBER -> toggleNumbers(getTargetNumbers());
+                case NUMBER_STYLE -> stepNumberStyles(getTargetNumbers());
+                default -> stepDecimals(getTargetNumbers());
+            }
+        }
+    }
+
+    /** The settings below an open bar. Number settings name the saturation number as such. */
+    private enum Setting {
+
+        FILL_DIRECTION("dashboard.customize.fill_direction", null),
+        DECORATIONS("dashboard.customize.decorations", null),
+        NUMBER("dashboard.customize.number", "dashboard.customize.saturation"),
+        NUMBER_STYLE("dashboard.customize.number_style", "dashboard.customize.saturation_style"),
+        DECIMALS("dashboard.customize.number_decimals", "dashboard.customize.saturation_decimals");
+
+        private final String key;
+        private final String saturationKey;
+
+        Setting(String key, String saturationKey) {
+            this.key = key;
+            this.saturationKey = saturationKey;
+        }
+
+        private String getNameKey(boolean saturation) {
+            return saturation && saturationKey != null ? saturationKey : key;
+        }
+
+        private String getName(boolean saturation) {
+            return StatCollector.translateToLocal(getNameKey(saturation));
+        }
+
+        private String getDescription() {
+            return StatCollector.translateToLocal(key + ".description");
         }
     }
 }

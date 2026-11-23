@@ -34,6 +34,7 @@ public final class ColorUtils {
         grid                    = color.argb("grid",                    "0x20FFFFFF"),
         gridCenter              = color.argb("gridCenter",              "0x50FFFFFF"),
         sectionHeader           = color.argb("sectionHeader",           "0x50A0A0A0"),
+        barSettings             = color.argb("barSettings",             "0x40000000"),
         
         scrollbarTrack          = color.argb("scrollbarTrack",          "0x50A0A0A0"),
         scrollbarHandle         = color.argb("scrollbarHandle",         "0xFFE0E0E0"),
