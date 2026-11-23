@@ -556,13 +556,17 @@ public final class VanillaHudElements {
                 if (event.type == ElementType.FOOD) {
                     barY += getHungerShake(mc);
                 }
-                BarThemes.drawBar(theme, getStateSlot(slot, mc.thePlayer), bounds.x, barY, fill, fromRight);
+                // Decoration last
+                BarSlot stateSlot = getStateSlot(slot, mc.thePlayer);
+                BarThemes.drawBarBase(theme, stateSlot, bounds.x, barY, fill, fromRight);
                 if (event.type == ElementType.FOOD) {
                     drawAppleCoreLayers(mc.thePlayer, theme, bounds.x, barY, fromRight);
                 }
                 if (event.type == ElementType.AIR && isBubblePopping(mc.thePlayer.getAir())) {
                     BarThemes.drawAirPop(theme, bounds.x, barY, fill, fromRight);
                 }
+                BarThemes
+                    .drawDecoration(theme, stateSlot, bounds.x, barY, BarThemes.isFull(stateSlot, fill), fromRight);
             }
             if (event.type == ElementType.BOSSHEALTH) {
                 drawBossName(bounds, BossStatus.bossName);
@@ -594,11 +598,8 @@ public final class VanillaHudElements {
             player.prevHealth / player.getMaxHealth(),
             mc.theWorld.getWorldInfo()
                 .isHardcoreModeEnabled(),
+            player.isPotionActive(Potion.regeneration) ? BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter()) : -1,
             fromRight);
-        if (player.isPotionActive(Potion.regeneration)) {
-            int step = BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter());
-            BarThemes.drawRegenShine(theme, x, barY, step, fromRight);
-        }
         if (absorption > 0) {
             float absorptionFill = Math.min(1, absorption / player.getMaxHealth());
             BarThemes.drawBar(theme, BarSlot.HEALTH_ABSORPTION, x, barY - ROW_HEIGHT, absorptionFill, fromRight);
