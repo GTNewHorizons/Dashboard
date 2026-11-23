@@ -134,18 +134,15 @@ Besides Minecraft's own HUD, Dashboard can move the HUD of these mods:
 <!-- TODO: bump version
 - **JourneyMap**: the minimap (needs JourneyMap {version} or newer)
 -->
+- **Overloaded Armor Bar**: its armor bar moves, resizes and hides like the vanilla one
 - **Thaumcraft**: wand vis dial, warp meter, runic shielding, hover harness and research notifications
 - **Tinkers' Construct**: its crosshair setting, and its hearts move with the health bar. Dashboard also adds a
   **Belt Hotbar** that shows the items in your Traveller's Belt (hidden by default, turn it on in the editor)
 - **Witchery**: vampire blood meter, the blood of the creature you look at, infusion energy and creature power bars,
   infused brew and bark belt charges (the vampire power bar moves with the hotbar)
-<!-- need pr
-- **Overloaded Armor Bar**: its armor bar moves, resizes and hides like the vanilla one
--->
 
 More mods are on the way.
 
-<!-- need pr
 ### Mods using the Dashboard API
 
 These mods use Dashboard's API to make their own HUD movable. This needs a recent version of both the mod and Dashboard:
@@ -153,28 +150,27 @@ These mods use Dashboard's API to make their own HUD movable. This needs a recen
 - **Adventure Backpack**: potion icons and tanks
 - **Akashic Tome**: the book hint next to the crosshair
 - **Backhand**: the off-hand slot, separate from the hotbar
-- **Battlegear 2**: shield block bar and quiver slots
-- **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)
-- **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair
-- **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon
+<!-- - **Battlegear 2**: shield block bar and quiver slots-->
+<!-- - **Bogosorter**: the usage ticker (the hotbar swap column moves with the hotbar)-->
+<!-- - **Botania**: mana bar, flight bar, boss bar, wand mode, corporea hint and the info around the crosshair-->
+<!-- - **Draconic Evolution**: the tool and block info box, the armor HUD and the magnet icon-->
 - **EnderIO**: the Conduit Probe modes and the Yeta Wrench mode (its selector and its icons in the corner)
 - **Et Futurum**: subtitles, the sound captions (when turned on in Et Futurum's config)
-- **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude
-- **GalaxySpace**: the atmospheric pressure bar
+<!-- - **Galacticraft**: oxygen tanks, oxygen warning, launch countdown, lander warning and rocket altitude-->
+<!-- - **GalaxySpace**: the atmospheric pressure bar-->
 - **GregTech**: the Power Goggles HUD
-- **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use
-- **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info
-- **Infernal Mobs**: the elite mob health bar, with its name and modifiers
+<!-- - **GTNHLib**: the text above the hotbar and titles, which other GTNH mods use-->
+<!-- - **Hardcore Ender Expansion**: the notes in the bottom right and the energy cluster info-->
+<!-- - **Infernal Mobs**: the elite mob health bar, with its name and modifiers-->
 - **InGameInfoXML**: each text area (top left, top right, and so on)
 - **LootGames**: the Minigames info in the top left
-- **Nature's Compass**: the biome search text
+<!-- - **Nature's Compass**: the biome search text-->
 - **Random Things**: the notification card
-- **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar
-- **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text
+<!-- - **ServerUtilities**: its notifications, which move with the GTNHLib text above the hotbar-->
+<!-- - **Tainted Magic**: Katana charge runes and Thaumic Disassembler mode text-->
 - **TaskNH**: the pinned task list
-- **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts
-- **Waila**: the block info box (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)
--->
+<!-- - **Thaumic Tinkerer**: Dislocation focus box, Kami tool mode text and soul hearts-->
+- **Waila**: the block info box <!-- (also when drawn by ChromaticTooltips, with a recent ChromaticTooltipsCompat)-->
 
 ## Settings
 
@@ -209,6 +205,11 @@ sheet layouts and every setting.
 
 Mods can make their own HUD movable, resizable and hideable in the editor, without depending on Dashboard. The
 [API guide](docs/API.md) explains how.
+
+## Credits
+
+#### Bar themes:
+- **Vanilla+** and **Neon Dreams** by [Embri](https://github.com/Graymare)
 
 ## License
 
