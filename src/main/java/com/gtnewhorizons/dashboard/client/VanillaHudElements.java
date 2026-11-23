@@ -354,7 +354,13 @@ public final class VanillaHudElements {
         if (theme == null) {
             drawVanillaSample(slot, x, y);
         } else {
-            BarThemes.drawSample(theme, slot, x, y, BarThemes.fillsFromRight(element, slot));
+            BarThemes.drawSample(
+                theme,
+                slot,
+                x,
+                y,
+                BarThemes.fillsFromRight(element, slot),
+                !HudLayout.isDecorationHidden(element));
         }
     }
 
@@ -550,8 +556,9 @@ public final class VanillaHudElements {
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
         try {
             int barY = bounds.getBottom() - slot.height;
+            boolean decorated = !HudLayout.isDecorationHidden(element);
             if (event.type == ElementType.HEALTH) {
-                drawThemedHealth(mc, theme, bounds.x, barY, fill, absorption, fromRight);
+                drawThemedHealth(mc, theme, bounds.x, barY, fill, absorption, fromRight, decorated);
             } else {
                 if (event.type == ElementType.FOOD) {
                     barY += getHungerShake(mc);
@@ -565,8 +572,10 @@ public final class VanillaHudElements {
                 if (event.type == ElementType.AIR && isBubblePopping(mc.thePlayer.getAir())) {
                     BarThemes.drawAirPop(theme, bounds.x, barY, fill, fromRight);
                 }
-                BarThemes
-                    .drawDecoration(theme, stateSlot, bounds.x, barY, BarThemes.isFull(stateSlot, fill), fromRight);
+                if (decorated) {
+                    BarThemes
+                        .drawDecoration(theme, stateSlot, bounds.x, barY, BarThemes.isFull(stateSlot, fill), fromRight);
+                }
             }
             if (event.type == ElementType.BOSSHEALTH) {
                 drawBossName(bounds, BossStatus.bossName);
@@ -582,7 +591,7 @@ public final class VanillaHudElements {
 
     /** With its shake, flash, regeneration and the absorption bar above it. */
     private static void drawThemedHealth(Minecraft mc, String theme, int x, int barY, float fill, float absorption,
-        boolean fromRight) {
+        boolean fromRight, boolean decorated) {
         EntityPlayer player = mc.thePlayer;
         if (player.getHealth() <= 4) {
             barY += getLowHealthShake(mc);
@@ -599,10 +608,12 @@ public final class VanillaHudElements {
             mc.theWorld.getWorldInfo()
                 .isHardcoreModeEnabled(),
             player.isPotionActive(Potion.regeneration) ? BarThemes.getRegenStep(mc.ingameGUI.getUpdateCounter()) : -1,
-            fromRight);
+            fromRight,
+            decorated);
         if (absorption > 0) {
             float absorptionFill = Math.min(1, absorption / player.getMaxHealth());
-            BarThemes.drawBar(theme, BarSlot.HEALTH_ABSORPTION, x, barY - ROW_HEIGHT, absorptionFill, fromRight);
+            BarThemes
+                .drawBar(theme, BarSlot.HEALTH_ABSORPTION, x, barY - ROW_HEIGHT, absorptionFill, fromRight, decorated);
         }
     }
 

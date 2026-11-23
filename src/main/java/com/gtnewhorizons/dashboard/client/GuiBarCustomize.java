@@ -1224,7 +1224,7 @@ public class GuiBarCustomize extends GuiScreen {
                 VanillaHudElements.drawVanillaSample(row.slot, x, y);
             } else {
                 boolean fromRight = BarThemes.fillsFromRight(bar, slots.get(row.barIndex));
-                BarThemes.drawSample(theme, row.slot, x, y, fromRight);
+                BarThemes.drawSample(theme, row.slot, x, y, fromRight, !HudLayout.isDecorationHidden(bar));
             }
             if (row.slot == BarSlot.EXPERIENCE) {
                 HudBounds bounds = new HudBounds(x, y - 6, row.slot.width, row.slot.height);

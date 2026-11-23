@@ -108,11 +108,14 @@ public final class BarThemes {
 
     /**
      * The empty bar, the fill, then one decoration: the active one while the bar is full. Sheets are painted filling
-     * from the left, so a bar filling from the right is drawn mirrored.
+     * from the left, so a bar filling from the right is drawn mirrored. Decorated is false when the player hid them.
      */
-    public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
+    public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight,
+        boolean decorated) {
         drawBarBase(theme, slot, x, y, fraction, fromRight);
-        drawDecoration(theme, slot, x, y, isFull(slot, fraction), fromRight);
+        if (decorated) {
+            drawDecoration(theme, slot, x, y, isFull(slot, fraction), fromRight);
+        }
     }
 
     public static void drawBarBase(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
@@ -126,7 +129,7 @@ public final class BarThemes {
      * state's.
      */
     public static void drawHealth(String theme, BarSlot state, BarSlot flash, int x, int y, float fill, float lastFill,
-        boolean hardcore, int regenStep, boolean fromRight) {
+        boolean hardcore, int regenStep, boolean fromRight, boolean decorated) {
         drawWhole(theme, flash != null ? BarSlot.HEALTH_FLASH : state, Layer.EMPTY, x, y, fromRight);
         if (hardcore) {
             drawWhole(theme, BarSlot.HEALTH_HARDCORE, Layer.EMPTY, x, y, fromRight);
@@ -139,7 +142,9 @@ public final class BarThemes {
             drawFillRange(theme, BarSlot.HEALTH_HARDCORE, x, y, 0, fill, fromRight);
         }
         drawRegenShine(theme, x, y, regenStep, fromRight);
-        drawDecoration(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill), fromRight);
+        if (decorated) {
+            drawDecoration(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill), fromRight);
+        }
     }
 
     /** A layer drawn with its 8 px space, like the empty bar or a single piece. */
@@ -165,40 +170,57 @@ public final class BarThemes {
     }
 
     /** Overlays like the regen shine sit on a health bar, since on their own they would mean nothing. */
-    public static void drawSample(String theme, BarSlot slot, int x, int y, boolean fromRight) {
+    public static void drawSample(String theme, BarSlot slot, int x, int y, boolean fromRight, boolean decorated) {
         switch (slot) {
-            case HEALTH_REGEN -> drawHealth(
+            case HEALTH_REGEN -> drawHealthSample(
                 theme,
                 BarSlot.HEALTH,
                 null,
-                x,
-                y,
-                PREVIEW_FILL,
                 0,
                 false,
                 getSampleRegenStep(),
-                fromRight);
-            case HEALTH_HARDCORE -> drawHealth(theme, BarSlot.HEALTH, null, x, y, PREVIEW_FILL, 0, true, -1, fromRight);
-            case HEALTH_FLASH -> drawFlashSample(theme, BarSlot.HEALTH, x, y, fromRight);
-            case HEALTH_FLASH_POISONED -> drawFlashSample(theme, BarSlot.HEALTH_POISONED, x, y, fromRight);
-            case HEALTH_FLASH_WITHERED -> drawFlashSample(theme, BarSlot.HEALTH_WITHERED, x, y, fromRight);
+                x,
+                y,
+                fromRight,
+                decorated);
+            case HEALTH_HARDCORE -> drawHealthSample(
+                theme,
+                BarSlot.HEALTH,
+                null,
+                0,
+                true,
+                -1,
+                x,
+                y,
+                fromRight,
+                decorated);
+            case HEALTH_FLASH, HEALTH_FLASH_POISONED, HEALTH_FLASH_WITHERED -> {
+                // The rest of the bar shows as just lost
+                BarSlot state = slot == BarSlot.HEALTH_FLASH ? BarSlot.HEALTH
+                    : slot == BarSlot.HEALTH_FLASH_POISONED ? BarSlot.HEALTH_POISONED : BarSlot.HEALTH_WITHERED;
+                drawHealthSample(theme, state, slot, 1, false, -1, x, y, fromRight, decorated);
+            }
             case AIR_POP -> {
                 drawBarBase(theme, BarSlot.AIR, x, y, PREVIEW_FILL, fromRight);
                 drawAirPop(theme, x, y, PREVIEW_FILL, fromRight);
-                drawDecoration(theme, BarSlot.AIR, x, y, false, fromRight);
+                if (decorated) {
+                    drawDecoration(theme, BarSlot.AIR, x, y, false, fromRight);
+                }
             }
             case FOOD_SATURATION, FOOD_EXHAUSTION -> {
                 drawBarBase(theme, BarSlot.FOOD, x, y, PREVIEW_FILL, fromRight);
                 drawFillRange(theme, slot, x, y, 0, PREVIEW_FILL / 2, fromRight);
-                drawDecoration(theme, BarSlot.FOOD, x, y, false, fromRight);
+                if (decorated) {
+                    drawDecoration(theme, BarSlot.FOOD, x, y, false, fromRight);
+                }
             }
-            default -> drawBar(theme, slot, x, y, PREVIEW_FILL, fromRight);
+            default -> drawBar(theme, slot, x, y, PREVIEW_FILL, fromRight, decorated);
         }
     }
 
-    /** The rest of the bar shows as just lost. */
-    private static void drawFlashSample(String theme, BarSlot state, int x, int y, boolean fromRight) {
-        drawHealth(theme, state, state.getFlashFill(), x, y, PREVIEW_FILL, 1, false, -1, fromRight);
+    private static void drawHealthSample(String theme, BarSlot state, BarSlot flash, float lastFill, boolean hardcore,
+        int regenStep, int x, int y, boolean fromRight, boolean decorated) {
+        drawHealth(theme, state, flash, x, y, PREVIEW_FILL, lastFill, hardcore, regenStep, fromRight, decorated);
     }
 
     /** From the clock, since samples have no game ticks. */
