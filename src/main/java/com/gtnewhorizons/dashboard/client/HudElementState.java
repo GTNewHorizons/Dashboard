@@ -31,6 +31,7 @@ public class HudElementState {
     public int offsetY;
     public String theme;
     public boolean flipped;
+    public boolean decorationHidden;
     public boolean numberOn;
     public NumberStyle numberStyle;
     public Integer numberDecimals;
@@ -51,6 +52,7 @@ public class HudElementState {
             && !detached
             && theme == null
             && !flipped
+            && !decorationHidden
             && !numberOn
             && numberStyle == null
             && numberDecimals == null

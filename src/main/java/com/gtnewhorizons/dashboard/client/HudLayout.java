@@ -93,6 +93,18 @@ public final class HudLayout {
         changed = true;
     }
 
+    /** For bar themes, see {@link BarSlot.Layer#DECORATION}. */
+    public static boolean isDecorationHidden(HudElement element) {
+        HudElementState state = getStates().get(element.getId());
+        return state != null && state.decorationHidden;
+    }
+
+    public static void setDecorationHidden(HudElement element, boolean hidden) {
+        getOrCreateState(element).decorationHidden = hidden;
+        removeIfDefault(element);
+        changed = true;
+    }
+
     public static boolean isNumberOn(HudElement element) {
         HudElementState state = getStates().get(element.getId());
         return state != null && state.numberOn;
