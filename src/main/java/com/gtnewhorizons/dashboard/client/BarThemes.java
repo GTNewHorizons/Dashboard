@@ -107,18 +107,18 @@ public final class BarThemes {
     }
 
     /**
-     * The empty bar, the fill, then one ornament: the active one while the bar is full. Sheets are painted filling from
-     * the left, so a bar filling from the right is drawn mirrored.
+     * The empty bar, the fill, then one decoration: the active one while the bar is full. Sheets are painted filling
+     * from the left, so a bar filling from the right is drawn mirrored.
      */
     public static void drawBar(String theme, BarSlot slot, int x, int y, float fraction, boolean fromRight) {
         drawWhole(theme, slot, Layer.EMPTY, x, y, fromRight);
         drawFillRange(theme, slot, x, y, 0, fraction, fromRight);
-        drawOrnament(theme, slot, x, y, isFull(slot, fraction), fromRight);
+        drawDecoration(theme, slot, x, y, isFull(slot, fraction), fromRight);
     }
 
     /**
      * Health in its state, with the flash row and the health just lost while flashing (flash null when not), and the
-     * hardcore overlay on top. In hardcore, the hardcore ornament replaces the state's.
+     * hardcore overlay on top. In hardcore, the hardcore decoration replaces the state's.
      */
     public static void drawHealth(String theme, BarSlot state, BarSlot flash, int x, int y, float fill, float lastFill,
         boolean hardcore, boolean fromRight) {
@@ -133,7 +133,7 @@ public final class BarThemes {
         if (hardcore) {
             drawFillRange(theme, BarSlot.HEALTH_HARDCORE, x, y, 0, fill, fromRight);
         }
-        drawOrnament(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill), fromRight);
+        drawDecoration(theme, hardcore ? BarSlot.HEALTH_HARDCORE : state, x, y, isFull(state, fill), fromRight);
     }
 
     /** A layer drawn with its 8 px space, like the empty bar or a single piece. */
@@ -149,8 +149,8 @@ public final class BarThemes {
             mirrored);
     }
 
-    public static void drawOrnament(String theme, BarSlot slot, int x, int y, boolean active, boolean mirrored) {
-        drawWhole(theme, slot, active ? Layer.ORNAMENT_ACTIVE : Layer.ORNAMENT, x, y, mirrored);
+    public static void drawDecoration(String theme, BarSlot slot, int x, int y, boolean active, boolean mirrored) {
+        drawWhole(theme, slot, active ? Layer.DECORATION_ACTIVE : Layer.DECORATION, x, y, mirrored);
     }
 
     /** Full once the fill covers every pixel of the bar. */

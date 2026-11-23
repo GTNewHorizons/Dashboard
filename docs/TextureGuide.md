@@ -79,7 +79,7 @@ players can move, resize and hide. They are listed in `images.json`, next to `th
 - Every slot is the bar plus **8 px of space on each side**. The bar starts 8 px in from the slot's top left corner.
 - Wide slots (XP, jump, boss): **198 x 21**, bar **182 x 5**
 - Row slots (everything else): **97 x 25**, bar **81 x 9**
-- Each bar has 4 slots: **empty**, **full**, **ornament** and **ornament active**.
+- Each bar has 4 slots: **empty**, **full**, **decoration** and **decoration active**.
 
 ## Slots
 
@@ -90,39 +90,39 @@ Wide bars, 2 x 2 each:
 | v | u 0 | u 198 |
 |---|---|---|
 | **0** | XP empty | XP full |
-| **21** | XP ornament | XP ornament active |
+| **21** | XP decoration | XP decoration active |
 | **42** | Jump empty | Jump full |
-| **63** | Jump ornament | Jump ornament active |
+| **63** | Jump decoration | Jump decoration active |
 | **84** | Boss empty | Boss full |
-| **105** | Boss ornament | Boss ornament active |
+| **105** | Boss decoration | Boss decoration active |
 
 Row bars, one row each:
 
 | v | u 0 | u 97 | u 194 | u 291 |
 |---|---|---|---|---|
-| **126** | Health empty | Health full | Health ornament | Health ornament active |
-| **151** | Poisoned empty | Poisoned full | Poisoned ornament | Poisoned ornament active |
-| **176** | Withered empty | Withered full | Withered ornament | Withered ornament active |
-| **201** | Hardcore empty | Hardcore full | Hardcore ornament | Hardcore ornament active |
-| **226** | Flash empty | Flash full | Flash ornament | Flash ornament active |
+| **126** | Health empty | Health full | Health decoration | Health decoration active |
+| **151** | Poisoned empty | Poisoned full | Poisoned decoration | Poisoned decoration active |
+| **176** | Withered empty | Withered full | Withered decoration | Withered decoration active |
+| **201** | Hardcore empty | Hardcore full | Hardcore decoration | Hardcore decoration active |
+| **226** | Flash empty | Flash full | Flash decoration | Flash decoration active |
 | **251** | Flash poisoned (full) | Flash withered (full) | | |
-| **276** | Absorption empty | Absorption full | Absorption ornament | Absorption ornament active |
-| **301** | Armor empty | Armor full | Armor ornament | Armor ornament active |
-| **326** | Food empty | Food full | Food ornament | Food ornament active |
-| **351** | Hunger empty | Hunger full | Hunger ornament | Hunger ornament active |
-| **376** | Air empty | Air full | Air ornament | Air ornament active |
-| **401** | Mount health empty | Mount health full | Mount health ornament | Mount health ornament active |
+| **276** | Absorption empty | Absorption full | Absorption decoration | Absorption decoration active |
+| **301** | Armor empty | Armor full | Armor decoration | Armor decoration active |
+| **326** | Food empty | Food full | Food decoration | Food decoration active |
+| **351** | Hunger empty | Hunger full | Hunger decoration | Hunger decoration active |
+| **376** | Air empty | Air full | Air decoration | Air decoration active |
+| **401** | Mount health empty | Mount health full | Mount health decoration | Mount health decoration active |
 | **426** | Regen shine *(u 0, 25 x 25)*, Air pop *(u 25, 25 x 25)* | AppleCore saturation (full) | AppleCore exhaustion (full) | |
 
 ## How the slots are used
 
 - Every slot is drawn exactly as painted. A transparent slot draws nothing, so state rows (poisoned, withered, flash,
-  hunger) need their empty bar and ornaments painted too, not only the fill.
-- **Empty** slots and **ornaments** are drawn whole, including their 8 px space. Paint outlines, glow and frames there.
+  hunger) need their empty bar and decorations painted too, not only the fill.
+- **Empty** slots and **decorations** are drawn whole, including their 8 px space. Paint outlines, glow and frames there.
 - **Full** slots are cut to how full the bar is, and only the bar area is used. Their 8 px space is ignored.
-- Flair that reaches into the bar area of an empty slot gets covered by the fill. Ornaments are drawn after the fill.
-- **Ornament active** replaces the ornament while the bar is completely full.
-- Paint every bar **filling from the left**, with its ornament at the right end. Bars that fill from the right (food,
+- Flair that reaches into the bar area of an empty slot gets covered by the fill. decorations are drawn after the fill.
+- **decoration active** replaces the decoration while the bar is completely full.
+- Paint every bar **filling from the left**, with its decoration at the right end. Bars that fill from the right (food,
   air and mount health by default, or any bar a player flips) are drawn mirrored.
 - **Poisoned** and **withered** replace the health row while the effect lasts. Withered wins over poisoned.
 - **Hunger** replaces the food row during the Hunger effect.
@@ -131,7 +131,7 @@ Row bars, one row each:
   the flash full bar shows the health just lost. While poisoned or withered, the flash poisoned or flash withered
   fill shows it instead.
 - **Hardcore** is drawn on top of the health bar in Hardcore worlds, whatever state it is in: its empty over the empty
-  bar, its full over the fill. Its ornaments replace the health ornaments. Leave it transparent where the bar should
+  bar, its full over the fill. Its decorations replace the health decorations. Leave it transparent where the bar should
   show through.
 - **Health regen shine** is a 9 x 9 piece (25 x 25 with its 8 px space), drawn whole on top of the health bar during
   Regeneration. It steps along the bar one heart width (8 px) per tick, like vanilla's heart wave.

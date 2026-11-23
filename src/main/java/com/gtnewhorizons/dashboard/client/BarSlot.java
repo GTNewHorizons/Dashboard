@@ -37,8 +37,8 @@ public enum BarSlot {
     public enum Layer {
         EMPTY,
         FULL,
-        ORNAMENT,
-        ORNAMENT_ACTIVE
+        DECORATION,
+        DECORATION_ACTIVE
     }
 
     private static final int ROW_SLOT_WIDTH = 97;
