@@ -27,6 +27,10 @@ public final class Icons {
     public static final int HELP = 6;
     public static final int DECORATION_OFF = 7;
     public static final int DECORATION_ON = 8;
+    public static final int NUMBER_OFF = 9;
+    public static final int NUMBER_ON = 10;
+    public static final int NUMBER_STYLE = 11;
+    public static final int DECIMALS = 12;
 
     public static final int SMALL_TICK_BOX = 0;
     public static final int SMALL_TICK_BOX_TICKED = 1;
