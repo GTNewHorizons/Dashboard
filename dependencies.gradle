@@ -15,6 +15,7 @@ dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Botania:1.13.37-GTNH:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:EnderIO:2.10.53:dev")
     runtimeOnlyNonPublishable("ganymedes01.etfuturum:Et-Futurum-Requiem:2.6.64-GTNH:dev")
+    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:extrautilities-225561:2264383")) // 1.2.12
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Galacticraft:3.4.34-GTNH:dev") // Needs tinker
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Galaxy-Space-GTNH:1.1.143-GTNH:dev") // Needs Galacticraft and Tinker
     runtimeOnlyNonPublishable(deobf("https://forum.industrial-craft.net/core/attachment/4519-gravisuite-1-7-10-2-0-3-jar")) // Needs IC2

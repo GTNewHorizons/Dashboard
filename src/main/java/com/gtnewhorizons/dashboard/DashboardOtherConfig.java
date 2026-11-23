@@ -26,6 +26,11 @@ public class DashboardOtherConfig {
     @Config.RangeInt(min = 0, max = PickupFeed.MAX_SLIDE_OUT_MILLIS)
     public static int pickupFeedSlideOutMillis;
 
+    @Config.Comment("Draw the Extra Utilities /xu_tps line with the HUD, behind open screens. Off: over everything, like Extra Utilities does")
+    @Config.LangKey("dashboard.config.other.extra_utilities_tps_with_hud")
+    @Config.DefaultBoolean(true)
+    public static boolean extraUtilitiesTpsWithHud;
+
     @Config.Comment("Which of the HUD layouts is used. Each one remembers its own element positions, sizes and looks")
     @Config.LangKey("dashboard.config.other.active_layout")
     @Config.DefaultInt(1)
