@@ -25,6 +25,8 @@ public final class Icons {
     public static final int REMOVE = 4;
     public static final int HELD = 5;
     public static final int HELP = 6;
+    public static final int DECORATION_OFF = 7;
+    public static final int DECORATION_ON = 8;
 
     public static final int SMALL_TICK_BOX = 0;
     public static final int SMALL_TICK_BOX_TICKED = 1;

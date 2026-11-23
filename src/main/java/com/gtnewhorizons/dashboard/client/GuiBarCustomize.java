@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -44,6 +45,7 @@ public class GuiBarCustomize extends GuiScreen {
     private static final int BUTTON_ALL_NUMBERS = 9;
     private static final int BUTTON_ALL_NUMBER_STYLES = 10;
     private static final int BUTTON_ALL_NUMBER_DECIMALS = 11;
+    private static final int BUTTON_RESET_DECORATIONS = 12;
     private static final int BUTTON_RESET_CROSSHAIR = 14;
     private static final int BUTTON_TINKERS_CROSSHAIR = 15;
     private static final int BUTTON_AVOID_OVERLAP = 16;
@@ -94,12 +96,14 @@ public class GuiBarCustomize extends GuiScreen {
     private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
     private final GuiButton themeButton = GuiHelpers.button(0, 0, THEME_BUTTON_WIDTH);
     private final IconButton flipButton = GuiHelpers.iconButton(0, 0, FLIP_BUTTON_WIDTH, Icons.ARROW_RIGHT);
+    private final IconButton decorationButton = GuiHelpers.iconButton(0, 0, FLIP_BUTTON_WIDTH, Icons.DECORATION_ON);
     private final GuiButton numberButton = GuiHelpers.button(0, 0, NUMBER_BUTTON_WIDTH);
     private final GuiButton numberStyleButton = GuiHelpers.button(0, 0, NUMBER_STYLE_BUTTON_WIDTH);
     private final GuiButton decimalsButton = GuiHelpers.button(0, 0, DECIMALS_BUTTON_WIDTH);
     private BarList list;
     private GuiButton allButton;
     private GuiButton resetFlipsButton;
+    private GuiButton resetDecorationsButton;
     private GuiButton allNumbersButton;
     private GuiButton allNumberStylesButton;
     private GuiButton allDecimalsButton;
@@ -185,7 +189,7 @@ public class GuiBarCustomize extends GuiScreen {
             int rowWidth = row.number != null && !row.numberOnly ? row.slot.width + numberSampleWidth : row.slot.width;
             previewWidth = Math.max(previewWidth, rowWidth);
         }
-        int themeWidth = THEME_BUTTON_WIDTH + COLUMN_GAP + FLIP_BUTTON_WIDTH;
+        int themeWidth = THEME_BUTTON_WIDTH + (COLUMN_GAP + FLIP_BUTTON_WIDTH) * 2;
         int numbersWidth = NUMBER_BUTTON_WIDTH + COLUMN_GAP
             + NUMBER_STYLE_BUTTON_WIDTH
             + COLUMN_GAP
@@ -207,6 +211,8 @@ public class GuiBarCustomize extends GuiScreen {
         resetButton = GuiHelpers.button(BUTTON_RESET, 0, SECTION_BUTTON_WIDTH, reset);
         allButton = GuiHelpers.button(BUTTON_ALL, left + getButtonX(), THEME_BUTTON_WIDTH);
         resetFlipsButton = GuiHelpers.iconButton(BUTTON_RESET_FLIPS, left + getFlipX(), FLIP_BUTTON_WIDTH, Icons.RESET);
+        resetDecorationsButton = GuiHelpers
+            .iconButton(BUTTON_RESET_DECORATIONS, left + getDecorationX(), FLIP_BUTTON_WIDTH, Icons.DECORATION_ON);
         allNumbersButton = GuiHelpers.button(BUTTON_ALL_NUMBERS, left + getNumberX(), NUMBER_BUTTON_WIDTH);
         allNumberStylesButton = GuiHelpers
             .button(BUTTON_ALL_NUMBER_STYLES, left + getNumberStyleX(), NUMBER_STYLE_BUTTON_WIDTH);
@@ -234,7 +240,7 @@ public class GuiBarCustomize extends GuiScreen {
 
         addHeader("dashboard.customize.section.bars");
         if (twoLines) {
-            lines.add(new Line(getAllBarsName(), allButton, resetFlipsButton));
+            lines.add(new Line(getAllBarsName(), allButton, resetFlipsButton, resetDecorationsButton));
             lines.add(new Line(null, allNumbersButton, allNumberStylesButton, allDecimalsButton));
         } else {
             lines.add(
@@ -242,6 +248,7 @@ public class GuiBarCustomize extends GuiScreen {
                     getAllBarsName(),
                     allButton,
                     resetFlipsButton,
+                    resetDecorationsButton,
                     allNumbersButton,
                     allNumberStylesButton,
                     allDecimalsButton));
@@ -356,7 +363,8 @@ public class GuiBarCustomize extends GuiScreen {
         String mixed = StatCollector.translateToLocal("dashboard.customize.mixed");
         allBarsLabel = allBarsMatch() ? getThemeName(HudLayout.getTheme(bars.get(0))) : mixed;
         allButton.displayString = fitToButton(allBarsLabel, allButton);
-        resetFlipsButton.enabled = anyBarFlipped();
+        resetFlipsButton.enabled = anyBar(HudLayout::isFlipped);
+        resetDecorationsButton.enabled = anyBar(HudLayout::isDecorationHidden);
 
         int numbersOn = countNumbersOn();
         allNumbersButton.displayString = numbersOn == numbers.size() ? GuiHelpers.getOnOff(true)
@@ -368,7 +376,8 @@ public class GuiBarCustomize extends GuiScreen {
         allDecimalsButton.displayString = decimals != null ? getDecimalsLabel(decimals) : mixed;
         allDecimalsButton.enabled = numbersOn > 0;
 
-        resetButton.enabled = resetFlipsButton.enabled || anyBarThemed()
+        resetButton.enabled = resetFlipsButton.enabled || resetDecorationsButton.enabled
+            || anyBarThemed()
             || numbersOn > 0
             || style != NumberStyle.SLASH
             || anyDecimalsChanged();
@@ -541,8 +550,12 @@ public class GuiBarCustomize extends GuiScreen {
         return getButtonX() + THEME_BUTTON_WIDTH + COLUMN_GAP;
     }
 
+    private int getDecorationX() {
+        return getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+    }
+
     private int getNumberX() {
-        return twoLines ? getButtonX() : getFlipX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
+        return twoLines ? getButtonX() : getDecorationX() + FLIP_BUTTON_WIDTH + COLUMN_GAP;
     }
 
     private int getNumberStyleX() {
@@ -602,9 +615,9 @@ public class GuiBarCustomize extends GuiScreen {
         return true;
     }
 
-    private boolean anyBarFlipped() {
+    private boolean anyBar(Predicate<HudElement> check) {
         for (HudElement bar : bars) {
-            if (HudLayout.isFlipped(bar)) {
+            if (check.test(bar)) {
                 return true;
             }
         }
@@ -656,6 +669,7 @@ public class GuiBarCustomize extends GuiScreen {
     private List<String> getButtonTooltip(GuiButton button) {
         return switch (button.id) {
             case BUTTON_RESET_FLIPS -> GuiHelpers.getTooltip("dashboard.customize.reset_flips");
+            case BUTTON_RESET_DECORATIONS -> GuiHelpers.getTooltip("dashboard.customize.reset_decorations");
             case BUTTON_ALL -> GuiHelpers.getCutTooltip(button.displayString, allBarsLabel);
             case BUTTON_ALL_NUMBERS -> GuiHelpers.getTooltip("dashboard.customize.number");
             case BUTTON_ALL_NUMBER_STYLES -> getStyleTooltip(getCommonNumberStyle());
@@ -736,6 +750,7 @@ public class GuiBarCustomize extends GuiScreen {
         if (first && !row.state && !row.numberOnly) {
             rowButtons.add(themeButton);
             rowButtons.add(flipButton);
+            rowButtons.add(decorationButton);
         }
         if (last && row.number != null) {
             rowButtons.add(numberButton);
@@ -757,6 +772,11 @@ public class GuiBarCustomize extends GuiScreen {
         flipButton.yPosition = y;
         flipButton.icon = BarThemes.fillsFromRight(bar, slots.get(row.barIndex)) ? Icons.ARROW_LEFT : Icons.ARROW_RIGHT;
         flipButton.enabled = theme != null;
+
+        decorationButton.xPosition = left + getDecorationX();
+        decorationButton.yPosition = y;
+        decorationButton.icon = HudLayout.isDecorationHidden(bar) ? Icons.DECORATION_OFF : Icons.DECORATION_ON;
+        decorationButton.enabled = theme != null;
 
         if (row.number != null) {
             boolean on = HudLayout.isNumberOn(row.number);
@@ -798,6 +818,11 @@ public class GuiBarCustomize extends GuiScreen {
                     HudLayout.setFlipped(bar, false);
                 }
             }
+            case BUTTON_RESET_DECORATIONS -> {
+                for (HudElement bar : bars) {
+                    HudLayout.setDecorationHidden(bar, false);
+                }
+            }
             case BUTTON_ALL_NUMBERS -> toggleAllNumbers();
             case BUTTON_ALL_NUMBER_STYLES -> stepAllNumberStyles();
             case BUTTON_ALL_NUMBER_DECIMALS -> stepAllDecimals();
@@ -829,6 +854,7 @@ public class GuiBarCustomize extends GuiScreen {
                 for (HudElement bar : bars) {
                     HudLayout.setTheme(bar, null);
                     HudLayout.setFlipped(bar, false);
+                    HudLayout.setDecorationHidden(bar, false);
                 }
                 for (HudElement number : numbers) {
                     HudLayout.setNumberOn(number, false);
@@ -1166,6 +1192,14 @@ public class GuiBarCustomize extends GuiScreen {
             if (button == flipButton) {
                 return GuiHelpers.getTooltip("dashboard.customize.fill_direction");
             }
+            if (button == decorationButton) {
+                String shown = HudLayout.isDecorationHidden(bars.get(row.barIndex)) ? "hidden" : "shown";
+                return Arrays.asList(
+                    StatCollector.translateToLocalFormatted(
+                        "dashboard.customize.decorations",
+                        StatCollector.translateToLocal("dashboard.customize.decorations." + shown)),
+                    EnumChatFormatting.GRAY + StatCollector.translateToLocal("dashboard.customize.decorations.note"));
+            }
             if (button == numberButton) {
                 return GuiHelpers.getTooltip("dashboard.customize.number");
             }
@@ -1211,6 +1245,8 @@ public class GuiBarCustomize extends GuiScreen {
                 HudLayout.setTheme(bar, stepTheme(HudLayout.getTheme(bar)));
             } else if (button == flipButton) {
                 HudLayout.setFlipped(bar, !isCtrlKeyDown() && !HudLayout.isFlipped(bar));
+            } else if (button == decorationButton) {
+                HudLayout.setDecorationHidden(bar, !isCtrlKeyDown() && !HudLayout.isDecorationHidden(bar));
             } else if (button == numberButton) {
                 HudLayout.setNumberOn(row.number, !isCtrlKeyDown() && !HudLayout.isNumberOn(row.number));
             } else if (button == numberStyleButton) {
