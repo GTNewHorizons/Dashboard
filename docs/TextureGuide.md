@@ -118,10 +118,10 @@ Row bars, one row each:
 
 - Every slot is drawn exactly as painted. A transparent slot draws nothing, so state rows (poisoned, withered, flash,
   hunger) need their empty bar and decorations painted too, not only the fill.
-- **Empty** slots and **decorations** are drawn whole, including their 8 px space. Paint outlines, glow and frames there.
+- **Empty** slots and **Decorations** are drawn whole, including their 8 px space. Paint outlines, glow and frames there.
 - **Full** slots are cut to how full the bar is, and only the bar area is used. Their 8 px space is ignored.
 - Flair that reaches into the bar area of an empty slot gets covered by the fill. decorations are drawn after the fill.
-- **decoration active** replaces the decoration while the bar is completely full.
+- **Decoration active** replaces the decoration while the bar is completely full.
 - Paint every bar **filling from the left**, with its decoration at the right end. Bars that fill from the right (food,
   air and mount health by default, or any bar a player flips) are drawn mirrored.
 - **Poisoned** and **withered** replace the health row while the effect lasts. Withered wins over poisoned.

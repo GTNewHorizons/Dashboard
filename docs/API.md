@@ -2,8 +2,8 @@
 
 How a mod makes its own HUD movable, resizable and hideable in Dashboard's HUD editor, without depending on Dashboard.
 
-Up to date with **Dashboard 1.0.23**. Newer releases may add API not covered here, see the
-[version table](#2-minimum-dashboard-version).
+Up to date with **Dashboard 1.0.26**. The [version table](#2-minimum-dashboard-version) shows which release added
+what.
 
 The whole API is five classes in
 [`com.gtnewhorizons.dashboard.api`](../src/main/java/com/gtnewhorizons/dashboard/api), only for use on the client:
@@ -80,6 +80,7 @@ Compiling against that same minimum makes it impossible to use newer API by acci
 | 1.0.20 | Lang keys for TaskNH, Akashic Tome and LootGames |
 | 1.0.21 to 1.0.22 | No API changes |
 | 1.0.23 | [Avoid Overlap](#avoid-overlap): `setAvoid`, `setAvoidSides`, `AvoidSide` and `setNeverMove` |
+| 1.0.24 to 1.0.26 | No API changes |
 
 ### 3. One helper class
 
