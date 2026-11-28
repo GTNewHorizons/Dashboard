@@ -22,6 +22,8 @@ public enum Mixins implements IMixins {
     CHAT_IMAGES(
         new MixinBuilder("Move and zoom image elements while chat is open").addClientMixins("MixinGuiChat_Images")
             .setPhase(Phase.EARLY)),
+    CHAT(new MixinBuilder("Make the chat movable").addClientMixins("GuiNewChatAccessor")
+        .setPhase(Phase.EARLY)),
     BOSS_HEALTH(new MixinBuilder("Remember the boss for its health number").addClientMixins("MixinBossStatus")
         .setPhase(Phase.EARLY)),
     PICKUP_FEED(
