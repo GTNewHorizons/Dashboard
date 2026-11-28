@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -13,10 +14,13 @@ import java.util.function.Consumer;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ChatLine;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
@@ -48,6 +52,7 @@ import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
 import com.gtnewhorizons.dashboard.compat.AppleCoreCompat;
 import com.gtnewhorizons.dashboard.compat.Mods;
+import com.gtnewhorizons.dashboard.mixins.early.GuiNewChatAccessor;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -83,6 +88,8 @@ public final class VanillaHudElements {
     private static final int LEVEL_WIDTH = 30;
     private static final int ACHIEVEMENT_WIDTH = 160;
     private static final int ACHIEVEMENT_HEIGHT = 32;
+    private static final int CHAT_LINE_HEIGHT = 9;
+    private static final int CHAT_FADE_TICKS = 200;
 
     public static final HudElement ITEM_NAME = new HudElement(
         "minecraft:item_name",
@@ -112,6 +119,11 @@ public final class VanillaHudElements {
         "dashboard.element.minecraft.achievement",
         (w, h) -> new HudBounds(w - ACHIEVEMENT_WIDTH, 0, ACHIEVEMENT_WIDTH, ACHIEVEMENT_HEIGHT));
 
+    public static final HudElement CHAT = new HudElement(
+        "minecraft:chat",
+        "dashboard.element.minecraft.chat",
+        VanillaHudElements::getChatBounds);
+
     private static final ResourceLocation ACHIEVEMENT_BACKGROUND = new ResourceLocation(
         "textures/gui/achievement/achievement_background.png");
 
@@ -129,6 +141,8 @@ public final class VanillaHudElements {
         PreviewDrawing.setImitationInBounds(SCOREBOARD, VanillaHudElements::drawScoreboardPreview);
         HudRegistry.register(ACHIEVEMENT);
         PreviewDrawing.setImitationInBounds(ACHIEVEMENT, VanillaHudElements::drawAchievementPreview);
+        HudRegistry.register(CHAT);
+        PreviewDrawing.setImitationInBounds(CHAT, VanillaHudElements::drawChatPreview);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
             ElementType.EXPERIENCE,
@@ -233,6 +247,95 @@ public final class VanillaHudElements {
             width = Math.max(width, font.getStringWidth(line));
         }
         return width;
+    }
+
+    /** Fits the chat; both open and closed, sized like GuiNewChat.drawChat. */
+    private static HudBounds getChatBounds(int screenWidth, int screenHeight) {
+        GameSettings settings = Minecraft.getMinecraft().gameSettings;
+        float scale = settings.chatScale;
+        int width = MathHelper.ceiling_float_int(getChatLineWidth(settings) * scale);
+        int height = MathHelper.ceiling_float_int(getChatLineCount(settings) * CHAT_LINE_HEIGHT * scale);
+        int bottom = screenHeight - 28;
+        return new HudBounds(2, bottom - height, width, height);
+    }
+
+    private static int getChatLineCount(GameSettings settings) {
+        return GuiNewChat.func_146243_b(Math.max(settings.chatHeightFocused, settings.chatHeightUnfocused))
+            / CHAT_LINE_HEIGHT;
+    }
+
+    /** Before the chat scale, with the background's margin. */
+    private static int getChatLineWidth(GameSettings settings) {
+        return MathHelper.ceiling_float_int(GuiNewChat.func_146233_a(settings.chatWidth) / settings.chatScale) + 4;
+    }
+
+    /** Open, or its newest message has not faded yet. */
+    private static boolean isChatShowing() {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.gameSettings.chatVisibility == EntityPlayer.EnumChatVisibility.HIDDEN) {
+            return false;
+        }
+        GuiNewChat chat = mc.ingameGUI.getChatGUI();
+        List<ChatLine> lines = ((GuiNewChatAccessor) chat).dashboard$getDrawnLines();
+        if (lines.isEmpty()) {
+            return false;
+        }
+        return chat.getChatOpen() || mc.ingameGUI.getUpdateCounter() - lines.get(0)
+            .getUpdatedCounter() < CHAT_FADE_TICKS;
+    }
+
+    /**
+     * A mouse position in raw screen pixels, y from the bottom, moved from where the chat is drawn to where vanilla
+     * expects it. Outside the chat when it is hidden.
+     */
+    public static int toVanillaChatMouse(int raw, boolean vertical) {
+        if (!HudLayout.isVisible(CHAT)) {
+            return -1;
+        }
+        ScaledResolution resolution = HudRegistry.getResolution();
+        int screenWidth = resolution.getScaledWidth();
+        int screenHeight = resolution.getScaledHeight();
+        int factor = resolution.getScaleFactor();
+        HudBounds defaultBounds = CHAT.getDefaultBounds(screenWidth, screenHeight);
+        HudBounds bounds = HudLayout.getBounds(CHAT, defaultBounds, screenWidth, screenHeight);
+        float scale = HudLayout.getScale(CHAT);
+        if (vertical) {
+            float y = screenHeight - raw / (float) factor;
+            float vanillaY = defaultBounds.y + (y - bounds.y) / scale;
+            return Math.round((screenHeight - vanillaY) * factor);
+        }
+        float x = raw / (float) factor;
+        float vanillaX = defaultBounds.x + (x - bounds.x) / scale;
+        return Math.round(vanillaX * factor);
+    }
+
+    /** Vanilla join and achievement messages, newest at the bottom, with vanilla's line backgrounds. */
+    private static void drawChatPreview(HudBounds bounds) {
+        Minecraft mc = Minecraft.getMinecraft();
+        FontRenderer font = mc.fontRenderer;
+        GameSettings settings = mc.gameSettings;
+        int lineWidth = getChatLineWidth(settings);
+        int alpha = (int) (255 * (settings.chatOpacity * 0.9f + 0.1f));
+        String achievement = EnumChatFormatting.GREEN + "["
+            + AchievementList.openInventory.func_150951_e()
+                .getUnformattedText()
+            + "]";
+        String[] messages = { StatCollector.translateToLocalFormatted("chat.type.achievement", "Alex", achievement),
+            EnumChatFormatting.YELLOW + StatCollector.translateToLocalFormatted("multiplayer.player.joined", "Alex"),
+            EnumChatFormatting.YELLOW + StatCollector.translateToLocalFormatted("multiplayer.player.joined", "Steve") };
+        int count = Math.min(messages.length, getChatLineCount(settings));
+
+        GL11.glPushMatrix();
+        GL11.glTranslatef(bounds.x, bounds.getBottom(), 0);
+        GL11.glScalef(settings.chatScale, settings.chatScale, 1);
+        for (int i = 0; i < count; i++) {
+            int lineBottom = -i * CHAT_LINE_HEIGHT;
+            Gui.drawRect(0, lineBottom - CHAT_LINE_HEIGHT, lineWidth, lineBottom, alpha / 2 << 24);
+            GL11.glEnable(GL11.GL_BLEND);
+            String text = font.trimStringToWidth(messages[i], lineWidth);
+            font.drawStringWithShadow(text, 0, lineBottom - 8, 0xFFFFFF | alpha << 24);
+        }
+        GL11.glPopMatrix();
     }
 
     /** 59px above the bottom screen border, or 14px lower without hearts and food (creative). */
@@ -457,6 +560,29 @@ public final class VanillaHudElements {
         } else {
             cancel(event);
             postSkippedEvent(event);
+        }
+    }
+
+    /**
+     * Runs last, so Et Futurum's subtitles drawn here stay in their corner. The editor shows the preview instead, since
+     * it pauses the game and with it the chat fade.
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onPreRenderChat(RenderGameOverlayEvent.Pre event) {
+        if (event.type != ElementType.CHAT) {
+            return;
+        }
+        if (HudRegistry.isLayoutScreenOpen()) {
+            event.setCanceled(true);
+            return;
+        }
+        if (!isChatShowing()) {
+            return;
+        }
+        if (HudRegistry.beginRender(CHAT, event.resolution)) {
+            SHIFTED.add(ElementType.CHAT);
+        } else {
+            event.setCanceled(true);
         }
     }
 
