@@ -115,6 +115,7 @@ dashboard.element.minecraft.item_name=Held Item Name
 dashboard.element.minecraft.action_bar=Action Bar
 dashboard.element.minecraft.scoreboard=Scoreboard
 dashboard.element.minecraft.achievement=Achievement Popup
+dashboard.element.minecraft.chat=Chat
 dashboard.element.minecraft.health_number=Health Number
 dashboard.element.minecraft.armor_number=Armor Number
 dashboard.element.minecraft.food_number=Food Number

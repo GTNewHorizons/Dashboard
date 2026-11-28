@@ -15,8 +15,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
@@ -112,6 +114,11 @@ public final class VanillaHudElements {
         "dashboard.element.minecraft.achievement",
         (w, h) -> new HudBounds(w - ACHIEVEMENT_WIDTH, 0, ACHIEVEMENT_WIDTH, ACHIEVEMENT_HEIGHT));
 
+    public static final HudElement CHAT = new HudElement(
+        "minecraft:chat",
+        "dashboard.element.minecraft.chat",
+        VanillaHudElements::getChatBounds);
+
     private static final ResourceLocation ACHIEVEMENT_BACKGROUND = new ResourceLocation(
         "textures/gui/achievement/achievement_background.png");
 
@@ -129,6 +136,7 @@ public final class VanillaHudElements {
         PreviewDrawing.setImitationInBounds(SCOREBOARD, VanillaHudElements::drawScoreboardPreview);
         HudRegistry.register(ACHIEVEMENT);
         PreviewDrawing.setImitationInBounds(ACHIEVEMENT, VanillaHudElements::drawAchievementPreview);
+        HudRegistry.register(CHAT);
         add(ElementType.HOTBAR, "hotbar", (w, h) -> new HudBounds(w / 2 - 91, h - 22, BAR_WIDTH, 22));
         HudElement experience = add(
             ElementType.EXPERIENCE,
@@ -233,6 +241,18 @@ public final class VanillaHudElements {
             width = Math.max(width, font.getStringWidth(line));
         }
         return width;
+    }
+
+    /** Fits the chat; both open and closed, sized like GuiNewChat.drawChat. */
+    private static HudBounds getChatBounds(int screenWidth, int screenHeight) {
+        GameSettings settings = Minecraft.getMinecraft().gameSettings;
+        float scale = settings.chatScale;
+        int lines = GuiNewChat.func_146243_b(Math.max(settings.chatHeightFocused, settings.chatHeightUnfocused)) / 9;
+        int lineWidth = MathHelper.ceiling_float_int(GuiNewChat.func_146233_a(settings.chatWidth) / scale) + 4;
+        int width = MathHelper.ceiling_float_int(lineWidth * scale);
+        int height = MathHelper.ceiling_float_int(lines * 9 * scale);
+        int bottom = screenHeight - 28;
+        return new HudBounds(2, bottom - height, width, height);
     }
 
     /** 59px above the bottom screen border, or 14px lower without hearts and food (creative). */
