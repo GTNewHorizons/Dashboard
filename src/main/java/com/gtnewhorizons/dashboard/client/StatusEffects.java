@@ -28,6 +28,7 @@ import com.gtnewhorizons.dashboard.api.HudElement;
 import com.gtnewhorizons.dashboard.api.HudRegistry;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -71,8 +72,14 @@ public final class StatusEffects {
         "dashboard.element.minecraft.status_effects",
         StatusEffects::getBounds).setModId(Dashboard.MODID);
 
+    private static final int KEPT_UP_MAX_TICKS = 40 * 20;
+    private static final int KEPT_UP_RENEWALS = 2;
+
     private static long widthKey = Long.MIN_VALUE;
     private static int measuredWidth;
+    // By potion id
+    private static int[] lastTicks = new int[0];
+    private static int[] renewals = new int[0];
 
     private StatusEffects() {}
 
@@ -191,9 +198,46 @@ public final class StatusEffects {
         return shown;
     }
 
-    /** Infinite, or kept up by a beacon. */
+    /** Infinite, or kept up by a beacon, equipment or food. */
     private static boolean isPermanent(PotionEffect effect) {
-        return effect.getIsPotionDurationMax() || effect.getIsAmbient();
+        int id = effect.getPotionID();
+        return effect.getIsPotionDurationMax() || effect.getIsAmbient()
+            || id < renewals.length && renewals[id] >= KEPT_UP_RENEWALS;
+    }
+
+    /** Counts how often each short effect gets topped up, until it ends. */
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
+        int size = Potion.potionTypes.length;
+        if (lastTicks.length != size) {
+            lastTicks = new int[size];
+            renewals = new int[size];
+        }
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        for (int id = 0; id < size; id++) {
+            if (lastTicks[id] != 0 && (player == null || !player.isPotionActive(id))) {
+                lastTicks[id] = 0;
+                renewals[id] = 0;
+            }
+        }
+        if (player == null) {
+            return;
+        }
+        for (Object entry : player.getActivePotionEffects()) {
+            PotionEffect effect = (PotionEffect) entry;
+            int id = effect.getPotionID();
+            if (id >= size || effect.getIsPotionDurationMax()) {
+                continue;
+            }
+            int ticks = effect.getDuration();
+            if (lastTicks[id] > 0 && ticks > lastTicks[id] && ticks <= KEPT_UP_MAX_TICKS) {
+                renewals[id]++;
+            }
+            lastTicks[id] = Math.max(1, ticks);
+        }
     }
 
     /** Measured again only when an effect, its time in seconds or a shown part changes. */

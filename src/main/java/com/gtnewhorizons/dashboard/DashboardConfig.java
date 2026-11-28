@@ -148,7 +148,7 @@ public class DashboardConfig {
     @Config.DefaultBoolean(false)
     public static boolean statusEffectSortByTime;
 
-    @Config.Comment("Show infinite status effects and the ones kept up by a beacon")
+    @Config.Comment("Show infinite status effects and the ones kept up by a beacon, equipment or food")
     @Config.LangKey("dashboard.config.editor.status_effect_permanent")
     @Config.DefaultBoolean(true)
     public static boolean statusEffectPermanent;
