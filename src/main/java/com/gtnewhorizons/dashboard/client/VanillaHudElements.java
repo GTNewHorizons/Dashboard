@@ -480,6 +480,19 @@ public final class VanillaHudElements {
         }
     }
 
+    /** Runs last, so Et Futurum's subtitles drawn here stay in their corner. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onPreRenderChat(RenderGameOverlayEvent.Pre event) {
+        if (event.type != ElementType.CHAT) {
+            return;
+        }
+        if (HudRegistry.beginRender(CHAT, event.resolution)) {
+            SHIFTED.add(ElementType.CHAT);
+        } else {
+            event.setCanceled(true);
+        }
+    }
+
     /** A message above the hotbar, where music disc names show, but with a shadow like other HUD text. */
     public static void showShadowedActionBarText(String text) {
         shadowedActionBarText = text;
