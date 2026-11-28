@@ -284,6 +284,31 @@ public final class VanillaHudElements {
             .getUpdatedCounter() < CHAT_FADE_TICKS;
     }
 
+    /**
+     * A mouse position in raw screen pixels, y from the bottom, moved from where the chat is drawn to where vanilla
+     * expects it. Outside the chat when it is hidden.
+     */
+    public static int toVanillaChatMouse(int raw, boolean vertical) {
+        if (!HudLayout.isVisible(CHAT)) {
+            return -1;
+        }
+        ScaledResolution resolution = HudRegistry.getResolution();
+        int screenWidth = resolution.getScaledWidth();
+        int screenHeight = resolution.getScaledHeight();
+        int factor = resolution.getScaleFactor();
+        HudBounds defaultBounds = CHAT.getDefaultBounds(screenWidth, screenHeight);
+        HudBounds bounds = HudLayout.getBounds(CHAT, defaultBounds, screenWidth, screenHeight);
+        float scale = HudLayout.getScale(CHAT);
+        if (vertical) {
+            float y = screenHeight - raw / (float) factor;
+            float vanillaY = defaultBounds.y + (y - bounds.y) / scale;
+            return Math.round((screenHeight - vanillaY) * factor);
+        }
+        float x = raw / (float) factor;
+        float vanillaX = defaultBounds.x + (x - bounds.x) / scale;
+        return Math.round(vanillaX * factor);
+    }
+
     /** Vanilla join and achievement messages, newest at the bottom, with vanilla's line backgrounds. */
     private static void drawChatPreview(HudBounds bounds) {
         Minecraft mc = Minecraft.getMinecraft();
