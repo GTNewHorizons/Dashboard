@@ -38,8 +38,6 @@ public class GuiBarCustomize extends GuiScreen {
 
     private static final int BUTTON_DONE = 0;
     private static final int BUTTON_STATES = 3;
-    private static final int SCROLL_UP = 4;
-    private static final int SCROLL_DOWN = 5;
     private static final int BUTTON_CROSSHAIR_STYLE = 7;
     private static final int BUTTON_CROSSHAIR_SIZE = 8;
     private static final int BUTTON_RESET_CROSSHAIR = 14;
@@ -88,8 +86,6 @@ public class GuiBarCustomize extends GuiScreen {
     private final List<List<HudElement>> barNumbers = new ArrayList<>();
     private final List<Line> lines = new ArrayList<>();
     private final List<HudElement> numbers = new ArrayList<>();
-    private final GuiButton scrollUp = new GuiButton(SCROLL_UP, 0, 0, "");
-    private final GuiButton scrollDown = new GuiButton(SCROLL_DOWN, 0, 0, "");
     private final GuiButton themeButton = GuiHelpers.button(0, 0, THEME_BUTTON_WIDTH);
     private final IconButton moreSettingsButton = GuiHelpers.iconButton(0, 0, ICON_BUTTON_WIDTH, Icons.MORE_SETTINGS);
     private final IconButton barResetButton = GuiHelpers.iconButton(0, 0, ICON_BUTTON_WIDTH, Icons.RESET);
@@ -254,7 +250,6 @@ public class GuiBarCustomize extends GuiScreen {
         addSectionEnd(avoidOverlapButton, avoidOverlapAutoButton);
 
         list = new BarList();
-        list.registerScrollButtons(buttonList, SCROLL_UP, SCROLL_DOWN);
         LIST_SCROLL.setValue(list, scroll);
 
         int bottomY = height - LIST_BOTTOM_MARGIN + (LIST_BOTTOM_MARGIN - GuiHelpers.BUTTON_HEIGHT) / 2;
@@ -738,16 +733,6 @@ public class GuiBarCustomize extends GuiScreen {
     private void place(GuiButton button, int x, int y) {
         button.xPosition = getContentLeft() + x;
         button.yPosition = y;
-    }
-
-    /** The Forge list misses wheel events. */
-    @Override
-    public void handleMouseInput() {
-        super.handleMouseInput();
-        int wheel = Mouse.getEventDWheel();
-        if (wheel != 0) {
-            list.actionPerformed(wheel > 0 ? scrollUp : scrollDown);
-        }
     }
 
     @Override
