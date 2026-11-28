@@ -14,8 +14,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 
 /**
- * Draws each status line itself instead of adding it to Forge's text list. An empty line stays in the list, so lines
- * other mods add after it keep their place. Not null, which other mods reading the list may not expect.
+ * Draws each status line itself instead of adding it to Forge's text list. A null line stays in the list, so lines
+ * other mods add after it keep their place. Null like Forge's own spacers, since Angelica draws a box behind an empty
+ * one.
  */
 @Pseudo
 @Mixin(targets = "iguanaman.hungeroverhaul.util.IguanaEventHook", remap = false)
@@ -29,6 +30,6 @@ public class MixinIguanaEventHook_Hud {
     private boolean dashboard$drawStatusLine(ArrayList<String> list, Object line, Operation<Boolean> original,
         @Local(argsOnly = true) RenderGameOverlayEvent.Text event) {
         HungerOverhaulCompat.drawLine(list == event.right, (String) line, list.size());
-        return original.call(list, "");
+        return original.call(list, null);
     }
 }
